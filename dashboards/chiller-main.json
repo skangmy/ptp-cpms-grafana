@@ -645,7 +645,7 @@
       ],
       "fiscalYearStartMonth": 0,
       "from": "now-6h",
-      "hideTimepicker": false,
+      "hideTimepicker": true,
       "timezone": "browser",
       "to": "now"
     },
