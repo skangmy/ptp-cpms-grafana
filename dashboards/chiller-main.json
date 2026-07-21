@@ -626,7 +626,9 @@
     ],
     "liveNow": false,
     "preload": false,
-    "tags": [],
+    "tags": [
+      "cpms"
+    ],
     "timeSettings": {
       "autoRefresh": "",
       "autoRefreshIntervals": [
