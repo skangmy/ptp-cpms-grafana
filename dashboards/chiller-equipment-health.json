@@ -1,0 +1,235 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "defsqnr8bjs3k0d"
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations \u0026 Alerts",
+          "query": {
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-api"
+                      },
+                      "group": "yesoreyeram-infinity-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "columns": [],
+                        "filters": [],
+                        "format": "table",
+                        "global_query_id": "",
+                        "parser": "backend",
+                        "root_selector": "",
+                        "source": "url",
+                        "type": "json",
+                        "url": "/cpms/telemetry/state",
+                        "url_options": {
+                          "data": "",
+                          "method": "GET"
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "convertFieldType",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "conversions": [
+                        {
+                          "destinationType": "other",
+                          "targetField": "chillers"
+                        },
+                        {
+                          "destinationType": "other",
+                          "enumConfig": {
+                            "text": [
+                              "{\"mv\":0,\"pv\":1.061,\"sv\":1.5}"
+                            ]
+                          },
+                          "targetField": "bypassValve"
+                        },
+                        {
+                          "destinationType": "other",
+                          "enumConfig": {
+                            "text": [
+                              "{\"chiller1\":\"LEAD\",\"chiller2\":\"LAG\",\"chiller3\":\"STANDBY\"}"
+                            ]
+                          },
+                          "targetField": "chillerPriority"
+                        },
+                        {
+                          "destinationType": "other",
+                          "targetField": "chwHeader"
+                        },
+                        {
+                          "destinationType": "other",
+                          "targetField": "coolingTowerPriority"
+                        },
+                        {
+                          "destinationType": "other",
+                          "targetField": "coolingTowers"
+                        },
+                        {
+                          "destinationType": "other",
+                          "targetField": "cwHeader"
+                        },
+                        {
+                          "destinationType": "other",
+                          "targetField": "cwPumps"
+                        },
+                        {
+                          "destinationType": "other",
+                          "targetField": "outdoor"
+                        }
+                      ],
+                      "fields": {}
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "function safe(value) {\n  return value === undefined || value === null || value === \"\"\n    ? \"-\"\n    : value;\n}\n\nfunction css(value) {\n  return String(safe(value))\n    .toLowerCase()\n    .replace(/[^a-z0-9]+/g, \"-\");\n}\n\nfunction badge(value, prefix) {\n  value = safe(value);\n  const className = prefix === \"quality\" \u0026\u0026 value === \"-\" ? \"quality-unknown\" : prefix + \"-\" + css(value);\n  return '\u003cspan class=\"badge ' + className + '\"\u003e' + value + '\u003c/span\u003e';\n}\n\nfunction stateBadges(device) {\n  let html = badge(device.state, \"state\");\n  if (device.trip) html += '\u003cspan class=\"badge event-trip\"\u003eTRIP\u003c/span\u003e';\n  if (device.alarm) html += '\u003cspan class=\"badge event-alarm\"\u003eALARM\u003c/span\u003e';\n  return html;\n}\n\nfunction buildPackages(state) {\n\n  const packages = [];\n\n  // ======================\n  // Chillers\n  // ======================\n\n  Object.values(state.chillers || {}).forEach(ch =\u003e {\n\n    packages.push({\n      name: ch.chillerId.toUpperCase(),\n      state: ch.state,\n      controlMode: ch.controlMode,\n      availability: ch.availability,\n      reason: ch.reason,\n      devices: [\n\n        {\n          type: \"Chiller\",\n          id: ch.chiller.deviceId,\n          mode: ch.chiller.mode,\n          remote: ch.chiller.remoteMode,\n          state: ch.chiller.state,\n          trip: ch.chiller.trip,\n          alarm: ch.chiller.alarm,\n          quality: ch.chiller.telemetryQuality,\n          reason: ch.chiller.reason\n        },\n\n        {\n          type: \"CHW Pump\",\n          id: ch.chwPump.deviceId,\n          mode: ch.chwPump.mode,\n          remote: ch.chwPump.remoteMode,\n          state: ch.chwPump.state,\n          trip: ch.chwPump.trip,\n          alarm: ch.chwPump.alarm,\n          quality: ch.chwPump.telemetryQuality,\n          reason: ch.chwPump.reason\n        },\n\n        {\n          type: \"CW Pump\",\n          id: ch.cwPump.deviceId,\n          mode: ch.cwPump.mode,\n          remote: ch.cwPump.remoteMode,\n          state: ch.cwPump.state,\n          trip: ch.cwPump.trip,\n          alarm: ch.cwPump.alarm,\n          quality: ch.cwPump.telemetryQuality,\n          reason: ch.cwPump.reason\n        }\n\n      ]\n    });\n\n  });\n\n  // ======================\n  // Cooling Towers\n  // ======================\n\n  Object.values(state.coolingTowers || {}).forEach(ct =\u003e {\n\n    const devices = [];\n\n    devices.push({\n      type: \"Cooling Tower\",\n      id: ct.towerId,\n      mode: ct.controlMode,\n      remote: ct.remoteMode,\n      state: ct.state,\n      trip: false,\n      alarm: false,\n      quality: \"-\",\n      reason: \"-\"\n    });\n\n    (ct.fans || []).forEach((fan, i) =\u003e {\n\n      devices.push({\n        type: \"Fan \" + (i + 1),\n        id: fan.deviceId,\n        mode: fan.mode,\n        remote: fan.remoteMode,\n        state: fan.state,\n        trip: fan.trip,\n        alarm: fan.alarm,\n        quality: fan.telemetryQuality,\n        reason: fan.reason\n      });\n\n    });\n\n    (ct.valves || []).forEach((valve, i) =\u003e {\n\n      devices.push({\n        type: i === 0 ? \"Inlet Valve\" : \"Outlet Valve\",\n        id: valve.deviceId,\n        mode: valve.mode,\n        remote: valve.remoteMode,\n        state: valve.state,\n        trip: valve.trip,\n        alarm: valve.alarm,\n        quality: valve.telemetryQuality,\n        reason: valve.reason\n      });\n\n    });\n\n    packages.push({\n      name: ct.towerId.toUpperCase(),\n      state: ct.state,\n      controlMode: ct.controlMode,\n      availability: ct.availability,\n      reason: ct.reason,\n      devices\n    });\n\n  });\n\n  return packages;\n}\n\nfunction renderDeviceStateTable(state) {\n\n  const packages = buildPackages(state);\n\n  let html = '' +\n    '\u003ctable class=\"device-table\"\u003e' +\n      '\u003cthead\u003e' +\n        '\u003ctr\u003e' +\n          '\u003cth\u003ePackage\u003c/th\u003e' +\n          '\u003cth\u003ePkg State\u003c/th\u003e' +\n          '\u003cth\u003eControl\u003c/th\u003e' +\n          '\u003cth\u003eAvailability\u003c/th\u003e' +\n          '\u003cth\u003ePkg Reason\u003c/th\u003e' +\n          '\u003cth\u003eDevice\u003c/th\u003e' +\n          '\u003cth\u003eID\u003c/th\u003e' +\n          '\u003cth\u003eMode\u003c/th\u003e' +\n          '\u003cth\u003eRemote\u003c/th\u003e' +\n          '\u003cth\u003eState\u003c/th\u003e' +\n          '\u003cth\u003eQuality\u003c/th\u003e' +\n          '\u003cth\u003eDevice Reason\u003c/th\u003e' +\n        '\u003c/tr\u003e' +\n      '\u003c/thead\u003e' +\n      '\u003ctbody\u003e';\n\n  packages.forEach(pkg =\u003e {\n\n    pkg.devices.forEach((device, index) =\u003e {\n\n      html += '\u003ctr\u003e';\n\n      if (index === 0) {\n\n        html += '' +\n          '\u003ctd rowspan=\"' + pkg.devices.length + '\" class=\"package-cell\"\u003e' + pkg.name + '\u003c/td\u003e' +\n          '\u003ctd rowspan=\"' + pkg.devices.length + '\" class=\"package-info-cell\"\u003e' + badge(pkg.state, \"state\") + '\u003c/td\u003e' +\n          '\u003ctd rowspan=\"' + pkg.devices.length + '\" class=\"package-info-cell\"\u003e' + badge(pkg.controlMode, \"mode\") + '\u003c/td\u003e' +\n          '\u003ctd rowspan=\"' + pkg.devices.length + '\" class=\"package-info-cell\"\u003e' + badge(pkg.availability, \"availability\") + '\u003c/td\u003e' +\n          '\u003ctd rowspan=\"' + pkg.devices.length + '\" class=\"package-reason-cell muted\"\u003e' + safe(pkg.reason) + '\u003c/td\u003e';\n\n      }\n\n      html += '' +\n        '\u003ctd\u003e' + device.type + '\u003c/td\u003e' +\n        '\u003ctd\u003e' + device.id + '\u003c/td\u003e' +\n        '\u003ctd\u003e' + badge(device.mode, \"mode\") + '\u003c/td\u003e' +\n        '\u003ctd\u003e' + badge(device.remote, \"remote\") + '\u003c/td\u003e' +\n        '\u003ctd class=\"state-cell\"\u003e' + stateBadges(device) + '\u003c/td\u003e' +\n        '\u003ctd\u003e' + badge(device.quality, \"quality\") + '\u003c/td\u003e' +\n        '\u003ctd class=\"muted\"\u003e' + safe(device.reason) + '\u003c/td\u003e';\n\n      html += '\u003c/tr\u003e';\n\n    });\n\n  });\n\n  html += '\u003c/tbody\u003e\u003c/table\u003e';\n\n  document.getElementById(\"device-state-table\").innerHTML = html;\n  document.getElementById(\"device-state-ts\").innerHTML = \"Last updated: \" + new Date(state.timestamp).toLocaleString();\n}\n\n// Usage:\n// renderDeviceStateTable(latestState);\nrenderDeviceStateTable(context.data);",
+                "content": "\u003cdiv id=\"cpms-device-state\"\u003e\n    \u003cdiv id=\"device-state-ts\"\u003eLast updated: ---\u003c/div\u003e\n    \u003cdiv id=\"device-state-table\"\u003e\u003c/div\u003e\n\u003c/div\u003e\n",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "markdown"
+                },
+                "editors": [
+                  "afterRender",
+                  "helpers",
+                  "styles"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "everyRow",
+                "styles": "#cpms-device-state {\n    font-family: Arial, sans-serif;\n}\n\n#cpms-device-state .device-table {\n    width: 100%;\n    border-collapse: collapse;\n    background: #fff;\n    font-size: 13px;\n}\n\n#cpms-device-state .device-table th,\n#cpms-device-state .device-table td {\n    padding: 8px 10px;\n    border: 1px solid #ddd;\n    text-align: left;\n    vertical-align: middle;\n}\n\n#cpms-device-state .device-table th {\n    background: #f1f5f9;\n    font-weight: 600;\n}\n\n#cpms-device-state .package-cell {\n    background: #f8fafc;\n    font-weight: bold;\n    white-space: nowrap;\n}\n\n#cpms-device-state .package-info-cell,\n#cpms-device-state .package-reason-cell {\n    background: #f8fafc;\n}\n\n#cpms-device-state .package-reason-cell {\n    min-width: 140px;\n}\n\n#cpms-device-state .badge {\n    display: inline-block;\n    min-width: 64px;\n    padding: 3px 8px;\n    border-radius: 999px;\n    font-size: 11px;\n    font-weight: 600;\n    text-align: center;\n}\n\n/* ---------- State ---------- */\n\n#cpms-device-state .state-off {\n    background: #e5e7eb;\n    color: #374151;\n}\n\n#cpms-device-state .state-on,\n#cpms-device-state .state-running {\n    background: #dcfce7;\n    color: #166534;\n}\n\n#cpms-device-state .state-starting {\n    background: #dbeafe;\n    color: #1d4ed8;\n}\n\n#cpms-device-state .state-stopping {\n    background: #fde68a;\n    color: #92400e;\n}\n\n#cpms-device-state .state-fault,\n#cpms-device-state .state-alarm,\n#cpms-device-state .state-lockout {\n    background: #fee2e2;\n    color: #991b1b;\n}\n\n#cpms-device-state .state-cell .badge + .badge {\n    margin-left: 4px;\n}\n\n#cpms-device-state .event-trip {\n    background: #991b1b;\n    color: #fff;\n}\n\n#cpms-device-state .event-alarm {\n    background: #f59e0b;\n    color: #111827;\n}\n\n/* ---------- Mode ---------- */\n\n#cpms-device-state .mode-auto,\n#cpms-device-state .remote-auto {\n    background: #dbeafe;\n    color: #1d4ed8;\n}\n\n#cpms-device-state .mode-manual,\n#cpms-device-state .remote-manual {\n    background: #fef3c7;\n    color: #92400e;\n}\n\n/* ---------- Availability ---------- */\n\n#cpms-device-state .availability-available {\n    background: #dcfce7;\n    color: #166534;\n}\n\n#cpms-device-state .availability-maintenance {\n    background: #fef7e2;\n    color: #99791b;\n}\n\n#cpms-device-state .availability-unavailable {\n    background: #fee2e2;\n    color: #991b1b;\n}\n\n\n/* ---------- Quality ---------- */\n\n#cpms-device-state .quality-good {\n    background: #dcfce7;\n    color: #166534;\n}\n\n#cpms-device-state .quality-stale,\n#cpms-device-state .quality-insufficient,\n#cpms-device-state .quality-fair {\n    background: #fef3c7;\n    color: #92400e;\n}\n\n#cpms-device-state .quality-missing,\n#cpms-device-state .quality-bad {\n    background: #fee2e2;\n    color: #991b1b;\n}\n\n#cpms-device-state .quality-unknown {\n    background: #e5e7eb;\n    color: #374151;\n}\n\n#cpms-device-state .muted {\n    color: #64748b;\n}",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              },
+              "height": 25,
+              "width": 24,
+              "x": 0,
+              "y": 0
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "cpms"
+    ],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-6h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "Chiller Equipment Health",
+    "variables": []
+  }
+}
