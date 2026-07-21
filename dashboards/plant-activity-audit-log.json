@@ -458,7 +458,7 @@
                     "cellOptions": {
                       "type": "auto"
                     },
-                    "filterable": false,
+                    "filterable": true,
                     "footer": {
                       "reducers": []
                     },
@@ -528,11 +528,36 @@
                         "value": 133
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*Value/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.filterable"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "reason",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.filterable"
+                      }
+                    ]
                   }
                 ]
               },
               "options": {
                 "cellHeight": "sm",
+                "enablePagination": true,
                 "showHeader": true,
                 "sortBy": []
               }
@@ -575,7 +600,20 @@
         ]
       }
     },
-    "links": [],
+    "links": [
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/plant-activity-audit-log.json"
+      }
+    ],
     "liveNow": false,
     "preload": false,
     "tags": [
