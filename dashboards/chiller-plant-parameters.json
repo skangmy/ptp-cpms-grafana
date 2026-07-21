@@ -1,0 +1,1285 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "defsqntfjbuv40a"
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations \u0026 Alerts",
+          "query": {
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "Scheduling",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\n  $(document).ready(function () {\n    const HOST = \"/cpms\";\n    let table;\n    let isEdit = false;\n\n    const GROUP = \"Scheduling\";\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\n    const rawData = context.data;\n    const data = Array.isArray(rawData)\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\n      : [];\n\n    const isBooleanParam = (row) =\u003e row.key === \"schedule.enabled\";\n    const isEnabled = (value) =\u003e value === true || value === \"true\";\n\n    table = new DataTable(\"#ptp-table-1\", {\n      retrieve: true,\n      searching: false,\n      paging: false,\n      pageLength: 10,\n      lengthChange: false,\n      ordering: true,\n      info: false,\n      data: data ?? [],\n      order: [[0, \"asc\"]],\n      columns: [\n        {\n          data: null,\n          className: \"col-setting\",\n          render: function (_, __, row) {\n            return '\u003cdiv class=\"ptp-label\"\u003e' + (grouping[GROUP][row.key] ?? '-') + '\u003c/div\u003e' +\n              '\u003cdiv class=\"ptp-hint\"\u003e' + (row.description ?? '') + '\u003c/div\u003e';\n          }\n        },\n        {\n          data: \"value\",\n          className: \"col-value ptp-value\",\n          render: function (value, _, row) {\n            if (row.isEditingRow \u0026\u0026 isBooleanParam(row)) {\n              const selected = isEnabled(value) ? \"true\" : \"false\";\n              return '\u003cdiv class=\"ptp-edit-row\"\u003e' +\n                '\u003cselect class=\"ptp-input ptp-boolean-field\"\u003e' +\n                '\u003coption value=\"true\" ' + (selected === \"true\" ? \"selected\" : \"\") + '\u003eEnabled\u003c/option\u003e' +\n                '\u003coption value=\"false\" ' + (selected === \"false\" ? \"selected\" : \"\") + '\u003eDisabled\u003c/option\u003e' +\n                '\u003c/select\u003e' +\n                '\u003cspan class=\"ptp-unit\"\u003e' + (row.unit ?? '') + '\u003c/span\u003e' +\n                '\u003c/div\u003e';\n            }\n\n            if (row.isEditingRow) {\n              const timeParts = String(value || \"00:00:00\").split(\":\");\n              const hours = timeParts[0] || \"00\";\n              const minutes = timeParts[1] || \"00\";\n              const seconds = timeParts[2] || \"00\";\n\n              return '\u003cdiv class=\"ptp-edit-row time-picker-group\"\u003e' +\n                '\u003cinput class=\"ptp-input ptp-time-field hh\" type=\"number\" min=\"0\" max=\"23\" placeholder=\"HH\" style=\"width: 50px; text-align: center;\" value=\"' + hours + '\"\u003e' +\n                '\u003cspan\u003e:\u003c/span\u003e' +\n                '\u003cinput class=\"ptp-input ptp-time-field mm\" type=\"number\" min=\"0\" max=\"59\" placeholder=\"MM\" style=\"width: 50px; text-align: center;\" value=\"' + minutes + '\"\u003e' +\n                '\u003cspan\u003e:\u003c/span\u003e' +\n                '\u003cinput class=\"ptp-input ptp-time-field ss\" type=\"number\" min=\"0\" max=\"59\" placeholder=\"SS\" style=\"width: 50px; text-align: center;\" value=\"' + seconds + '\"\u003e' +\n                '\u003cspan class=\"ptp-unit\"\u003e' + (row.unit ?? '') + '\u003c/span\u003e' +\n                '\u003c/div\u003e';\n            }\n\n            if (isBooleanParam(row)) return isEnabled(value) ? \"Enabled\" : \"Disabled\";\n            return String(value ?? \"-\") + ' \u003cspan class=\"ptp-unit\"\u003e' + (row.unit ?? '') + '\u003c/span\u003e';\n          }\n        },\n        {\n          data: null,\n          className: \"col-action dt-body-center\",\n          render: function (_, __, row) {\n            if (row.isLoading) return '\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e';\n            if (row.isEditingRow) {\n              return '\u003cdiv class=\"ptp-actions\"\u003e' +\n                '\u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e' +\n                '\u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e' +\n                '\u003c/div\u003e';\n            }\n            return '\u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ' + (row.isDisableEdit ? \"disabled\" : \"\") + '\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e';\n          }\n        }\n      ]\n    });\n\n    table.clear().rows.add(data).draw(false);\n    resetEvents();\n\n    function post(url, data) {\n      return new Promise((resolve, reject) =\u003e {\n        $.ajax({\n          url,\n          dataType: 'json',\n          type: 'post',\n          contentType: 'application/json',\n          data: JSON.stringify(data),\n          processData: false,\n          success: function (response) { resolve(response); },\n          error: function (jqXhr, textStatus, errorThrown) {\n            reject({ response: jqXhr.responseText, error: errorThrown });\n          },\n        });\n      });\n    }\n\n    function resetEvents() {\n      const tableEl = $(\"#ptp-table-1\");\n      tableEl.off();\n\n      tableEl.on(\"click\", \"button.editSetting\", function () {\n        const row = table.row($(this).closest(\"tr\"));\n        const data = row.data();\n        if (isEdit) return alert(\"Can only edit one record at a time\");\n        isEdit = true;\n        data.isEditingRow = true;\n        row.invalidate().draw(false);\n      });\n\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\n        const tr = $(this).closest(\"tr\");\n        const row = table.row(tr);\n        const data = row.data();\n        data.isLoading = true;\n\n        const handleValidationError = (message) =\u003e {\n          alert(message);\n          data.isLoading = false;\n          row.invalidate().draw(false);\n        };\n\n        let value;\n\n        if (isBooleanParam(data)) {\n          value = tr.find('.ptp-boolean-field').val() === 'true';\n        } else {\n          const hhRaw = String(tr.find('.ptp-time-field.hh').val() ?? '');\n          const mmRaw = String(tr.find('.ptp-time-field.mm').val() ?? '');\n          const ssRaw = String(tr.find('.ptp-time-field.ss').val() ?? '');\n\n          if (hhRaw.includes('.') || mmRaw.includes('.') || ssRaw.includes('.')) {\n            handleValidationError(\"Please enter whole numbers only. Decimals/floats are not allowed.\");\n            return;\n          }\n\n          const hhVal = parseInt(hhRaw, 10);\n          const mmVal = parseInt(mmRaw, 10);\n          const ssVal = parseInt(ssRaw, 10);\n\n          if (Number.isNaN(hhVal) || Number.isNaN(mmVal) || Number.isNaN(ssVal)) {\n            handleValidationError(\"Please enter a valid number for hours, minutes, and seconds.\");\n            return;\n          }\n\n          if (hhVal \u003c 0 || hhVal \u003e 23 || mmVal \u003c 0 || mmVal \u003e 59 || ssVal \u003c 0 || ssVal \u003e 59) {\n            handleValidationError(\"Please enter a valid time range (Hours between 0 and 23 || Minutes/Seconds between 0 and 59).\");\n            return;\n          }\n\n          value = String(hhVal).padStart(2, '0') + ':' + String(mmVal).padStart(2, '0') + ':' + String(ssVal).padStart(2, '0');\n        }\n\n        const payload = {\n          scope: data.scope,\n          equipmentKind: data.equipment_kind,\n          equipmentId: data.equipment_id,\n          key: data.key,\n          value,\n        };\n\n        row.invalidate().draw(false);\n\n        try {\n          if (data.value !== payload.value) await post(HOST + '/params/value', payload);\n          Object.assign(data, { value: payload.value, isEditingRow: false, isLoading: false });\n          isEdit = false;\n          row.invalidate().draw(false);\n          context.grafana.refresh();\n          setTimeout(() =\u003e alert(\"Updated!\"), 100);\n        } catch (e) {\n          data.isLoading = false;\n          row.invalidate().draw(false);\n          alert('Error: ' + (e.response ?? e.message));\n          console.error(e);\n        }\n      });\n\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\n        const row = table.row($(this).closest(\"tr\"));\n        const data = row.data();\n        data.isEditingRow = false;\n        isEdit = false;\n        row.invalidate().draw(false);\n      });\n    }\n  })\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-1\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-1\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 2,
+          "links": [],
+          "title": "Plant Warmup",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Plant Warmup\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n\r\n\r\n    table = new DataTable(\"#ptp-table-2\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue2\" class=\"ptp-input\" placeholder=\"Enter Numerical Value\" type=\"number\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-2\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: toPayloadValue(value, data),\r\n        };\r\n\r\n        try {\r\n          if (data.value !== payload.value) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-2\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-2\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 3,
+          "links": [],
+          "title": "Chiller Control \u0026 Setpoints",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Chiller Control \u0026 Setpoints\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n    table = new DataTable(\"#ptp-table-3\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue3\" class=\"ptp-input\" type=\"number\" placeholder=\"Enter Numerical Value\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-3\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: toPayloadValue(value, data),\r\n        };\r\n\r\n        try {\r\n          // Check if value actually changed before sending API call\r\n          if (data.value !== payload.value) {\r\n            // Modify endpoint template literal destination structure as needed\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-3\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-3\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 4,
+          "links": [],
+          "title": "Chiller Staging Thresholds \u0026 Delays",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Chiller Staging Thresholds \u0026 Delays\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n\r\n    table = new DataTable(\"#ptp-table-4\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue4\" class=\"ptp-input\" type=\"number\" placeholder=\"Enter Numerical Value\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-4\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: toPayloadValue(value, data),\r\n        };\r\n\r\n        row.invalidate().draw(false);\r\n\r\n        try {\r\n          if (data.value !== payload.value) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-4\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 5,
+          "links": [],
+          "title": "Cooling Tower Staging",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Cooling Tower Staging\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n\r\n    table = new DataTable(\"#ptp-table-5\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue5\" class=\"ptp-input\" type=\"number\" placeholder=\"Enter Numerical Value\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-5\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: $(\"#newValue5\").val(),\r\n        };\r\n\r\n        row.invalidate().draw(false);\r\n\r\n        try {\r\n          if (data.value !== payload.value) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          row.invalidate().draw(false);\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-5\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 6,
+          "links": [],
+          "title": "Fan Startup",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Fan Startup\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n\r\n    table = new DataTable(\"#ptp-table-6\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue6\" class=\"ptp-input\" type=\"number\" placeholder=\"Enter Numerical Value\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-6\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: toPayloadValue(value, data),\r\n        };\r\n\r\n        try {\r\n          if (data.value !== payload.value) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-6\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-6\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\" or r[\"deviceId\"] == \"cwHeader\" )\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"deltaT\" or r[\"_field\"] == \"cws\")\n  |\u003e mean()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\", \"deviceId\"], valueColumn: \"_value\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "data"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 7,
+          "links": [],
+          "title": "Pump \u0026 Fan Controllers",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(async function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Pump \u0026 Fan Controllers\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data[0];\r\n    let telemeryData = context.data[1].pop() ?? {};\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\r\n\r\n    table = new DataTable(\"#ptp-table-7\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      ordering: false,\r\n      lengthChange: false,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n      ],\r\n      columns: [\r\n        // 1. Setting Name Column\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n            \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n            \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n          `;\r\n          }\r\n        },\r\n        // 2. Enabled Column\r\n        {\r\n          data: \"value.enabled\",\r\n          className: \"col-value col-enabled dt-body-center\",\r\n          // width: \"54px\",\r\n          orderable: false,\r\n          render: function (data, type, row) {\r\n            const enabled = data !== false;\r\n            const disabled = row.isEditingRow ? \"\" : \"disabled\";\r\n            return `\u003cinput class=\"ptp-field\" data-field=\"enabled\" data-type=\"boolean\" type=\"checkbox\" style=\"width:16px;height:16px\" ${enabled ? \"checked\" : \"\"} ${disabled}\u003e`;\r\n          }\r\n        },\r\n        // 3. Fixed Hz Column\r\n        {\r\n          data: \"value.defaultHz\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            const value = data ?? 35;\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"defaultHz\" placeholder=\"Enter Numerical Value\" type=\"number\" step=\"0.1\" style=\"width:70px\" value=\"${value}\"\u003e`\r\n              : `${value}`;\r\n          }\r\n        },\r\n        // 4. Max Hz Column\r\n        {\r\n          data: \"value.maxHz\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"maxHz\" placeholder=\"Enter Numerical Value\" type=\"number\" style=\"width:60px\" value=\"${data ?? ''}\"\u003e`\r\n              : `${data ?? \"-\"}`;\r\n          }\r\n        },\r\n        // 5. Min Hz Column\r\n        {\r\n          data: \"value.minHz\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"minHz\" placeholder=\"Enter Numerical Value\" type=\"number\" style=\"width:60px\" value=\"${data ?? ''}\"\u003e`\r\n              : `${data ?? \"-\"}`;\r\n          }\r\n        },\r\n        // 6. Hold (s) Column\r\n        {\r\n          data: \"value.holdMs\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            const value = data === null || data === undefined || data === \"\" ? \"\" : Number(data) / 1000;\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"holdMs\" placeholder=\"Enter Numerical Value\" type=\"number\" step=\"0.001\" style=\"width:80px\" value=\"${value}\"\u003e`\r\n              : value === \"\" ? \"-\" : `${value}`;\r\n          }\r\n        },\r\n        // 7. Step Hz Column\r\n        {\r\n          data: \"value.stepHz\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"stepHz\" placeholder=\"Enter Numerical Value\" type=\"number\" style=\"width:60px\" value=\"${data ?? ''}\"\u003e`\r\n              : `${data ?? \"-\"}`;\r\n          }\r\n        },\r\n        // 8. Target Column\r\n        {\r\n          data: \"value.target\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"target\" placeholder=\"Enter Numerical Value\" type=\"number\" step=\"0.1\" style=\"width:60px\" value=\"${data ?? ''}\"\u003e`\r\n              : `${data ?? \"-\"}`;\r\n          }\r\n        },\r\n        // 9. Reading Column\r\n        {\r\n          data: \"value.target\",\r\n          className: \"col-value text-center\",\r\n          render: function (data, type, row) {\r\n            let value = null;\r\n            if (row.key === 'ct_fan.cws_controller') {\r\n              value = telemeryData['cws_cwHeader'];\r\n            } else if (row.key === 'cwp.delta_t_controller') {\r\n              value = telemeryData['deltaT_cwHeader'];\r\n            } else if (row.key === 'chwp.delta_t_controller') {\r\n              value = telemeryData['deltaT_chwHeader'];\r\n            }\r\n            if (value == null) return '-';\r\n\r\n            return value.toFixed(2);\r\n          }\r\n        },\r\n        // 9. Dwell (s) Column\r\n        {\r\n          data: \"value.dwellMs\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            const value = data === null || data === undefined || data === \"\" ? \"\" : Number(data) / 1000;\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"dwellMs\" placeholder=\"Enter Numerical Value\" type=\"number\" step=\"0.001\" style=\"width:80px\" value=\"${value}\"\u003e`\r\n              : value === \"\" ? \"-\" : `${value}`;\r\n          }\r\n        },\r\n        // 10. Deadband Column\r\n        {\r\n          data: \"value.deadband\",\r\n          className: \"col-value\",\r\n          render: function (data, type, row) {\r\n            return row.isEditingRow\r\n              ? `\u003cinput class=\"ptp-input ptp-field\" data-field=\"deadband\" placeholder=\"Enter Numerical Value\" type=\"number\" step=\"0.1\" style=\"width:60px\" value=\"${data ?? ''}\"\u003e`\r\n              : `${data ?? \"-\"}`;\r\n          }\r\n        },\r\n        // 11. Action Buttons Column\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n              \u003cdiv class=\"ptp-actions\"\u003e\r\n                \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n                \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n              \u003c/div\u003e\r\n            `;\r\n            }\r\n            return `\u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e`;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-7\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const valueObject = {};\r\n        let isValid = true;\r\n\r\n        tr.find('.ptp-field').each(function () {\r\n          const fieldName = $(this).data('field');\r\n          const fieldType = $(this).data('type');\r\n          let fieldValue = $(this).val();\r\n\r\n          if (fieldType === 'boolean') {\r\n            valueObject[fieldName] = $(this).is(':checked');\r\n            return;\r\n          }\r\n\r\n          // Cast string numbers to real JS numbers if filled\r\n          if (fieldValue !== \"\") {\r\n            const parsedValue = parseFloat(fieldValue, 10);\r\n\r\n            if (isNaN(parsedValue)) {\r\n              handleValidationError(`Please enter a valid number for ${fieldName}.`);\r\n              isValid = false;\r\n              return false;\r\n            }\r\n            // 2. Check if the number is negative\r\n            if (parsedValue \u003c 0) {\r\n              handleValidationError(`Please enter a number greater than or equal to 0 for ${fieldName}.`);\r\n              isValid = false;\r\n              return false;\r\n            }\r\n            fieldValue = fieldName.endsWith('Ms') ? Math.round(parsedValue * 1000) : parsedValue;\r\n          } else {\r\n            fieldValue = null;\r\n          }\r\n\r\n          valueObject[fieldName] = fieldValue;\r\n        });\r\n\r\n        if (!isValid) {\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: valueObject,\r\n        };\r\n\r\n\r\n        try {\r\n          if (JSON.stringify(data.value) !== JSON.stringify(payload.value)) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-7\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value col-enabled\"\u003eEnabled\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eFixed Speed (Hz)\n          \u003ci class=\"fa fa-info-circle\" aria-hidden=\"true\" title=\"Speed to apply when controller is not enabled\"\u003e\u003c/i\u003e\n        \u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eMax Speed (Hz)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eMin Speed (Hz)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eHold (s)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eStep Speed (Hz)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eTarget (°C)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eAvg Reading (°C)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eDwell (s)\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eDeadband (°C)\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-7\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value col-enabled\"\u003eEnabled\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eFixed Speed (Hz)\r\n          \u003ci class=\"fa fa-info-circle\" aria-hidden=\"true\" title=\"Speed to apply when controller is not enabled\"\u003e\u003c/i\u003e\r\n        \u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eMax Speed (Hz)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eMin Speed (Hz)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eHold (s)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eStep Speed (Hz)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eTarget (°C)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eAvg Reading (°C)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eDwell (s)\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eDeadband (°C)\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [
+                  {
+                    "id": "2508bbd2-ca1d-4c51-b750-9643916c32e0",
+                    "url": "https://cdn.datatables.net/2.3.8/css/dataTables.bootstrap5.min.css"
+                  }
+                ],
+                "helpers": "",
+                "renderMode": "data",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: 20%; }\r\n.ptp-table .col-value { width: 10%; }\r\n.ptp-table .col-action { width: 100px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 8,
+          "links": [],
+          "title": "Interlocking \u0026 Sequence Delays",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"Interlocking \u0026 Sequence Delays\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n\r\n\r\n    table = new DataTable(\"#ptp-table-8\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue8\" class=\"ptp-input\" placeholder=\"Enter Numerical Value\" type=\"number\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-8\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: toPayloadValue(value, data),\r\n        };\r\n\r\n        try {\r\n          if (data.value !== payload.value) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-8\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-8\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 9,
+          "links": [],
+          "title": "System \u0026 Diagnostics",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "import(\"/esm/datatables.net-bs5\").then(({ default: DataTable }) =\u003e {\r\n  $(document).ready(function () {\r\n    const HOST = \"/cpms\";\r\n    let table;\r\n    let isEdit = false;\r\n\r\n    const GROUP = \"System \u0026 Diagnostics\";\r\n    const grouping = JSON.parse(context.grafana.replaceVariables(\"$grouping\"));\r\n\r\n    let rawData = context.data;\r\n\r\n    const allowedKeys = grouping[GROUP] ? Object.keys(grouping[GROUP]) : [];\r\n\r\n    const data = Array.isArray(rawData)\r\n      ? rawData.filter(item =\u003e item \u0026\u0026 item.key \u0026\u0026 allowedKeys.includes(item.key))\r\n      : [];\n\n    const isMsParam = (row) =\u003e row \u0026\u0026 row.unit === \"ms\";\n    const formatUnit = (row) =\u003e isMsParam(row) ? \"s\" : (row.unit ?? \"\");\n    const formatValue = (value, row) =\u003e {\n      if (!isMsParam(row) || value === null || value === undefined || value === \"\") return value;\n      const seconds = Number(value) / 1000;\n      return Number.isInteger(seconds) ? seconds : Number(seconds.toFixed(3));\n    };\n    const toPayloadValue = (value, row) =\u003e isMsParam(row) ? Math.round(value * 1000) : value;\r\n\r\n    table = new DataTable(\"#ptp-table-9\", {\r\n      retrieve: true,\r\n      searching: false,\r\n      paging: false,\r\n      pageLength: 10,\r\n      lengthChange: false,\r\n      ordering: true,\r\n      info: false,\r\n      data: data ?? [],\r\n      order: [\r\n        [0, \"asc\"],\r\n        [1, \"asc\"],\r\n        [2, \"desc\"],\r\n      ],\r\n      columns: [\r\n        {\r\n          data: null,\r\n          className: \"col-setting\",\r\n          render: function (data, type, row) {\r\n            return `\r\n        \u003cdiv class=\"ptp-label\"\u003e${grouping[GROUP][row.key] ?? \"-\"}\u003c/div\u003e\r\n        \u003cdiv class=\"ptp-hint\"\u003e${row.description ?? \"\"}\u003c/div\u003e\r\n      `;\r\n          }\r\n        },\r\n        {\r\n          data: \"value\",\r\n          className: \"col-value ptp-value\",\r\n          render: function (data, type, row) {\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-edit-row\"\u003e\r\n            \u003cinput id=\"newValue9\" class=\"ptp-input\" placeholder=\"Enter Numerical Value\" type=\"number\" value=\"${formatValue(data, row) ?? ''}\"\u003e\r\n            \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `${formatValue(data, row) ?? \"-\"} \u003cspan class=\"ptp-unit\"\u003e${formatUnit(row)}\u003c/span\u003e`;\r\n          }\r\n        },\r\n        {\r\n          data: null,\r\n          className: \"col-action dt-body-center\",\r\n          render: function (_, __, row) {\r\n            if (row.isLoading) {\r\n              return `\u003ci class=\"fa fa-spinner fa-spin\"\u003e\u003c/i\u003e`;\r\n            }\r\n            if (row.isEditingRow) {\r\n              return `\r\n          \u003cdiv class=\"ptp-actions\"\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-save saveSetting btn-secondary\" type=\"button\" title=\"Save\" aria-label=\"Save\"\u003e\u003ci class=\"fa fa-check\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n            \u003cbutton class=\"ptp-btn ptp-btn-icon ptp-btn-cancel cancelSetting btn-secondary\" type=\"button\" title=\"Cancel\" aria-label=\"Cancel\"\u003e\u003ci class=\"fa fa-times\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n          \u003c/div\u003e\r\n        `;\r\n            }\r\n            return `\r\n        \u003cbutton class=\"ptp-btn ptp-btn-icon editSetting btn-secondary\" type=\"button\" title=\"Edit\" aria-label=\"Edit\" ${row.isDisableEdit ? \"disabled\" : \"\"}\u003e\u003ci class=\"fa fa-pencil\" aria-hidden=\"true\"\u003e\u003c/i\u003e\u003c/button\u003e\r\n      `;\r\n          }\r\n        }\r\n      ]\r\n    });\r\n\r\n    table.clear().rows.add(data).draw(false);\r\n    resetEvents();\r\n\r\n    function patch(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function put(url, data) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'put',\r\n          contentType: 'application/json',\r\n          data: JSON.stringify(data),\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function get(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'get',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function del(url) {\r\n      return new Promise((resolve, reject) =\u003e {\r\n        $.ajax({\r\n          url,\r\n          dataType: 'json',\r\n          type: 'post',\r\n          processData: false,\r\n          success: function (response, textStatus, jQxhr) {\r\n            resolve(response);\r\n          },\r\n          error: function (jqXhr, textStatus, errorThrown) {\r\n            reject({ response: jqXhr.responseText, error: errorThrown });\r\n          },\r\n        });\r\n      });\r\n    }\r\n\r\n    function resetEvents() {\r\n      const tableEl = $(\"#ptp-table-9\");\r\n      tableEl.off();\r\n\r\n      tableEl.on(\"click\", \"button.editSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n\r\n        if (isEdit) return alert(\"Can only edit one record at a time\");\r\n\r\n        isEdit = true;\r\n        data.isEditingRow = true;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.saveSetting\", async function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isLoading = true;\r\n\r\n        const handleValidationError = (message) =\u003e {\r\n          alert(message);\r\n          data.isLoading = false;\r\n        };\r\n\r\n        const rawValue = $(\".ptp-input\").val();\r\n\r\n        const value = parseFloat(rawValue, 10)\r\n\r\n        if (isNaN(value)) {\r\n          handleValidationError(\"Please enter a valid number.\");\r\n          return;\r\n        }\r\n\r\n        if (value \u003c 0) {\r\n          handleValidationError(\"Please enter a number more than 0.\");\r\n          return;\r\n        }\r\n\r\n        // Compile payload using the updated layout properties\r\n        const payload = {\r\n          scope: data.scope,\r\n          equipmentKind: data.equipment_kind,\r\n          equipmentId: data.equipment_id,\r\n          key: data.key,\r\n          value: toPayloadValue(value, data),\r\n        };\r\n\r\n        try {\r\n          if (data.value !== payload.value) {\r\n            await patch(`${HOST}/params/value`, payload);\r\n          }\r\n          Object.assign(data, {\r\n            isEditingRow: false,\r\n            isLoading: false,\r\n          });\r\n\r\n          isEdit = false;\r\n          context.grafana.refresh();\r\n          setTimeout(() =\u003e {\r\n            alert(\"Updated!\");\r\n          }, 100);\r\n        } catch (e) {\r\n          alert(`Error: ${e.response ? e.response.data.message : e.message}`);\r\n          console.error(e);\r\n        }\r\n\r\n\r\n      });\r\n\r\n      tableEl.on(\"click\", \"button.cancelSetting\", function () {\r\n        const tr = $(this).closest(\"tr\");\r\n        const row = table.row(tr);\r\n        const data = row.data();\r\n        data.isEditingRow = false;\r\n        isEdit = false;\r\n        row.invalidate().draw(false);\r\n      });\r\n\r\n    }\r\n  })\r\n});",
+                "content": "\u003cdiv class=\"ptp-card\"\u003e\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-9\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003cdiv class=\"ptp-card\"\u003e\r\n  \u003ctable class=\"ptp-table\" id=\"ptp-table-9\"\u003e\r\n    \u003cthead\u003e\r\n      \u003ctr\u003e\r\n        \u003cth class=\"col-setting\"\u003eSetting\u003c/th\u003e\r\n        \u003cth class=\"col-value\"\u003eValue\u003c/th\u003e\r\n        \u003cth class=\"col-action\"\u003e\u003c/th\u003e\r\n      \u003c/tr\u003e\r\n    \u003c/thead\u003e\r\n  \u003c/table\u003e\r\n\u003c/div\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "afterRender",
+                  "styles",
+                  "default"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "TabsLayout",
+      "spec": {
+        "tabs": [
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-1"
+                        },
+                        "height": 18,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Scheduling"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-2"
+                        },
+                        "height": 23,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Plant Warmup"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-3"
+                        },
+                        "height": 18,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Chiller Control \u0026 Setpoints"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-4"
+                        },
+                        "height": 22,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Chiller Staging Thresholds \u0026 Delays"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-5"
+                        },
+                        "height": 18,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Cooling Tower Staging"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-6"
+                        },
+                        "height": 18,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Pump \u0026 Fan Startup"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-7"
+                        },
+                        "height": 18,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Pump \u0026 Fan Controllers"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-8"
+                        },
+                        "height": 25,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Interlocking \u0026 Sequence Delays"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        },
+                        "height": 18,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "System \u0026 Diagnostics"
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "cpms"
+    ],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-6h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "Chiller Plant Parameters Copy",
+    "variables": [
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "current": {
+            "text": "{\"Scheduling\":{\"schedule.enabled\":\"Schedule Authority Enabled\",\"schedule.start_time\":\"Start Time\",\"schedule.end_time\":\"End Time\"},\"Plant Warmup\":{\"plant.warmup_duration_ms\":\"Warmup Duration (s)\",\"plant.warmup_chw_pump_speed\":\"Warmup CHW Pump Speed\",\"plant.warmup_cw_pump_speed\":\"Warmup CW Pump Speed\",\"plant.warmup_ct_fan_speed\":\"Warmup CT Fan Speed\",\"plant.warmup_min_chillers\":\"Warmup Minimum Chillers\",\"plant.warmup_max_chillers\":\"Warmup Maximum Chillers\",\"plant.warmup_min_cooling_towers\":\"Warmup Minimum Cooling Towers\",\"plant.warmup_max_cooling_towers\":\"Warmup Maximum Cooling Towers\",\"plant.warmup_chiller_setpoint\":\"Warmup Chiller Setpoint\"},\"Chiller Control \u0026 Setpoints\":{\"chiller.capacity\":\"Chiller Capacity\",\"chiller.chws_setpoint\":\"CHWS Setpoint\",\"plant.normal_chiller_setpoint\":\"Normal Chiller Setpoint\",\"chiller.min_off_ms\":\"Minimum Off Time (s)\",\"chiller.min_on_ms\":\"Minimum On Time (s)\",\"chiller.stage_hold_ms\":\"Stage Hold Time (s)\"},\"Chiller Staging Thresholds \u0026 Delays\":{\"chiller.stage_up_threshold\":\"Stage Up Load Threshold\",\"chiller.stage_down_threshold\":\"Stage Down Load Threshold\",\"chiller.stage_up_rla_threshold\":\"Stage Up RLA Threshold\",\"chiller.stage_up_rla_delay_ms\":\"Stage Up RLA Delay (s)\",\"chiller.chws_stage_up_delta\":\"CHWS Stage Up Delta\",\"chiller.chws_stage_down_delta\":\"CHWS Stage Down Delta\",\"chiller.chws_stage_up_delay_ms\":\"CHWS Stage Up Delay (s)\",\"chiller.chws_stage_down_delay_ms\":\"CHWS Stage Down Delay (s)\"},\"Cooling Tower Staging\":{\"cooling_tower.stage_hold_ms\":\"Cooling Tower Stage Hold (s)\"},\"Fan Startup\":{\"chwp.starting_speed\":\"CHWP Starting Speed\",\"cwp.starting_speed\":\"CWP Starting Speed\",\"ct_fan.starting_speed\":\"CT Fan Starting Speed\"},\"Pump \u0026 Fan Controllers\":{\"chwp.delta_t_controller\":\"CHWP Delta-T Controller\",\"cwp.delta_t_controller\":\"CWP Delta-T Controller\",\"ct_fan.cws_controller\":\"CT Fan CWS Controller\"},\"Interlocking \u0026 Sequence Delays\":{\"sequence.chiller.after_chiller_start_delay_ms\":\"After Chiller Start Delay (s)\",\"sequence.chiller.after_chiller_stop_delay_ms\":\"After Chiller Stop Delay (s)\",\"sequence.chiller.after_chwp_start_delay_ms\":\"After CHWP Start Delay (s)\",\"sequence.chiller.after_chwp_stop_delay_ms\":\"After CHWP Stop Delay (s)\",\"sequence.chiller.after_cwp_start_delay_ms\":\"After CWP Start Delay (s)\",\"sequence.chiller.after_cwp_stop_delay_ms\":\"After CWP Stop Delay (s)\",\"sequence.cooling_tower.after_valve_open_delay_ms\":\"After Valve Open Delay (s)\",\"sequence.cooling_tower.after_valve_close_delay_ms\":\"After Valve Close Delay (s)\",\"sequence.cooling_tower.after_fan_start_delay_ms\":\"After Fan Start Delay (s)\",\"sequence.cooling_tower.after_fan_stop_delay_ms\":\"After Fan Stop Delay (s)\"},\"System \u0026 Diagnostics\":{\"plant.runtime_stale_after_ms\":\"Plant Runtime Stale After (s)\",\"device.telemetry_stale_after_ms\":\"Device Telemetry Stale After (s)\",\"plant.activity_log_retention_days\":\"Activity Log Retention Days\"}}",
+            "value": "{\"Scheduling\":{\"schedule.enabled\":\"Schedule Authority Enabled\",\"schedule.start_time\":\"Start Time\",\"schedule.end_time\":\"End Time\"},\"Plant Warmup\":{\"plant.warmup_duration_ms\":\"Warmup Duration (s)\",\"plant.warmup_chw_pump_speed\":\"Warmup CHW Pump Speed\",\"plant.warmup_cw_pump_speed\":\"Warmup CW Pump Speed\",\"plant.warmup_ct_fan_speed\":\"Warmup CT Fan Speed\",\"plant.warmup_min_chillers\":\"Warmup Minimum Chillers\",\"plant.warmup_max_chillers\":\"Warmup Maximum Chillers\",\"plant.warmup_min_cooling_towers\":\"Warmup Minimum Cooling Towers\",\"plant.warmup_max_cooling_towers\":\"Warmup Maximum Cooling Towers\",\"plant.warmup_chiller_setpoint\":\"Warmup Chiller Setpoint\"},\"Chiller Control \u0026 Setpoints\":{\"chiller.capacity\":\"Chiller Capacity\",\"chiller.chws_setpoint\":\"CHWS Setpoint\",\"plant.normal_chiller_setpoint\":\"Normal Chiller Setpoint\",\"chiller.min_off_ms\":\"Minimum Off Time (s)\",\"chiller.min_on_ms\":\"Minimum On Time (s)\",\"chiller.stage_hold_ms\":\"Stage Hold Time (s)\"},\"Chiller Staging Thresholds \u0026 Delays\":{\"chiller.stage_up_threshold\":\"Stage Up Load Threshold\",\"chiller.stage_down_threshold\":\"Stage Down Load Threshold\",\"chiller.stage_up_rla_threshold\":\"Stage Up RLA Threshold\",\"chiller.stage_up_rla_delay_ms\":\"Stage Up RLA Delay (s)\",\"chiller.chws_stage_up_delta\":\"CHWS Stage Up Delta\",\"chiller.chws_stage_down_delta\":\"CHWS Stage Down Delta\",\"chiller.chws_stage_up_delay_ms\":\"CHWS Stage Up Delay (s)\",\"chiller.chws_stage_down_delay_ms\":\"CHWS Stage Down Delay (s)\"},\"Cooling Tower Staging\":{\"cooling_tower.stage_hold_ms\":\"Cooling Tower Stage Hold (s)\"},\"Fan Startup\":{\"chwp.starting_speed\":\"CHWP Starting Speed\",\"cwp.starting_speed\":\"CWP Starting Speed\",\"ct_fan.starting_speed\":\"CT Fan Starting Speed\"},\"Pump \u0026 Fan Controllers\":{\"chwp.delta_t_controller\":\"CHWP Delta-T Controller\",\"cwp.delta_t_controller\":\"CWP Delta-T Controller\",\"ct_fan.cws_controller\":\"CT Fan CWS Controller\"},\"Interlocking \u0026 Sequence Delays\":{\"sequence.chiller.after_chiller_start_delay_ms\":\"After Chiller Start Delay (s)\",\"sequence.chiller.after_chiller_stop_delay_ms\":\"After Chiller Stop Delay (s)\",\"sequence.chiller.after_chwp_start_delay_ms\":\"After CHWP Start Delay (s)\",\"sequence.chiller.after_chwp_stop_delay_ms\":\"After CHWP Stop Delay (s)\",\"sequence.chiller.after_cwp_start_delay_ms\":\"After CWP Start Delay (s)\",\"sequence.chiller.after_cwp_stop_delay_ms\":\"After CWP Stop Delay (s)\",\"sequence.cooling_tower.after_valve_open_delay_ms\":\"After Valve Open Delay (s)\",\"sequence.cooling_tower.after_valve_close_delay_ms\":\"After Valve Close Delay (s)\",\"sequence.cooling_tower.after_fan_start_delay_ms\":\"After Fan Start Delay (s)\",\"sequence.cooling_tower.after_fan_stop_delay_ms\":\"After Fan Stop Delay (s)\"},\"System \u0026 Diagnostics\":{\"plant.runtime_stale_after_ms\":\"Plant Runtime Stale After (s)\",\"device.telemetry_stale_after_ms\":\"Device Telemetry Stale After (s)\",\"plant.activity_log_retention_days\":\"Activity Log Retention Days\"}}"
+          },
+          "hide": "hideVariable",
+          "name": "grouping",
+          "query": "{\"Scheduling\":{\"schedule.enabled\":\"Schedule Authority Enabled\",\"schedule.start_time\":\"Start Time\",\"schedule.end_time\":\"End Time\"},\"Plant Warmup\":{\"plant.warmup_duration_ms\":\"Warmup Duration (s)\",\"plant.warmup_chw_pump_speed\":\"Warmup CHW Pump Speed\",\"plant.warmup_cw_pump_speed\":\"Warmup CW Pump Speed\",\"plant.warmup_ct_fan_speed\":\"Warmup CT Fan Speed\",\"plant.warmup_min_chillers\":\"Warmup Minimum Chillers\",\"plant.warmup_max_chillers\":\"Warmup Maximum Chillers\",\"plant.warmup_min_cooling_towers\":\"Warmup Minimum Cooling Towers\",\"plant.warmup_max_cooling_towers\":\"Warmup Maximum Cooling Towers\",\"plant.warmup_chiller_setpoint\":\"Warmup Chiller Setpoint\"},\"Chiller Control \u0026 Setpoints\":{\"chiller.capacity\":\"Chiller Capacity\",\"chiller.chws_setpoint\":\"CHWS Setpoint\",\"plant.normal_chiller_setpoint\":\"Normal Chiller Setpoint\",\"chiller.min_off_ms\":\"Minimum Off Time (s)\",\"chiller.min_on_ms\":\"Minimum On Time (s)\",\"chiller.stage_hold_ms\":\"Stage Hold Time (s)\"},\"Chiller Staging Thresholds \u0026 Delays\":{\"chiller.stage_up_threshold\":\"Stage Up Load Threshold\",\"chiller.stage_down_threshold\":\"Stage Down Load Threshold\",\"chiller.stage_up_rla_threshold\":\"Stage Up RLA Threshold\",\"chiller.stage_up_rla_delay_ms\":\"Stage Up RLA Delay (s)\",\"chiller.chws_stage_up_delta\":\"CHWS Stage Up Delta\",\"chiller.chws_stage_down_delta\":\"CHWS Stage Down Delta\",\"chiller.chws_stage_up_delay_ms\":\"CHWS Stage Up Delay (s)\",\"chiller.chws_stage_down_delay_ms\":\"CHWS Stage Down Delay (s)\"},\"Cooling Tower Staging\":{\"cooling_tower.stage_hold_ms\":\"Cooling Tower Stage Hold (s)\"},\"Fan Startup\":{\"chwp.starting_speed\":\"CHWP Starting Speed\",\"cwp.starting_speed\":\"CWP Starting Speed\",\"ct_fan.starting_speed\":\"CT Fan Starting Speed\"},\"Pump \u0026 Fan Controllers\":{\"chwp.delta_t_controller\":\"CHWP Delta-T Controller\",\"cwp.delta_t_controller\":\"CWP Delta-T Controller\",\"ct_fan.cws_controller\":\"CT Fan CWS Controller\"},\"Interlocking \u0026 Sequence Delays\":{\"sequence.chiller.after_chiller_start_delay_ms\":\"After Chiller Start Delay (s)\",\"sequence.chiller.after_chiller_stop_delay_ms\":\"After Chiller Stop Delay (s)\",\"sequence.chiller.after_chwp_start_delay_ms\":\"After CHWP Start Delay (s)\",\"sequence.chiller.after_chwp_stop_delay_ms\":\"After CHWP Stop Delay (s)\",\"sequence.chiller.after_cwp_start_delay_ms\":\"After CWP Start Delay (s)\",\"sequence.chiller.after_cwp_stop_delay_ms\":\"After CWP Stop Delay (s)\",\"sequence.cooling_tower.after_valve_open_delay_ms\":\"After Valve Open Delay (s)\",\"sequence.cooling_tower.after_valve_close_delay_ms\":\"After Valve Close Delay (s)\",\"sequence.cooling_tower.after_fan_start_delay_ms\":\"After Fan Start Delay (s)\",\"sequence.cooling_tower.after_fan_stop_delay_ms\":\"After Fan Stop Delay (s)\"},\"System \u0026 Diagnostics\":{\"plant.runtime_stale_after_ms\":\"Plant Runtime Stale After (s)\",\"device.telemetry_stale_after_ms\":\"Device Telemetry Stale After (s)\",\"plant.activity_log_retention_days\":\"Activity Log Retention Days\"}}",
+          "skipUrlSync": true
+        }
+      },
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "All",
+            "value": [
+              "$__all"
+            ]
+          },
+          "hide": "hideVariable",
+          "includeAll": true,
+          "multi": true,
+          "name": "groups",
+          "options": [],
+          "query": "Scheduling,Plant Warmup,Chiller Control \u0026 Setpoints,Chiller Staging Thresholds \u0026 Delays,Cooling Tower Staging,Fan Startup,Pump \u0026 Fan Controllers,Interlocking \u0026 Sequence Delays,System \u0026 Diagnostics",
+          "skipUrlSync": false,
+          "valuesFormat": "csv"
+        }
+      }
+    ]
+  }
+}
