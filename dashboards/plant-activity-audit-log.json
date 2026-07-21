@@ -1,0 +1,607 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "dcfsqnyf3k38xsa"
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations \u0026 Alerts",
+          "query": {
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT\n  *\nFROM\n  plant_activity_log\nWHERE\n  $__timeFilter(event_time)\nORDER BY\n  event_time DESC",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [
+                                {
+                                  "name": "*",
+                                  "type": "functionParameter"
+                                }
+                              ],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "orderBy": {
+                            "property": {
+                              "name": "event_time",
+                              "type": "string"
+                            },
+                            "type": "property"
+                          },
+                          "orderByDirection": "DESC",
+                          "whereJsonTree": {
+                            "children1": [
+                              {
+                                "id": "aabbaaa8-cdef-4012-b456-719f44b7f06f",
+                                "properties": {
+                                  "field": "event_time",
+                                  "fieldSrc": "field",
+                                  "operator": "macros",
+                                  "value": [
+                                    "timeFilter"
+                                  ],
+                                  "valueError": [
+                                    null
+                                  ],
+                                  "valueSrc": [
+                                    "value"
+                                  ],
+                                  "valueType": [
+                                    "datetime"
+                                  ]
+                                },
+                                "type": "rule"
+                              }
+                            ],
+                            "id": "b9a98ab8-0123-4456-b89a-b19f44b79a98",
+                            "type": "group"
+                          },
+                          "whereString": "$__timeFilter(event_time)"
+                        },
+                        "table": "plant_activity_log"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "created_at": true,
+                        "data": true,
+                        "id": true,
+                        "plant_state": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "action": "Action",
+                        "category": "Category",
+                        "data": "",
+                        "equipment_id": "Equipment ID",
+                        "equipment_kind": "Equipment Kind",
+                        "event_code": "Event Code",
+                        "event_time": "Event Time",
+                        "id": "",
+                        "level": "Log Level",
+                        "message": "Message",
+                        "plant_mode": "Plant Mode",
+                        "plant_state": ""
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "Plant Activity",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": true,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "message",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.filterable"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Log Level",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 118
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Category",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 148
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Plant Mode",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 142
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Equipment Kind",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 162
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Equipment ID",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 149
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Action",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 99
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Event Time",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 182
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": []
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT al.*, p.description FROM control_param_audit_log al, control_params p WHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nORDER BY al.created_at DESC ",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [
+                                {
+                                  "name": "*",
+                                  "type": "functionParameter"
+                                }
+                              ],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "orderBy": {
+                            "property": {
+                              "name": "created_at",
+                              "type": "string"
+                            },
+                            "type": "property"
+                          },
+                          "orderByDirection": "DESC",
+                          "whereJsonTree": {
+                            "children1": [
+                              {
+                                "id": "ba8b9b9a-4567-489a-bcde-f19f44e03ac1",
+                                "properties": {
+                                  "field": "created_at",
+                                  "fieldSrc": "field",
+                                  "operator": "macros",
+                                  "value": [
+                                    "timeFilter"
+                                  ],
+                                  "valueError": [
+                                    null
+                                  ],
+                                  "valueSrc": [
+                                    "value"
+                                  ],
+                                  "valueType": [
+                                    "datetime"
+                                  ]
+                                },
+                                "type": "rule"
+                              }
+                            ],
+                            "id": "b9a98ab8-0123-4456-b89a-b19f44b79a98",
+                            "type": "group"
+                          },
+                          "whereString": "$__timeFilter(created_at)"
+                        },
+                        "table": "control_param_audit_log"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "id": true,
+                        "scope": true,
+                        "source": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {
+                        "changed_by": 9,
+                        "created_at": 1,
+                        "description": 5,
+                        "equipment_id": 4,
+                        "equipment_kind": 3,
+                        "id": 0,
+                        "key": 6,
+                        "new_value": 8,
+                        "old_value": 7,
+                        "reason": 11,
+                        "scope": 2,
+                        "source": 10
+                      },
+                      "renameByName": {
+                        "changed_by": "Changed By",
+                        "created_at": "Change Time",
+                        "description": "Parameter",
+                        "equipment_id": "Equipment ID",
+                        "equipment_kind": "Equipment Kind",
+                        "key": "Key",
+                        "new_value": "New Value",
+                        "old_value": "Old Value",
+                        "reason": "Reason",
+                        "scope": "Scope"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 2,
+          "links": [],
+          "title": "Audit Log",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "filterable": false,
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Key",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.hideFrom.viz",
+                        "value": true
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "description",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.tooltip.field",
+                        "value": "Key"
+                      },
+                      {
+                        "id": "custom.tooltip.placement",
+                        "value": "auto"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": ""
+                    },
+                    "properties": []
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Equipment ID",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.width",
+                        "value": 133
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "sm",
+                "showHeader": true,
+                "sortBy": []
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "GridLayout",
+      "spec": {
+        "items": [
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-1"
+              },
+              "height": 19,
+              "width": 24,
+              "x": 0,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              },
+              "height": 19,
+              "width": 24,
+              "x": 0,
+              "y": 19
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preload": false,
+    "tags": [
+      "cpms"
+    ],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-6h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "Plant Activity / Audit Log",
+    "variables": []
+  }
+}
