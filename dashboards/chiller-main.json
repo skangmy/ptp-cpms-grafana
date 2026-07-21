@@ -598,6 +598,18 @@
     },
     "links": [
       {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-main.json"
+      },
+      {
         "asDropdown": true,
         "icon": "external link",
         "includeVars": false,
@@ -635,7 +647,7 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "Chiller - Main Copy",
+    "title": "Chiller - Main",
     "variables": [
       {
         "kind": "ConstantVariable",
