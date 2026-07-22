@@ -1584,15 +1584,13 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": [
-              "All"
-            ],
+            "text": "All",
             "value": [
               "$__all"
             ]
           },
           "definition": "with data as (select value::text as chwpId, equipment_id as chiller from control_params where \"key\" = 'chiller.chwpId'),\nchwps as (select unnest(array['chwp1', 'chwp2', 'chwp3']) as id)\nselect *, upper(id) as name from chwps p left join data d on '\"' || p.id || '\"' = d.chwpId  \norder by id\n",
-          "hide": "dontHide",
+          "hide": "hideVariable",
           "includeAll": true,
           "multi": true,
           "name": "chwp",
