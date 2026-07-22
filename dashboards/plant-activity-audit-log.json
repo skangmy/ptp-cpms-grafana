@@ -329,7 +329,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "SELECT al.*, p.description FROM control_param_audit_log al, control_params p WHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nORDER BY al.created_at DESC ",
+                        "rawSql": "SELECT al.*, p.description, p.unit FROM control_param_audit_log al, control_params p WHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nORDER BY al.created_at DESC ",
                         "sql": {
                           "columns": [
                             {
@@ -409,7 +409,7 @@
                       },
                       "includeByName": {},
                       "indexByName": {
-                        "changed_by": 9,
+                        "changed_by": 10,
                         "created_at": 1,
                         "description": 5,
                         "equipment_id": 4,
@@ -418,9 +418,10 @@
                         "key": 6,
                         "new_value": 8,
                         "old_value": 7,
-                        "reason": 11,
+                        "reason": 12,
                         "scope": 2,
-                        "source": 10
+                        "source": 11,
+                        "unit": 9
                       },
                       "renameByName": {
                         "changed_by": "Changed By",
@@ -432,7 +433,8 @@
                         "new_value": "New Value",
                         "old_value": "Old Value",
                         "reason": "Reason",
-                        "scope": "Scope"
+                        "scope": "Scope",
+                        "unit": "Unit"
                       }
                     }
                   }
@@ -634,7 +636,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-6h",
+      "from": "now-6M",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
