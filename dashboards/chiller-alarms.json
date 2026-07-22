@@ -52,7 +52,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "select * from alarm_state where status \u003c\u003e 'CLEARED' \norder by severity = 'INFO', severity, first_seen_at",
+                        "rawSql": "select * from alarm_state where status \u003c\u003e 'CLEARED' \norder by first_seen_at desc",
                         "sql": {
                           "columns": [
                             {
@@ -439,6 +439,18 @@
       }
     },
     "links": [
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-alarms.json"
+      },
       {
         "asDropdown": true,
         "icon": "external link",
