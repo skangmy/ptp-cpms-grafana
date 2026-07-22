@@ -673,13 +673,13 @@
         "kind": "ConstantVariable",
         "spec": {
           "current": {
-            "text": "/d/cpms_chiller_alarms",
-            "value": "/d/cpms_chiller_alarms"
+            "text": "/d/dcfsqnp1b6wgzkd/chiller-alarms",
+            "value": "/d/dcfsqnp1b6wgzkd/chiller-alarms"
           },
           "description": "Grafana URL for the Chiller Alarms dashboard",
           "hide": "hideVariable",
           "name": "cpms_alarm_dashboard_url",
-          "query": "/d/cpms_chiller_alarms",
+          "query": "/d/dcfsqnp1b6wgzkd/chiller-alarms",
           "skipUrlSync": true
         }
       }
