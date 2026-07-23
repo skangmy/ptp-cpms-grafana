@@ -2670,8 +2670,8 @@
         "spec": {
           "allowCustomValue": true,
           "current": {
-            "text": "s_3",
-            "value": "s_3"
+            "text": "w_4",
+            "value": "w_4"
           },
           "definition": "with a_schedule as (\n  select 0 as o, 's_' || id as row from schedule_event where start_time \u003c= current_timestamp and end_time \u003e current_timestamp and enabled = true\n),\na_ph as (\n  select 1 as o, 'p_' || id as row from holiday_schedule where holiday_date = current_date and enabled = true\n),\na_week as (\n  select 2 as o, 'w_' || id as row from weekly_schedule ws  where ws.day_of_week = extract(dow from current_timestamp) and enabled = true\n)\nselect * from a_schedule\nunion\nselect * from a_ph\nunion\nselect * from a_week\norder by o limit 1",
           "hide": "dontHide",
@@ -2717,7 +2717,7 @@
             },
             "version": "v0"
           },
-          "refresh": "onDashboardLoad",
+          "refresh": "onTimeRangeChanged",
           "regex": "",
           "regexApplyTo": "value",
           "skipUrlSync": false,
