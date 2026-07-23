@@ -52,7 +52,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "select *, EXTRACT(DOW FROM CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kuala_Lumpur') = day_of_week as is_active \nfrom weekly_schedule order by day_of_week = 0 , day_of_week",
+                        "rawSql": "select 'w_' || id as selected, *\nfrom weekly_schedule order by day_of_week = 0 , day_of_week",
                         "sql": {
                           "columns": [
                             {
@@ -647,6 +647,75 @@
                           "enabled": false
                         },
                         "type": "auto"
+                      },
+                      {
+                        "aggregation": "none",
+                        "appearance": {
+                          "alignment": "start",
+                          "background": {
+                            "applyToRow": false
+                          },
+                          "colors": {},
+                          "header": {
+                            "fontSize": "md"
+                          },
+                          "width": {
+                            "auto": true,
+                            "min": 20,
+                            "value": 100
+                          },
+                          "wrap": true
+                        },
+                        "columnTooltip": "",
+                        "edit": {
+                          "editor": {
+                            "type": "string"
+                          },
+                          "enabled": false,
+                          "permission": {
+                            "mode": "",
+                            "userRole": []
+                          }
+                        },
+                        "enabled": false,
+                        "field": {
+                          "name": "selected",
+                          "source": "A"
+                        },
+                        "fileCell": {
+                          "size": "md",
+                          "text": "Download",
+                          "variant": "primary"
+                        },
+                        "filter": {
+                          "enabled": false,
+                          "mode": "client",
+                          "variable": ""
+                        },
+                        "footer": [],
+                        "gauge": {
+                          "mode": "basic",
+                          "valueDisplayMode": "text",
+                          "valueSize": 14
+                        },
+                        "group": false,
+                        "label": "",
+                        "newRowEdit": {
+                          "editor": {
+                            "type": "string"
+                          },
+                          "enabled": false
+                        },
+                        "objectId": "",
+                        "pin": "",
+                        "preformattedStyle": false,
+                        "scale": "auto",
+                        "showingRows": 20,
+                        "sort": {
+                          "descFirst": false,
+                          "enabled": false
+                        },
+                        "type": "auto"
                       }
                     ],
                     "name": "schedule",
@@ -656,13 +725,13 @@
                       "mode": "client"
                     },
                     "rowHighlight": {
-                      "backgroundColor": "transparent",
-                      "columnId": "",
-                      "enabled": false,
+                      "backgroundColor": "#56A64B",
+                      "columnId": "A:selected",
+                      "enabled": true,
                       "resetVariable": false,
                       "scrollTo": "",
                       "smooth": false,
-                      "variable": ""
+                      "variable": "active_id"
                     },
                     "showHeader": true,
                     "stripedRows": false,
@@ -720,7 +789,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "with data as (select id, holiday_date, name, mode, enabled, true as can_edit from holiday_schedule\norder by holiday_date)\nselect * from data\nunion all\nselect -1, '1900-01-01' as holiday_date, null as name, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
+                        "rawSql": "with data as (select id, holiday_date, name, mode, enabled, true as can_edit from holiday_schedule\norder by holiday_date)\nselect 'p_' || id as selected, * from data\nunion all\nselect '' as selected, -1, '1900-01-01' as holiday_date, null as name, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
                         "sql": {
                           "columns": [
                             {
@@ -1307,6 +1376,75 @@
                           "enabled": false
                         },
                         "type": "coloredBackground"
+                      },
+                      {
+                        "aggregation": "none",
+                        "appearance": {
+                          "alignment": "start",
+                          "background": {
+                            "applyToRow": false
+                          },
+                          "colors": {},
+                          "header": {
+                            "fontSize": "md"
+                          },
+                          "width": {
+                            "auto": true,
+                            "min": 20,
+                            "value": 100
+                          },
+                          "wrap": true
+                        },
+                        "columnTooltip": "",
+                        "edit": {
+                          "editor": {
+                            "type": "string"
+                          },
+                          "enabled": false,
+                          "permission": {
+                            "mode": "",
+                            "userRole": []
+                          }
+                        },
+                        "enabled": false,
+                        "field": {
+                          "name": "selected",
+                          "source": "A"
+                        },
+                        "fileCell": {
+                          "size": "md",
+                          "text": "Download",
+                          "variant": "primary"
+                        },
+                        "filter": {
+                          "enabled": false,
+                          "mode": "client",
+                          "variable": ""
+                        },
+                        "footer": [],
+                        "gauge": {
+                          "mode": "basic",
+                          "valueDisplayMode": "text",
+                          "valueSize": 14
+                        },
+                        "group": false,
+                        "label": "",
+                        "newRowEdit": {
+                          "editor": {
+                            "type": "string"
+                          },
+                          "enabled": false
+                        },
+                        "objectId": "",
+                        "pin": "",
+                        "preformattedStyle": false,
+                        "scale": "auto",
+                        "showingRows": 20,
+                        "sort": {
+                          "descFirst": false,
+                          "enabled": false
+                        },
+                        "type": "auto"
                       }
                     ],
                     "name": "holiday",
@@ -1316,13 +1454,13 @@
                       "mode": "client"
                     },
                     "rowHighlight": {
-                      "backgroundColor": "transparent",
-                      "columnId": "",
-                      "enabled": false,
+                      "backgroundColor": "#56A64B",
+                      "columnId": "A:selected",
+                      "enabled": true,
                       "resetVariable": false,
                       "scrollTo": "",
                       "smooth": false,
-                      "variable": ""
+                      "variable": "active_id"
                     },
                     "showHeader": true,
                     "stripedRows": false,
@@ -1630,7 +1768,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "with data as (select id, start_time, end_time, description, enabled, true as can_edit from schedule_event \nwhere start_time \u003c= CURRENT_TIMESTAMP and end_time \u003e CURRENT_TIMESTAMP\norder by start_time, end_time)\nselect * from data\nunion all\nselect -1 as id, null as start_time, null as end_time, null as description, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
+                        "rawSql": "with data as (select id, start_time, end_time, description, enabled, true as can_edit from schedule_event \nwhere start_time \u003c= CURRENT_TIMESTAMP and end_time \u003e CURRENT_TIMESTAMP\norder by start_time, end_time)\nselect 's_' || id as selected, * from data\nunion all\nselect '' as selected, -1 as id, null as start_time, null as end_time, null as description, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
                         "sql": {
                           "columns": [
                             {
@@ -2279,6 +2417,75 @@
                           "enabled": false
                         },
                         "type": "auto"
+                      },
+                      {
+                        "aggregation": "none",
+                        "appearance": {
+                          "alignment": "start",
+                          "background": {
+                            "applyToRow": false
+                          },
+                          "colors": {},
+                          "header": {
+                            "fontSize": "md"
+                          },
+                          "width": {
+                            "auto": true,
+                            "min": 20,
+                            "value": 100
+                          },
+                          "wrap": true
+                        },
+                        "columnTooltip": "",
+                        "edit": {
+                          "editor": {
+                            "type": "string"
+                          },
+                          "enabled": false,
+                          "permission": {
+                            "mode": "",
+                            "userRole": []
+                          }
+                        },
+                        "enabled": false,
+                        "field": {
+                          "name": "selected",
+                          "source": "A"
+                        },
+                        "fileCell": {
+                          "size": "md",
+                          "text": "Download",
+                          "variant": "primary"
+                        },
+                        "filter": {
+                          "enabled": false,
+                          "mode": "client",
+                          "variable": ""
+                        },
+                        "footer": [],
+                        "gauge": {
+                          "mode": "basic",
+                          "valueDisplayMode": "text",
+                          "valueSize": 14
+                        },
+                        "group": false,
+                        "label": "",
+                        "newRowEdit": {
+                          "editor": {
+                            "type": "string"
+                          },
+                          "enabled": false
+                        },
+                        "objectId": "",
+                        "pin": "",
+                        "preformattedStyle": false,
+                        "scale": "auto",
+                        "showingRows": 20,
+                        "sort": {
+                          "descFirst": false,
+                          "enabled": false
+                        },
+                        "type": "auto"
                       }
                     ],
                     "name": "schedule_event",
@@ -2288,13 +2495,13 @@
                       "mode": "client"
                     },
                     "rowHighlight": {
-                      "backgroundColor": "transparent",
-                      "columnId": "",
-                      "enabled": false,
+                      "backgroundColor": "#56A64B",
+                      "columnId": "A:selected",
+                      "enabled": true,
                       "resetVariable": false,
                       "scrollTo": "",
                       "smooth": false,
-                      "variable": ""
+                      "variable": "active_id"
                     },
                     "showHeader": true,
                     "stripedRows": false,
