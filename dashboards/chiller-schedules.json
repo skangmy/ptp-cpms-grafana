@@ -2641,7 +2641,7 @@
                         "url_options": {
                           "body_content_type": "application/json",
                           "body_type": "raw",
-                          "data": "\n{\n    \"description\": \"${payload.description}\",\n    \"enabled\": ${payload.enabled}\n}",
+                          "data": "\n{\n    \"description\": \"${payload.description}\",\n    \"mode\": \"${payload.mode}\",\n    \"enabled\": ${payload.enabled}\n}",
                           "method": "POST"
                         }
                       }
