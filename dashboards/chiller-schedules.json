@@ -2337,14 +2337,18 @@
                         "edit": {
                           "editor": {
                             "queryOptions": {
-                              "source": "A",
-                              "value": "mode"
+                              "source": "mode",
+                              "value": "value"
                             },
                             "type": "select"
                           },
                           "enabled": true,
                           "permission": {
-                            "mode": "",
+                            "field": {
+                              "name": "can_edit",
+                              "source": "A"
+                            },
+                            "mode": "query",
                             "userRole": []
                           }
                         },
