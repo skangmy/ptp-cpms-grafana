@@ -965,7 +965,7 @@
                           "global_query_id": "",
                           "parser": "backend",
                           "refId": "",
-                          "root_selector": "$.result",
+                          "root_selector": "",
                           "source": "url",
                           "type": "json",
                           "url": "/cpms/schedule/holiday",
