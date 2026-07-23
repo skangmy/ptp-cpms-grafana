@@ -329,7 +329,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "SELECT al.*, p.description, p.unit FROM control_param_audit_log al, control_params p WHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nORDER BY al.created_at DESC ",
+                        "rawSql": "SELECT al.*, p.description, p.unit\nFROM control_param_audit_log al, control_params p \nWHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nORDER BY al.created_at DESC ",
                         "sql": {
                           "columns": [
                             {
@@ -539,7 +539,33 @@
                     },
                     "properties": [
                       {
-                        "id": "custom.filterable"
+                        "id": "custom.filterable",
+                        "value": false
+                      },
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "match": "null+nan",
+                              "result": {
+                                "index": 0,
+                                "text": "Not Assigned"
+                              }
+                            },
+                            "type": "special"
+                          },
+                          {
+                            "options": {
+                              "match": "empty",
+                              "result": {
+                                "index": 1,
+                                "text": "Not Assigned"
+                              }
+                            },
+                            "type": "special"
+                          }
+                        ]
                       }
                     ]
                   },
@@ -560,6 +586,7 @@
               "options": {
                 "cellHeight": "sm",
                 "enablePagination": true,
+                "frameIndex": 1,
                 "showHeader": true,
                 "sortBy": []
               }
@@ -603,6 +630,18 @@
       }
     },
     "links": [
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/plant-activity-audit-log.json"
+      },
       {
         "asDropdown": true,
         "icon": "external link",
