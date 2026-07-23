@@ -1768,7 +1768,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "with data as (select id, start_time, end_time, description, mode, enabled, true as can_edit from schedule_event \nwhere start_time \u003c= CURRENT_TIMESTAMP and end_time \u003e CURRENT_TIMESTAMP\norder by start_time, end_time)\nselect 's_' || id as selected, * from data\nunion all\nselect '' as selected, -1 as id, null as start_time, null as end_time, null as description, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
+                        "rawSql": "with data as (select id, start_time, end_time, description, mode, enabled, true as can_edit from schedule_event \nwhere start_time \u003c= $__timeTo() and end_time \u003e $__timeFrom() \norder by start_time, end_time)\nselect 's_' || id as selected, * from data\nunion all\nselect '' as selected, -1 as id, null as start_time, null as end_time, null as description, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
                         "sql": {
                           "columns": [
                             {
@@ -1790,6 +1790,45 @@
                       "version": "v0"
                     },
                     "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select 'ON' as value\nunion\nselect 'OFF' as value",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "mode"
                   }
                 }
               ],
@@ -2297,9 +2336,13 @@
                         "columnTooltip": "",
                         "edit": {
                           "editor": {
-                            "type": "string"
+                            "queryOptions": {
+                              "source": "A",
+                              "value": "mode"
+                            },
+                            "type": "select"
                           },
-                          "enabled": false,
+                          "enabled": true,
                           "permission": {
                             "mode": "",
                             "userRole": []
@@ -2330,9 +2373,13 @@
                         "label": "Mode",
                         "newRowEdit": {
                           "editor": {
-                            "type": "string"
+                            "queryOptions": {
+                              "source": "mode",
+                              "value": "value"
+                            },
+                            "type": "select"
                           },
-                          "enabled": false
+                          "enabled": true
                         },
                         "objectId": "",
                         "pin": "",
@@ -2727,7 +2774,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-6h",
+      "from": "now-90d",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
