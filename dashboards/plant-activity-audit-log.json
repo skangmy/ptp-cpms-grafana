@@ -329,7 +329,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "SELECT al.*, p.description, p.unit\nFROM control_param_audit_log al, control_params p \nWHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nORDER BY al.created_at DESC ",
+                        "rawSql": "SELECT al.*, p.description, p.unit\nFROM control_param_audit_log al, control_params p \nWHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nand al.equipment_kind = p.equipment_kind \nand al.equipment_id = p.equipment_id\nORDER BY al.created_at DESC ",
                         "sql": {
                           "columns": [
                             {
