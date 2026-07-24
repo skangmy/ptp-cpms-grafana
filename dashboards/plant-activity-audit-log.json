@@ -329,7 +329,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "SELECT al.*, p.description, p.unit\nFROM control_param_audit_log al, control_params p \nWHERE \n$__timeFilter(al.created_at) \nand al.key = p.key\nand al.equipment_kind = p.equipment_kind \nand al.equipment_id = p.equipment_id\nORDER BY al.created_at DESC ",
+                        "rawSql": "SELECT l.*, p.description, p.unit\nFROM control_param_audit_log l left join control_params p \non \tl.\"key\" = p.\"key\"\n\tand l.\"scope\" = p.\"scope\"\n\tand l.equipment_kind is not distinct from p.equipment_kind\n\tand l.equipment_id is not distinct from p.equipment_id\nWHERE \n$__timeFilter(l.created_at) \nORDER BY l.created_at DESC ",
                         "sql": {
                           "columns": [
                             {
