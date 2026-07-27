@@ -838,7 +838,7 @@
                 "name": "panel-5"
               },
               "height": 4,
-              "width": 6,
+              "width": 8,
               "x": 14,
               "y": 0
             }
@@ -850,7 +850,7 @@
                 "kind": "ElementReference",
                 "name": "panel-1"
               },
-              "height": 28,
+              "height": 27,
               "width": 24,
               "x": 0,
               "y": 4
@@ -866,7 +866,7 @@
               "height": 21,
               "width": 24,
               "x": 0,
-              "y": 32
+              "y": 31
             }
           }
         ]
