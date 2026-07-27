@@ -48,7 +48,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\" or r[\"_measurement\"] == \"water\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\" or r[\"_measurement\"] == \"water\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
                       },
                       "version": "v0"
                     },
@@ -517,8 +517,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 1",
-            "value": "chiller1"
+            "text": "Chiller 2",
+            "value": "chiller2"
           },
           "hide": "dontHide",
           "includeAll": false,
