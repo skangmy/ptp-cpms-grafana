@@ -787,7 +787,7 @@
                 "name": "panel-6"
               },
               "height": 4,
-              "width": 7,
+              "width": 6,
               "x": 0,
               "y": 0
             }
@@ -800,8 +800,8 @@
                 "name": "panel-4"
               },
               "height": 4,
-              "width": 6,
-              "x": 7,
+              "width": 5,
+              "x": 6,
               "y": 0
             }
           },
@@ -813,8 +813,8 @@
                 "name": "panel-5"
               },
               "height": 4,
-              "width": 8,
-              "x": 13,
+              "width": 9,
+              "x": 11,
               "y": 0
             }
           },
@@ -826,8 +826,8 @@
                 "name": "panel-10"
               },
               "height": 4,
-              "width": 3,
-              "x": 21,
+              "width": 4,
+              "x": 20,
               "y": 0
             }
           },
