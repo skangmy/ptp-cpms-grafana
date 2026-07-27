@@ -230,27 +230,48 @@
                     "hidden": false,
                     "query": {
                       "datasource": {
-                        "name": "grafana"
+                        "name": "cpms-influxdb"
                       },
-                      "group": "datasource",
+                      "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "queryType": "randomWalk"
+                        "query": "import \"timezone\"\nimport \"date\"\nimport \"array\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(from: date.truncate(t: now(), unit: 1d), d: 1d)\nstop = date.sub(from: now(), d: 1d)\n\ntoday_data = from(bucket: \"cpms\")\n  |\u003e range(start: date.truncate(t: now(), unit: 1d))\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n\n\nytd_data = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n\n\ndefault = array.from(rows: [\n    {_value: 0.0, \"_field\": \"loadUsage\"},\n  ])\n\ntoday = union(tables: [today_data, default])\n  |\u003e group()\n  |\u003e sum(column: \"_value\")\n  |\u003e rename(columns: {_value: \"today\"})\n  |\u003e map(fn: (r) =\u003e ({ r with join_key: 1 })) \n\nytd = union(tables: [ytd_data, default])\n  |\u003e group()\n  |\u003e sum(column: \"_value\")\n  |\u003e rename(columns: {_value: \"yesterday\"})  \n  |\u003e map(fn: (r) =\u003e ({ r with join_key: 1 })) \n\njoin.inner(\n    left: today,\n    right: ytd,\n    on: (l, r) =\u003e l.join_key == r.join_key,\n    as: (l, r) =\u003e ({\n      yesterday: r.yesterday,\n      today: l.today,\n      diff: if r.yesterday \u003e 0.0 then (r.yesterday - l.today) / r.yesterday else 0.0\n    }),\n)"
                       },
                       "version": "v0"
                     },
-                    "refId": "A"
+                    "refId": "data"
                   }
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "diff": 2,
+                        "today": 0,
+                        "yesterday": 1
+                      },
+                      "renameByName": {
+                        "diff": "Difference",
+                        "today": "Today",
+                        "yesterday": "Yesterday"
+                      }
+                    }
+                  }
+                }
+              ]
             }
           },
           "description": "",
           "id": 5,
           "links": [],
-          "title": "Total Plant Accumulated RTh",
+          "title": "RTH Today vs Yesterday",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -258,8 +279,8 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
-                    "fixedColor": "#ad46ff",
-                    "mode": "thresholds"
+                    "fixedColor": "blue",
+                    "mode": "fixed"
                   },
                   "thresholds": {
                     "mode": "absolute",
@@ -276,7 +297,44 @@
                   },
                   "unit": "RTh"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "diff",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "red",
+                              "value": 0
+                            },
+                            {
+                              "color": "transparent",
+                              "value": -0.01
+                            },
+                            {
+                              "color": "green",
+                              "value": 0.01
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "color"
+                      }
+                    ]
+                  }
+                ]
               },
               "options": {
                 "colorMode": "background",
@@ -780,7 +838,7 @@
                 "name": "panel-5"
               },
               "height": 4,
-              "width": 4,
+              "width": 6,
               "x": 14,
               "y": 0
             }
