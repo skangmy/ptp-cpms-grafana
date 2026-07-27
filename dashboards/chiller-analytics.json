@@ -421,7 +421,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "data = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"chiller1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"percentRla\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n\navg = data\n  |\u003e group()\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e set(key: \"deviceId\", value: \"average\")\n\nunion(tables: [data, avg])\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"_value\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"deviceId\"], valueColumn: \"_value\")"
+                        "query": "data = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"percentRla\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n\navg = data\n  |\u003e group()\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e set(key: \"deviceId\", value: \"average\")\n\nunion(tables: [data, avg])\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"_value\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"deviceId\"], valueColumn: \"_value\")\n  |\u003e sort(columns: [\"_time\"])"
                       },
                       "version": "v0"
                     },
@@ -501,7 +501,7 @@
                       "mode": "off"
                     }
                   },
-                  "max": 1,
+                  "max": 100,
                   "min": 0,
                   "thresholds": {
                     "mode": "absolute",
@@ -512,15 +512,15 @@
                       },
                       {
                         "color": "#EAB839",
-                        "value": 0.6
+                        "value": 60
                       },
                       {
                         "color": "red",
-                        "value": 0.75
+                        "value": 75
                       }
                     ]
                   },
-                  "unit": "percentunit"
+                  "unit": "percent"
                 },
                 "overrides": []
               },
@@ -679,8 +679,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 2",
-            "value": "chiller2"
+            "text": "Chiller 3",
+            "value": "chiller3"
           },
           "hide": "dontHide",
           "includeAll": false,
