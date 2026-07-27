@@ -957,23 +957,30 @@
                         "userRole": []
                       },
                       "request": {
-                        "datasource": "cpms-api",
+                        "datasource": "cpms-static",
                         "payload": {
-                          "columns": [],
-                          "filters": [],
-                          "format": "table",
-                          "global_query_id": "",
-                          "parser": "backend",
-                          "refId": "",
-                          "root_selector": "",
-                          "source": "url",
-                          "type": "json",
-                          "url": "/cpms/schedule/holiday",
-                          "url_options": {
-                            "body_content_type": "application/json",
-                            "body_type": "raw",
-                            "data": "{\n    \"holidayDate\": \"${payload.holiday_date}\",\n    \"name\": \"${payload.name}\",\n    \"mode\": \"${payload.mode}\",\n    \"enabled\": ${payload.enabled}\n}\n",
-                            "method": "POST"
+                          "frame": {
+                            "fields": [
+                              {
+                                "config": {},
+                                "name": "status",
+                                "type": "boolean",
+                                "values": []
+                              },
+                              {
+                                "config": {},
+                                "name": "message",
+                                "type": "string",
+                                "values": []
+                              }
+                            ],
+                            "meta": {
+                              "custom": {
+                                "customCode": "const leadZero = val =\u003e val \u003c 10 ? '0' + val : '' + val;\n\nconst parseBody = async (response) =\u003e {\n  const text = await response.text();\n  if (!text) return undefined;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return text;\n  }\n};\n\nconst errorMessage = (response, body) =\u003e {\n  if (typeof body === 'string') return `${body} (${response.status})`;\n  if (body?.error) return `${body.error} (${response.status})`;\n  return `HTTP ${response.status}`;\n};\n\nconst run = new Promise(async (resolve, reject) =\u003e {\n  let status = false;\n  let message = '';\n\n  const body = {\n    holidayDate: \"${payload.holiday_date}\",\n    name: \"${payload.name}\",\n    mode: \"${payload.mode}\",\n    enabled: '${payload.enabled}' === 'true'\n  }\n\n  if (body.holidayDate === '') {\n    const now = new Date();\n    body.holidayDate = `${now.getFullYear()}-${leadZero(now.getMonth() + 1)}-${leadZero(now.getDate())}`;\n  } else {\n    ok = true;\n  }\n  try {\n    const response = await fetch('/cpms/schedule/holiday', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(body),\n    });\n    const responseBody = await parseBody(response);\n\n    if (!response.ok) {\n      status = false;\n      message = errorMessage(response, responseBody);\n    } else {\n      status = true;\n      message = responseBody;\n    }\n\n  } catch (error) {\n    status = false;\n    message = error.message;\n  }\n\n  if (!status) {\n    reject(message);\n    return;\n  }\n  const result = {\n    ...frame,\n    errors: [],\n    fields: frame.fields.map((field) =\u003e ({\n      ...field,\n      values: [status, message]\n    }))\n  }\n  resolve(result);\n});\n\nreturn Promise.resolve(run);",
+                                "valuesEditor": "custom"
+                              }
+                            },
+                            "name": "result"
                           }
                         }
                       }
@@ -1981,23 +1988,30 @@
                         "userRole": []
                       },
                       "request": {
-                        "datasource": "cpms-api",
+                        "datasource": "cpms-static",
                         "payload": {
-                          "columns": [],
-                          "filters": [],
-                          "format": "table",
-                          "global_query_id": "",
-                          "parser": "backend",
-                          "refId": "",
-                          "root_selector": "",
-                          "source": "url",
-                          "type": "json",
-                          "url": "/cpms/schedule/event",
-                          "url_options": {
-                            "body_content_type": "application/json",
-                            "body_type": "raw",
-                            "data": "{\n    \"startTime\": \"${payload.start_time}\",\n    \"endTime\": \"${payload.end_time}\",\n    \"description\": \"${payload.description}\",\n    \"enabled\": ${payload.enabled}\n}\n",
-                            "method": "POST"
+                          "frame": {
+                            "fields": [
+                              {
+                                "config": {},
+                                "name": "message",
+                                "type": "string",
+                                "values": []
+                              },
+                              {
+                                "config": {},
+                                "name": "status",
+                                "type": "boolean",
+                                "values": []
+                              }
+                            ],
+                            "meta": {
+                              "custom": {
+                                "customCode": "const leadZero = val =\u003e val \u003c 10 ? '0' + val : '' + val;\n\nconst parseBody = async (response) =\u003e {\n  const text = await response.text();\n  if (!text) return undefined;\n  try {\n    return JSON.parse(text);\n  } catch {\n    return text;\n  }\n};\n\nconst errorMessage = (response, body) =\u003e {\n  if (typeof body === 'string') return `${body} (${response.status})`;\n  if (body?.error) return `${body.error} (${response.status})`;\n  return `HTTP ${response.status}`;\n};\n\nconst run = new Promise(async (resolve, reject) =\u003e {\n  let status = false;\n  let message = '';\n\n  const body = {\n    \"startTime\": \"${payload.start_time}\",\n    \"endTime\": \"${payload.end_time}\",\n    \"description\": \"${payload.description}\",\n    \"enabled\": '${payload.enabled}' === 'true',\n  }\n\n  console.log(body);\n  try {\n    const response = await fetch('/cpms/schedule/event', {\n      method: 'POST',\n      headers: { 'Content-Type': 'application/json' },\n      body: JSON.stringify(body),\n    });\n    const responseBody = await parseBody(response);\n\n    if (!response.ok) {\n      status = false;\n      message = errorMessage(response, responseBody);\n    } else {\n      status = true;\n      message = responseBody;\n    }\n\n  } catch (error) {\n    status = false;\n    message = error.message;\n  }\n\n  if (!status) {\n    reject(message);\n    return;\n  }\n  const result = {\n    ...frame,\n    errors: [],\n    fields: frame.fields.map((field) =\u003e ({\n      ...field,\n      values: [status, message]\n    }))\n  }\n  resolve(result);\n});\n\nreturn Promise.resolve(run);",
+                                "valuesEditor": "custom"
+                              }
+                            },
+                            "name": "result"
                           }
                         }
                       }
@@ -2732,6 +2746,18 @@
     },
     "links": [
       {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-schedules.json"
+      },
+      {
         "asDropdown": true,
         "icon": "external link",
         "includeVars": false,
@@ -2748,9 +2774,7 @@
     ],
     "liveNow": false,
     "preload": false,
-    "tags": [
-      "cpms"
-    ],
+    "tags": [],
     "timeSettings": {
       "autoRefresh": "",
       "autoRefreshIntervals": [
@@ -2778,8 +2802,8 @@
         "spec": {
           "allowCustomValue": true,
           "current": {
-            "text": "p_33",
-            "value": "p_33"
+            "text": "w_1",
+            "value": "w_1"
           },
           "definition": "with a_schedule as (\n  select 0 as o, 's_' || id as row from schedule_event where start_time \u003c= current_timestamp and end_time \u003e current_timestamp and enabled = true\n),\na_ph as (\n  select 1 as o, 'p_' || id as row from holiday_schedule where holiday_date = current_date and enabled = true\n),\na_week as (\n  select 2 as o, 'w_' || id as row from weekly_schedule ws  where ws.day_of_week = extract(dow from current_timestamp) and enabled = true\n)\nselect * from a_schedule\nunion\nselect * from a_ph\nunion\nselect * from a_week\norder by o limit 1",
           "hide": "hideVariable",
