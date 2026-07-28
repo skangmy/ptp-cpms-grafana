@@ -570,7 +570,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |\u003e keep(columns: [\"_field\", \"_value\", \"_time\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "maxData = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] != \"localRemote\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n\nminData = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"localRemote\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: min, createEmpty: false)\n\nunion(tables: [minData, maxData])\n  |\u003e keep(columns: [\"_field\", \"_value\", \"_time\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e sort(columns: [\"_time\"])\n"
                       },
                       "version": "v0"
                     },
@@ -974,8 +974,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 2",
-            "value": "chiller2"
+            "text": "Chiller 3",
+            "value": "chiller3"
           },
           "hide": "dontHide",
           "includeAll": false,
