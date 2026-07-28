@@ -48,7 +48,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorHumid\" or r[\"_field\"] == \"outdoorTemp\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_start\", \"_stop\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorHumid\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_field\", \"_start\", \"_stop\"])\n"
                       },
                       "version": "v0"
                     },
@@ -59,34 +59,13 @@
               "queryOptions": {
                 "interval": "1m"
               },
-              "transformations": [
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "outdoorTemp (.*)",
-                      "renamePattern": "temperautre $1"
-                    }
-                  }
-                },
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "outdoorHumid (.*)",
-                      "renamePattern": "humidity $1"
-                    }
-                  }
-                }
-              ]
+              "transformations": []
             }
           },
           "description": "",
           "id": 1,
           "links": [],
-          "title": "Outdoor TH",
+          "title": "Outdoor Humidity",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -143,27 +122,9 @@
                       }
                     ]
                   },
-                  "unit": "celsius"
+                  "unit": "percent"
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "outdoorHumid",
-                      "scope": "series"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percent"
-                      },
-                      {
-                        "id": "custom.axisPlacement",
-                        "value": "right"
-                      }
-                    ]
-                  }
-                ]
+                "overrides": []
               },
               "options": {
                 "annotations": {
@@ -177,9 +138,10 @@
                     "mean"
                   ],
                   "displayMode": "table",
-                  "enableFacetedFilter": false,
-                  "overflow": "ellipsis",
-                  "placement": "right",
+                  "enableFacetedFilter": true,
+                  "facetedFilterPinned": false,
+                  "overflow": "wrap",
+                  "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
@@ -312,7 +274,7 @@
                     "mean"
                   ],
                   "displayMode": "table",
-                  "enableFacetedFilter": false,
+                  "enableFacetedFilter": true,
                   "overflow": "ellipsis",
                   "placement": "right",
                   "showLegend": true
@@ -711,6 +673,170 @@
             "version": "13.1.0"
           }
         }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorTemp\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_field\", \"_start\", \"_stop\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "outdoorTemp (.*)",
+                      "renamePattern": "temperautre $1"
+                    }
+                  }
+                },
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "outdoorHumid (.*)",
+                      "renamePattern": "humidity $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 8,
+          "links": [],
+          "title": "Outdoor Temperature",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "outdoorHumid",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "right"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "min",
+                    "max",
+                    "mean"
+                  ],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "facetedFilterPinned": false,
+                  "overflow": "wrap",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
       }
     },
     "layout": {
@@ -732,9 +858,9 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-1"
+                          "name": "panel-8"
                         },
-                        "height": 8,
+                        "height": 11,
                         "width": 12,
                         "x": 0,
                         "y": 0
@@ -745,12 +871,25 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-2"
+                          "name": "panel-1"
                         },
-                        "height": 8,
+                        "height": 11,
                         "width": 12,
                         "x": 12,
                         "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-2"
+                        },
+                        "height": 12,
+                        "width": 24,
+                        "x": 0,
+                        "y": 11
                       }
                     }
                   ]
@@ -881,7 +1020,8 @@
     },
     "preload": false,
     "tags": [
-      "cpms"
+      "cpms",
+      "cpms-analytics"
     ],
     "timeSettings": {
       "autoRefresh": "",
