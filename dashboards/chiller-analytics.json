@@ -593,26 +593,29 @@
                       "includeByName": {},
                       "indexByName": {
                         "_time": 0,
-                        "alarm": 6,
+                        "alarm": 8,
                         "auto": 1,
-                        "condFlowSwitch": 10,
-                        "condPump1": 11,
-                        "condPump2": 12,
-                        "control": 7,
-                        "enable": 9,
-                        "evapFlowSwitch": 13,
-                        "evapPump1": 14,
-                        "evapPump2": 15,
-                        "limited": 16,
-                        "localRemote": 2,
-                        "run": 4,
-                        "runEnabled": 8,
-                        "status": 3,
-                        "trip": 5
+                        "availability": 2,
+                        "condFlowSwitch": 12,
+                        "condPump1": 13,
+                        "condPump2": 14,
+                        "control": 9,
+                        "enable": 11,
+                        "evapFlowSwitch": 15,
+                        "evapPump1": 16,
+                        "evapPump2": 17,
+                        "limited": 18,
+                        "localRemote": 4,
+                        "remoteMode": 3,
+                        "run": 6,
+                        "runEnabled": 10,
+                        "status": 5,
+                        "trip": 7
                       },
                       "renameByName": {
                         "alarm": "Alarm",
                         "auto": "Auto",
+                        "availability": "Availability",
                         "condFlowSwitch": "Cond Flow Switch",
                         "condPump1": "Cond Pump 1",
                         "condPump2": "Cond Pump 2",
@@ -621,7 +624,8 @@
                         "evapFlowSwitch": "Evap Flow Switch",
                         "evapPump1": "Evap Pump 1",
                         "evapPump2": "Evap Pump 2",
-                        "localRemote": "Local Remote",
+                        "localRemote": "Local / Remote",
+                        "remoteMode": "Soft Remote",
                         "run": "Run",
                         "runEnabled": "Run Enabled",
                         "status": "Status",
@@ -798,6 +802,40 @@
                                 "color": "orange",
                                 "index": 1,
                                 "text": "Local"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "availability",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "#808080",
+                                "index": 2,
+                                "text": "DISABLED"
+                              },
+                              "1": {
+                                "color": "orange",
+                                "index": 1,
+                                "text": "MAINTENANCE"
+                              },
+                              "2": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "AVAILABLE"
                               }
                             },
                             "type": "value"
@@ -1123,7 +1161,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-24h",
+      "from": "now-3h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
