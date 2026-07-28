@@ -101,7 +101,7 @@
                 "externalStyles": [
                   {
                     "id": "7b1083b0-9947-446e-be0d-031077106a2a",
-                    "url": "/custom/font-awesome.all.min.css"
+                    "url": "/custom/fontawesome/css/all.min.css"
                   }
                 ],
                 "helpers": "",
