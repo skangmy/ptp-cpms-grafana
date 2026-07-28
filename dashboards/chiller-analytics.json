@@ -429,7 +429,9 @@
                   }
                 }
               ],
-              "queryOptions": {},
+              "queryOptions": {
+                "interval": "1m"
+              },
               "transformations": [
                 {
                   "group": "renameByRegex",
@@ -486,7 +488,7 @@
                     "insertNulls": false,
                     "lineInterpolation": "linear",
                     "lineWidth": 1,
-                    "pointSize": 5,
+                    "pointSize": 1,
                     "scaleDistribution": {
                       "type": "linear"
                     },
@@ -898,7 +900,9 @@
                   }
                 }
               ],
-              "queryOptions": {},
+              "queryOptions": {
+                "interval": "1m"
+              },
               "transformations": [
                 {
                   "group": "renameByRegex",
@@ -955,7 +959,7 @@
                     "insertNulls": false,
                     "lineInterpolation": "linear",
                     "lineWidth": 1,
-                    "pointSize": 5,
+                    "pointSize": 1,
                     "scaleDistribution": {
                       "type": "linear"
                     },
@@ -1161,7 +1165,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-30m",
+      "from": "now-24h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
