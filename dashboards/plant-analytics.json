@@ -290,7 +290,7 @@
           }
         }
       },
-      "panel-4": {
+      "panel-6": {
         "kind": "Panel",
         "spec": {
           "data": {
@@ -308,7 +308,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorHumid\" or r[\"_field\"] == \"outdoorTemp\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_start\", \"_stop\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "import \"strings\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\" or r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chws\" or r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"cws\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with _field: strings.toUpper(v: r._field)}))"
                       },
                       "version": "v0"
                     },
@@ -316,37 +316,14 @@
                   }
                 }
               ],
-              "queryOptions": {
-                "interval": "1m"
-              },
-              "transformations": [
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "outdoorTemp (.*)",
-                      "renamePattern": "temperautre $1"
-                    }
-                  }
-                },
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "outdoorHumid (.*)",
-                      "renamePattern": "humidity $1"
-                    }
-                  }
-                }
-              ]
+              "queryOptions": {},
+              "transformations": []
             }
           },
           "description": "",
-          "id": 4,
+          "id": 6,
           "links": [],
-          "title": "Outdoor TH",
+          "title": "Plant Headers",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -405,159 +382,6 @@
                   },
                   "unit": "celsius"
                 },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "outdoorHumid",
-                      "scope": "series"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percent"
-                      },
-                      {
-                        "id": "custom.axisPlacement",
-                        "value": "right"
-                      }
-                    ]
-                  }
-                ]
-              },
-              "options": {
-                "annotations": {
-                  "clustering": -1,
-                  "multiLane": false
-                },
-                "legend": {
-                  "calcs": [
-                    "min",
-                    "max",
-                    "mean"
-                  ],
-                  "displayMode": "table",
-                  "enableFacetedFilter": false,
-                  "overflow": "ellipsis",
-                  "placement": "right",
-                  "showLegend": true
-                },
-                "tooltip": {
-                  "hideZeros": false,
-                  "mode": "single",
-                  "sort": "none"
-                }
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
-      "panel-5": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_start\", \"_stop\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {
-                "interval": "1m"
-              },
-              "transformations": [
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "radiation (.*)",
-                      "renamePattern": "$1"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "description": "",
-          "id": 5,
-          "links": [],
-          "title": "Outdoor Radiation",
-          "vizConfig": {
-            "group": "timeseries",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "palette-classic"
-                  },
-                  "custom": {
-                    "axisBorderShow": false,
-                    "axisCenteredZero": false,
-                    "axisColorMode": "text",
-                    "axisLabel": "",
-                    "axisPlacement": "auto",
-                    "barAlignment": 0,
-                    "barWidthFactor": 0.6,
-                    "drawStyle": "line",
-                    "fillOpacity": 0,
-                    "gradientMode": "none",
-                    "hideFrom": {
-                      "legend": false,
-                      "tooltip": false,
-                      "viz": false
-                    },
-                    "insertNulls": false,
-                    "lineInterpolation": "linear",
-                    "lineWidth": 1,
-                    "pointSize": 5,
-                    "scaleDistribution": {
-                      "type": "linear"
-                    },
-                    "showPoints": "auto",
-                    "showValues": false,
-                    "spanNulls": false,
-                    "stacking": {
-                      "group": "A",
-                      "mode": "none"
-                    },
-                    "thresholdsStyle": {
-                      "mode": "off"
-                    }
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
-                      }
-                    ]
-                  },
-                  "unit": "Wm2"
-                },
                 "overrides": []
               },
               "options": {
@@ -583,49 +407,6 @@
                   "sort": "none"
                 }
               }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
-      "panel-6": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "group": "",
-                      "kind": "DataQuery",
-                      "spec": {},
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 6,
-          "links": [],
-          "title": "New panel",
-          "vizConfig": {
-            "group": "__unconfigured-panel",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {}
             },
             "version": "13.1.0"
           }
@@ -858,12 +639,25 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-6"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-8"
                         },
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 0
+                        "y": 9
                       }
                     },
                     {
@@ -876,7 +670,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 0
+                        "y": 9
                       }
                     },
                     {
@@ -889,7 +683,7 @@
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 11
+                        "y": 20
                       }
                     }
                   ]
@@ -932,47 +726,7 @@
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
-                  "items": [
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-4"
-                        },
-                        "height": 8,
-                        "width": 24,
-                        "x": 0,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-5"
-                        },
-                        "height": 8,
-                        "width": 24,
-                        "x": 0,
-                        "y": 8
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-6"
-                        },
-                        "height": 8,
-                        "width": 12,
-                        "x": 0,
-                        "y": 16
-                      }
-                    }
-                  ]
+                  "items": []
                 }
               },
               "title": "Cooling Towers"
