@@ -579,7 +579,7 @@
                 }
               ],
               "queryOptions": {
-                "interval": "5m"
+                "interval": "1m"
               },
               "transformations": [
                 {
@@ -1161,7 +1161,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-3h",
+      "from": "now-30m",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -1173,8 +1173,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 3",
-            "value": "chiller3"
+            "text": "Chiller 2",
+            "value": "chiller2"
           },
           "hide": "dontHide",
           "includeAll": false,
