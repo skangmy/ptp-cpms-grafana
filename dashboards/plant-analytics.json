@@ -229,9 +229,9 @@
                     "axisSoftMax": 3,
                     "axisSoftMin": 0,
                     "barAlignment": 0,
-                    "barWidthFactor": 0.6,
+                    "barWidthFactor": 1,
                     "drawStyle": "bars",
-                    "fillOpacity": 0,
+                    "fillOpacity": 100,
                     "gradientMode": "none",
                     "hideFrom": {
                       "legend": false,
@@ -240,7 +240,7 @@
                     },
                     "insertNulls": false,
                     "lineInterpolation": "linear",
-                    "lineWidth": 1,
+                    "lineWidth": 0,
                     "pointSize": 5,
                     "scaleDistribution": {
                       "type": "linear"
@@ -332,7 +332,7 @@
                 },
                 "tooltip": {
                   "hideZeros": false,
-                  "mode": "single",
+                  "mode": "multi",
                   "sort": "none"
                 }
               }
@@ -413,9 +413,9 @@
                     "axisSoftMax": 3,
                     "axisSoftMin": 0,
                     "barAlignment": 0,
-                    "barWidthFactor": 0.6,
+                    "barWidthFactor": 1,
                     "drawStyle": "bars",
-                    "fillOpacity": 0,
+                    "fillOpacity": 100,
                     "gradientMode": "none",
                     "hideFrom": {
                       "legend": false,
@@ -424,7 +424,7 @@
                     },
                     "insertNulls": false,
                     "lineInterpolation": "linear",
-                    "lineWidth": 1,
+                    "lineWidth": 0,
                     "pointSize": 5,
                     "scaleDistribution": {
                       "type": "linear"
@@ -516,7 +516,7 @@
                 },
                 "tooltip": {
                   "hideZeros": false,
-                  "mode": "single",
+                  "mode": "multi",
                   "sort": "none"
                 }
               }
