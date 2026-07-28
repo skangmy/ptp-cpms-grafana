@@ -551,6 +551,288 @@
             "version": "13.1.0"
           }
         }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |\u003e keep(columns: [\"_field\", \"_value\", \"_time\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              },
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "limited": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {
+                        "_time": 0,
+                        "alarm": 6,
+                        "auto": 1,
+                        "condFlowSwitch": 10,
+                        "condPump1": 11,
+                        "condPump2": 12,
+                        "control": 7,
+                        "enable": 9,
+                        "evapFlowSwitch": 13,
+                        "evapPump1": 14,
+                        "evapPump2": 15,
+                        "limited": 16,
+                        "localRemote": 2,
+                        "run": 4,
+                        "runEnabled": 8,
+                        "status": 3,
+                        "trip": 5
+                      },
+                      "renameByName": {
+                        "alarm": "Alarm",
+                        "auto": "Auto",
+                        "condFlowSwitch": "Cond Flow Switch",
+                        "condPump1": "Cond Pump 1",
+                        "condPump2": "Cond Pump 2",
+                        "control": "Control",
+                        "enable": "Enable",
+                        "evapFlowSwitch": "Evap Flow Switch",
+                        "evapPump1": "Evap Pump 1",
+                        "evapPump2": "Evap Pump 2",
+                        "localRemote": "Local Remote",
+                        "run": "Run",
+                        "runEnabled": "Run Enabled",
+                        "status": "Status",
+                        "trip": "Trip"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 6,
+          "links": [],
+          "title": "Status",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "continuous-GrYlRd"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#9f9f9f",
+                          "index": 1,
+                          "text": "OFF"
+                        },
+                        "1": {
+                          "color": "green",
+                          "index": 0,
+                          "text": "ON"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "trip",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "OK"
+                              },
+                              "1": {
+                                "color": "red",
+                                "index": 1,
+                                "text": "NOK"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "alarm",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "OK"
+                              },
+                              "1": {
+                                "color": "red",
+                                "index": 1,
+                                "text": "NOK"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "auto",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "blue",
+                                "index": 1,
+                                "text": "MANUAL"
+                              },
+                              "1": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "AUTO"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "localRemote",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "Remote"
+                              },
+                              "1": {
+                                "color": "orange",
+                                "index": 1,
+                                "text": "Local"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "alignValue": "left",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.9,
+                "showValue": "never",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
       }
     },
     "layout": {
@@ -614,12 +896,25 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
+                "name": "panel-6"
+              },
+              "height": 13,
+              "width": 24,
+              "x": 0,
+              "y": 19
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
                 "name": "panel-5"
               },
               "height": 9,
               "width": 24,
               "x": 0,
-              "y": 19
+              "y": 32
             }
           }
         ]
@@ -667,7 +962,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-6h",
+      "from": "now-24h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -679,8 +974,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 3",
-            "value": "chiller3"
+            "text": "Chiller 2",
+            "value": "chiller2"
           },
           "hide": "dontHide",
           "includeAll": false,
