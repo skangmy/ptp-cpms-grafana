@@ -210,7 +210,7 @@
           "description": "",
           "id": 10,
           "links": [],
-          "title": "Chiller Overview",
+          "title": "Overview",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -394,7 +394,7 @@
           "description": "",
           "id": 11,
           "links": [],
-          "title": "Cooling Tower Overview",
+          "title": "Overview",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -777,49 +777,6 @@
                   "sort": "none"
                 }
               }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
-      "panel-7": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "group": "",
-                      "kind": "DataQuery",
-                      "spec": {},
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 7,
-          "links": [],
-          "title": "New panel",
-          "vizConfig": {
-            "group": "__unconfigured-panel",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {}
             },
             "version": "13.1.0"
           }
@@ -1239,32 +1196,6 @@
                         "x": 0,
                         "y": 25
                       }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-10"
-                        },
-                        "height": 8,
-                        "width": 12,
-                        "x": 0,
-                        "y": 37
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-11"
-                        },
-                        "height": 8,
-                        "width": 12,
-                        "x": 12,
-                        "y": 37
-                      }
                     }
                   ]
                 }
@@ -1285,10 +1216,10 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-7"
+                          "name": "panel-10"
                         },
-                        "height": 8,
-                        "width": 12,
+                        "height": 11,
+                        "width": 24,
                         "x": 0,
                         "y": 0
                       }
@@ -1306,7 +1237,21 @@
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
-                  "items": []
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-11"
+                        },
+                        "height": 12,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    }
+                  ]
                 }
               },
               "title": "Cooling Towers"
