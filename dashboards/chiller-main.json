@@ -53,7 +53,9 @@
                   }
                 }
               ],
-              "queryOptions": {},
+              "queryOptions": {
+                "interval": "1h"
+              },
               "transformations": []
             }
           },
