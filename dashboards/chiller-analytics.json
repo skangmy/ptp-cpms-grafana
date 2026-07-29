@@ -163,6 +163,339 @@
           }
         }
       },
+      "panel-11": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"actualRpm\" or r[\"_field\"] == \"current\")\n  |\u003e mean()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e filter(fn: (r) =\u003e r.current \u003e 0.01)\n  |\u003e group()\n  |\u003e mean(column: \"actualRpm\")  \n  |\u003e map(fn: (r) =\u003e ({ r with perc: r.actualRpm / 5200.0 }))\n  "
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 11,
+          "links": [],
+          "title": "Avg Comp RPM",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "displayName": "RPM",
+                  "max": 5200,
+                  "noValue": "----",
+                  "thresholds": {
+                    "mode": "percentage",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "orange",
+                        "value": 80
+                      },
+                      {
+                        "color": "red",
+                        "value": 90
+                      }
+                    ]
+                  },
+                  "unit": "rotrpm"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "perc",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "%"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": 0
+                            },
+                            {
+                              "color": "orange",
+                              "value": 0.8
+                            },
+                            {
+                              "color": "red",
+                              "value": 0.9
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"suctionPressure\" or r[\"_field\"] == \"dischargePressure\" or r[\"_field\"] == \"current\")\n  |\u003e mean()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e filter(fn: (r) =\u003e r.current \u003e 0.01)\n  |\u003e map(fn: (r) =\u003e ({ r with lift: r.dischargePressure - r.suctionPressure}))\n  |\u003e group()\n  |\u003e mean(column: \"lift\")  \n  "
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 12,
+          "links": [],
+          "title": "Lift",
+          "vizConfig": {
+            "group": "gauge",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "red",
+                    "mode": "fixed"
+                  },
+                  "noValue": "----",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "red",
+                        "value": 0
+                      },
+                      {
+                        "color": "orange",
+                        "value": 20
+                      },
+                      {
+                        "color": "green",
+                        "value": 25
+                      }
+                    ]
+                  },
+                  "unit": "pressurepsi"
+                },
+                "overrides": []
+              },
+              "options": {
+                "barShape": "rounded",
+                "barWidthFactor": 0.25,
+                "effects": {
+                  "barGlow": true,
+                  "centerGlow": true,
+                  "gradient": true
+                },
+                "endpointMarker": "glow",
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "segmentCount": 1,
+                "segmentSpacing": 0.3,
+                "shape": "circle",
+                "showThresholdLabels": false,
+                "showThresholdMarkers": false,
+                "sizing": "auto",
+                "sparkline": true,
+                "textMode": "auto"
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-13": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"percentRla\")\n  |\u003e group()\n  |\u003e mean()  "
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 13,
+          "links": [],
+          "title": "% RLA",
+          "vizConfig": {
+            "group": "gauge",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "red",
+                    "mode": "thresholds"
+                  },
+                  "noValue": "----",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "orange",
+                        "value": 70
+                      },
+                      {
+                        "color": "red",
+                        "value": 85
+                      }
+                    ]
+                  },
+                  "unit": "percent"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": ""
+                    },
+                    "properties": []
+                  }
+                ]
+              },
+              "options": {
+                "barShape": "rounded",
+                "barWidthFactor": 0.25,
+                "effects": {
+                  "barGlow": true,
+                  "centerGlow": true,
+                  "gradient": true
+                },
+                "endpointMarker": "glow",
+                "minVizHeight": 75,
+                "minVizWidth": 75,
+                "orientation": "auto",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": true
+                },
+                "segmentCount": 1,
+                "segmentSpacing": 0.3,
+                "shape": "circle",
+                "showThresholdLabels": false,
+                "showThresholdMarkers": false,
+                "sizing": "auto",
+                "sparkline": true,
+                "textMode": "auto"
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-2": {
         "kind": "Panel",
         "spec": {
@@ -1027,93 +1360,6 @@
           }
         }
       },
-      "panel-8": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"suctionPressure\" or r[\"_field\"] == \"dischargePressure\" or r[\"_field\"] == \"current\")\n  |\u003e mean()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e filter(fn: (r) =\u003e r.current \u003e 0.01)\n  |\u003e map(fn: (r) =\u003e ({ r with lift: r.dischargePressure - r.suctionPressure}))\n  |\u003e group()\n  |\u003e mean(column: \"lift\")  \n  "
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 8,
-          "links": [],
-          "title": "Lift",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "noValue": "----",
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "red",
-                        "value": 0
-                      },
-                      {
-                        "color": "orange",
-                        "value": 20
-                      },
-                      {
-                        "color": "green",
-                        "value": 25
-                      }
-                    ]
-                  },
-                  "unit": "pressurepsi"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
       "panel-9": {
         "kind": "Panel",
         "spec": {
@@ -1286,7 +1532,7 @@
                 "name": "panel-9"
               },
               "height": 3,
-              "width": 6,
+              "width": 8,
               "x": 0,
               "y": 0
             }
@@ -1296,11 +1542,24 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
-                "name": "panel-8"
+                "name": "panel-11"
               },
               "height": 3,
+              "width": 8,
+              "x": 8,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-12"
+              },
+              "height": 5,
               "width": 4,
-              "x": 6,
+              "x": 16,
               "y": 0
             }
           },
@@ -1312,9 +1571,22 @@
                 "name": "panel-1"
               },
               "height": 7,
-              "width": 24,
+              "width": 16,
               "x": 0,
               "y": 3
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-13"
+              },
+              "height": 5,
+              "width": 4,
+              "x": 16,
+              "y": 5
             }
           },
           {
