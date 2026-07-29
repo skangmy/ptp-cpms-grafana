@@ -474,7 +474,8 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green"
+                        "color": "green",
+                        "value": 0
                       }
                     ]
                   }
@@ -1030,14 +1031,14 @@
                       "indexByName": {
                         "_time": 0,
                         "availability": 1,
-                        "chillerState": 4,
-                        "coolingTowerState": 5,
+                        "chillerState": 8,
+                        "coolingTowerState": 9,
                         "emergency": 2,
-                        "health": 6,
+                        "health": 4,
                         "lockout": 3,
-                        "plantMode": 7,
-                        "remoteMode": 8,
-                        "state": 9
+                        "plantMode": 6,
+                        "remoteMode": 7,
+                        "state": 5
                       },
                       "renameByName": {
                         "availability": "Availability",
@@ -1291,7 +1292,7 @@
                           "kind": "ElementReference",
                           "name": "panel-9"
                         },
-                        "height": 5,
+                        "height": 6,
                         "width": 24,
                         "x": 0,
                         "y": 0
@@ -1307,7 +1308,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 5
+                        "y": 6
                       }
                     },
                     {
@@ -1320,7 +1321,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 14
+                        "y": 15
                       }
                     },
                     {
@@ -1333,7 +1334,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 14
+                        "y": 15
                       }
                     },
                     {
@@ -1346,7 +1347,7 @@
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 25
+                        "y": 26
                       }
                     }
                   ]
