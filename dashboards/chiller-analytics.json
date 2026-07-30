@@ -1003,7 +1003,7 @@
           "description": "",
           "id": 18,
           "links": [],
-          "title": "",
+          "title": "$compQuery",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -2485,7 +2485,7 @@
           "multi": true,
           "name": "compQuery",
           "options": [],
-          "query": "[\n{\"text\": \"Compressor 1\", \"value\": \"Comp1\", \"type\": \"not\"},\n{\"text\": \"Compressor 1\", \"value\": \"Comp1\", \"type\": \"\"},\n{\"text\": \"Compressor 2\", \"value\": \"Comp2\", \"type\": \"not\"},\n{\"text\": \"Compressor 2\", \"value\": \"Comp2\", \"type\": \"\"},\n{\"text\": \"Compressor 3\", \"value\": \"Comp3\", \"type\": \"not\"},\n{\"text\": \"Compressor 3\", \"value\": \"Comp3\", \"type\": \"\"}\n]",
+          "query": "[\n{\"text\": \"Compressor 1\", \"value\": \"Comp1\", \"type\": \"not\"},\n{\"text\": \"Compressor 1 ?\", \"value\": \"Comp1\", \"type\": \"not not\"},\n{\"text\": \"Compressor 2\", \"value\": \"Comp2\", \"type\": \"not\"},\n{\"text\": \"Compressor 2 ?\", \"value\": \"Comp2\", \"type\": \"not not\"},\n{\"text\": \"Compressor 3\", \"value\": \"Comp3\", \"type\": \"not\"},\n{\"text\": \"Compressor 3 ?\", \"value\": \"Comp3\", \"type\": \"not not\"}\n]",
           "skipUrlSync": false,
           "valuesFormat": "json"
         }
