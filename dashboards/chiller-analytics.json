@@ -496,6 +496,306 @@
           }
         }
       },
+      "panel-14": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select value from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "convertFieldType",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "conversions": [
+                        {
+                          "destinationType": "other",
+                          "targetField": "upper"
+                        }
+                      ],
+                      "fields": {}
+                    }
+                  }
+                },
+                {
+                  "group": "formatString",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "outputFormat": "Upper Case",
+                      "stringField": "value"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 14,
+          "links": [],
+          "title": "Assigned CHWP",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "empty",
+                        "result": {
+                          "color": "light-red",
+                          "index": 0,
+                          "text": "Not Assigned"
+                        }
+                      },
+                      "type": "special"
+                    },
+                    {
+                      "options": {
+                        "match": "null+nan",
+                        "result": {
+                          "color": "light-red",
+                          "index": 1,
+                          "text": "Not Assigned"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "none",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [],
+                  "fields": "/.*/",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-15": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select value from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "convertFieldType",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "conversions": [
+                        {
+                          "destinationType": "other",
+                          "targetField": "upper"
+                        }
+                      ],
+                      "fields": {}
+                    }
+                  }
+                },
+                {
+                  "group": "formatString",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "outputFormat": "Upper Case",
+                      "stringField": "value"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 15,
+          "links": [],
+          "title": "Assigned CWP",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "empty",
+                        "result": {
+                          "color": "light-red",
+                          "index": 1,
+                          "text": "Not Assigned"
+                        }
+                      },
+                      "type": "special"
+                    },
+                    {
+                      "options": {
+                        "match": "null+nan",
+                        "result": {
+                          "color": "light-red",
+                          "index": 2,
+                          "text": "Not Assigned"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "none",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [],
+                  "fields": "/.*/",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-2": {
         "kind": "Panel",
         "spec": {
@@ -1555,11 +1855,24 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
-                "name": "panel-12"
+                "name": "panel-14"
               },
-              "height": 5,
+              "height": 3,
               "width": 4,
               "x": 16,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-15"
+              },
+              "height": 3,
+              "width": 4,
+              "x": 20,
               "y": 0
             }
           },
@@ -1581,12 +1894,25 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
-                "name": "panel-13"
+                "name": "panel-12"
               },
-              "height": 5,
+              "height": 7,
               "width": 4,
               "x": 16,
-              "y": 5
+              "y": 3
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-13"
+              },
+              "height": 7,
+              "width": 4,
+              "x": 20,
+              "y": 3
             }
           },
           {
@@ -1738,8 +2064,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 3",
-            "value": "chiller3"
+            "text": "Chiller 1",
+            "value": "chiller1"
           },
           "hide": "dontHide",
           "includeAll": false,
@@ -1798,6 +2124,35 @@
                 "limit": 50
               }
             },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "regexApplyTo": "value",
+          "skipUrlSync": false,
+          "sort": "disabled"
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "current": {
+            "text": "",
+            "value": ""
+          },
+          "hide": "dontHide",
+          "includeAll": false,
+          "multi": false,
+          "name": "query0",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "cpms-redis"
+            },
+            "group": "redis-datasource",
+            "kind": "DataQuery",
+            "spec": {},
             "version": "v0"
           },
           "refresh": "onDashboardLoad",
