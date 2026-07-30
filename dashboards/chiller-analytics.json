@@ -54,10 +54,59 @@
                     },
                     "refId": "A"
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT\n    chiller_id as \"chillerId\",\n    FLOOR((\n        total_runtime_seconds\n        + COALESCE(FLOOR(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - current_started_at)))::bigint, 0)\n    ) / 3600.0) AS total_run_time_hours\nFROM chiller_runtime\nWHERE chiller_id = '${chiller}';",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
                 }
               ],
               "queryOptions": {},
               "transformations": [
+                {
+                  "group": "joinByField",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "byField": "chillerId",
+                      "mode": "outerTabular"
+                    }
+                  }
+                },
                 {
                   "group": "organize",
                   "kind": "Transformation",
@@ -80,7 +129,8 @@
                         "condLWT": "Cond LWT",
                         "evapEWT": "Evap EWT",
                         "evapLWT": "Evap LWT",
-                        "modeOutput": ""
+                        "modeOutput": "",
+                        "total_run_time_hours": "Run Hours"
                       }
                     }
                   }
@@ -116,26 +166,13 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "actualCapacity",
+                      "options": "total_run_time_hours",
                       "scope": "series"
                     },
                     "properties": [
                       {
                         "id": "unit",
-                        "value": "RT"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "capacityLimitOutput",
-                      "scope": "series"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "RT"
+                        "value": "h"
                       }
                     ]
                   }
@@ -225,8 +262,7 @@
                         "value": 90
                       }
                     ]
-                  },
-                  "unit": "rotrpm"
+                  }
                 },
                 "overrides": [
                   {
@@ -785,6 +821,82 @@
                 "reduceOptions": {
                   "calcs": [],
                   "fields": "/.*/",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-17": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"run\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\")\n  |\u003e integral(unit: 1s)"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 17,
+          "links": [],
+          "title": "Run Time",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "dtdhms"
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [],
+                  "fields": "",
                   "values": true
                 },
                 "showPercentChange": false,
@@ -1640,7 +1752,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\" or r[\"_measurement\"] == \"water\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with loadPerc: r.actualCapacity / float(v: ${chillerCapacity})}))"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\" or r[\"_measurement\"] == \"water\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with loadPerc: r.actualCapacity / float(v: ${chillerCapacity}), chillerId: \"${chiller}\"}))"
                       },
                       "version": "v0"
                     },
@@ -1793,8 +1905,8 @@
                 "kind": "ElementReference",
                 "name": "panel-9"
               },
-              "height": 3,
-              "width": 8,
+              "height": 4,
+              "width": 5,
               "x": 0,
               "y": 0
             }
@@ -1806,9 +1918,9 @@
                 "kind": "ElementReference",
                 "name": "panel-11"
               },
-              "height": 3,
-              "width": 8,
-              "x": 8,
+              "height": 4,
+              "width": 6,
+              "x": 5,
               "y": 0
             }
           },
@@ -1819,9 +1931,9 @@
                 "kind": "ElementReference",
                 "name": "panel-14"
               },
-              "height": 3,
+              "height": 4,
               "width": 4,
-              "x": 16,
+              "x": 11,
               "y": 0
             }
           },
@@ -1832,9 +1944,22 @@
                 "kind": "ElementReference",
                 "name": "panel-15"
               },
-              "height": 3,
+              "height": 4,
               "width": 4,
-              "x": 20,
+              "x": 15,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-17"
+              },
+              "height": 4,
+              "width": 5,
+              "x": 19,
               "y": 0
             }
           },
@@ -1848,7 +1973,7 @@
               "height": 7,
               "width": 16,
               "x": 0,
-              "y": 3
+              "y": 4
             }
           },
           {
@@ -1861,7 +1986,7 @@
               "height": 7,
               "width": 4,
               "x": 16,
-              "y": 3
+              "y": 4
             }
           },
           {
@@ -1871,10 +1996,10 @@
                 "kind": "ElementReference",
                 "name": "panel-13"
               },
-              "height": 7,
+              "height": 6,
               "width": 4,
               "x": 20,
-              "y": 3
+              "y": 4
             }
           },
           {
@@ -1887,7 +2012,7 @@
               "height": 13,
               "width": 24,
               "x": 0,
-              "y": 10
+              "y": 11
             }
           },
           {
@@ -1906,7 +2031,7 @@
               },
               "width": 24,
               "x": 0,
-              "y": 23
+              "y": 24
             }
           },
           {
@@ -1919,7 +2044,7 @@
               "height": 9,
               "width": 24,
               "x": 0,
-              "y": 33
+              "y": 34
             }
           },
           {
@@ -1932,7 +2057,7 @@
               "height": 9,
               "width": 24,
               "x": 0,
-              "y": 42
+              "y": 43
             }
           }
         ]
@@ -1994,7 +2119,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-24h",
+      "from": "now/d",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
