@@ -814,7 +814,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}Comp1\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}${comps}\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
                       },
                       "version": "v0"
                     },
@@ -823,13 +823,75 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "calculateField",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "alias": "Lift",
+                      "binary": {
+                        "left": {
+                          "matcher": {
+                            "id": "byName",
+                            "options": "dischargePressure"
+                          }
+                        },
+                        "operator": "-",
+                        "right": {
+                          "matcher": {
+                            "id": "byName",
+                            "options": "suctionPressure"
+                          }
+                        }
+                      },
+                      "mode": "binary",
+                      "reduce": {
+                        "reducer": "sum"
+                      },
+                      "replaceFields": false
+                    }
+                  }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "actualRpm": 0,
+                        "condSatTemp": 3,
+                        "current": 1,
+                        "dischargePressure": 7,
+                        "dischargeTemp": 4,
+                        "evapSatTemp": 5,
+                        "percentRla": 2,
+                        "suctionPressure": 8,
+                        "suctionTemp": 6
+                      },
+                      "renameByName": {
+                        "actualRpm": "Actual RPM",
+                        "condSatTemp": "Cond Sat Temp",
+                        "current": "Current",
+                        "dischargePressure": "Discharge Pressure",
+                        "dischargeTemp": "Discharge Temp",
+                        "evapSatTemp": "Evap Sat Temp",
+                        "percentRla": "% RLA",
+                        "suctionPressure": "Suction Pressure",
+                        "suctionTemp": "Suction Temp"
+                      }
+                    }
+                  }
+                }
+              ]
             }
           },
           "description": "",
           "id": 2,
           "links": [],
-          "title": "Compressor 1",
+          "title": "$comps",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -843,179 +905,79 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
+                        "color": "blue",
                         "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
                       }
                     ]
                   }
                 },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
-      "panel-3": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}Comp2\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
-                      },
-                      "version": "v0"
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*Temp/",
+                      "scope": "series"
                     },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 3,
-          "links": [],
-          "title": "Compressor 2",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
+                    "properties": [
                       {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
+                        "id": "unit",
+                        "value": "celsius"
                       }
                     ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": false
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
-      "panel-4": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}Comp3\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
-                      },
-                      "version": "v0"
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Current",
+                      "scope": "series"
                     },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 4,
-          "links": [],
-          "title": "Compressor 3",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "amp"
+                      }
+                    ]
                   },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "actualRpm",
+                      "scope": "series"
+                    },
+                    "properties": [
                       {
-                        "color": "green",
-                        "value": 0
-                      },
+                        "id": "unit",
+                        "value": "rotrpm"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*Pressure/",
+                      "scope": "series"
+                    },
+                    "properties": [
                       {
-                        "color": "red",
-                        "value": 80
+                        "id": "unit",
+                        "value": "pressurekpa"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Lift",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "pressurekpa"
                       }
                     ]
                   }
-                },
-                "overrides": []
+                ]
               },
               "options": {
                 "colorMode": "value",
@@ -1920,51 +1882,31 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
-                "name": "panel-2"
-              },
-              "height": 10,
-              "width": 8,
-              "x": 0,
-              "y": 10
-            }
-          },
-          {
-            "kind": "GridLayoutItem",
-            "spec": {
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-3"
-              },
-              "height": 10,
-              "width": 8,
-              "x": 8,
-              "y": 10
-            }
-          },
-          {
-            "kind": "GridLayoutItem",
-            "spec": {
-              "element": {
-                "kind": "ElementReference",
-                "name": "panel-4"
-              },
-              "height": 10,
-              "width": 8,
-              "x": 16,
-              "y": 10
-            }
-          },
-          {
-            "kind": "GridLayoutItem",
-            "spec": {
-              "element": {
-                "kind": "ElementReference",
                 "name": "panel-6"
               },
               "height": 13,
               "width": 24,
               "x": 0,
-              "y": 20
+              "y": 10
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-2"
+              },
+              "height": 10,
+              "repeat": {
+                "direction": "h",
+                "maxPerRow": 3,
+                "mode": "variable",
+                "value": "comps"
+              },
+              "width": 24,
+              "x": 0,
+              "y": 23
             }
           },
           {
@@ -2134,32 +2076,25 @@
         }
       },
       {
-        "kind": "QueryVariable",
+        "kind": "CustomVariable",
         "spec": {
-          "allowCustomValue": true,
+          "allowCustomValue": false,
           "current": {
-            "text": "",
-            "value": ""
+            "text": [
+              "All"
+            ],
+            "value": [
+              "$__all"
+            ]
           },
-          "hide": "dontHide",
-          "includeAll": false,
-          "multi": false,
-          "name": "query0",
+          "hide": "hideVariable",
+          "includeAll": true,
+          "multi": true,
+          "name": "comps",
           "options": [],
-          "query": {
-            "datasource": {
-              "name": "cpms-redis"
-            },
-            "group": "redis-datasource",
-            "kind": "DataQuery",
-            "spec": {},
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "regex": "",
-          "regexApplyTo": "value",
+          "query": "Compressor 1 : Comp1,\nCompressor 2 : Comp2,\nCompressor 3 : Comp3",
           "skipUrlSync": false,
-          "sort": "disabled"
+          "valuesFormat": "csv"
         }
       }
     ]
