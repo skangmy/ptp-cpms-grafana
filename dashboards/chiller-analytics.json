@@ -908,6 +908,224 @@
           }
         }
       },
+      "panel-18": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"array\"\n\nfield = [\"condSatTemp\",\"dischargeTemp\",\"evapSatTemp\",\"suctionTemp\"]\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}${compQuery.value}\")\n  |\u003e filter(fn: (r) =\u003e ${compQuery.type} contains(value: r._field, set: field))\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "calculateField",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "alias": "Lift",
+                      "binary": {
+                        "left": {
+                          "matcher": {
+                            "id": "byName",
+                            "options": "dischargePressure"
+                          }
+                        },
+                        "operator": "-",
+                        "right": {
+                          "matcher": {
+                            "id": "byName",
+                            "options": "suctionPressure"
+                          }
+                        }
+                      },
+                      "mode": "binary",
+                      "reduce": {
+                        "reducer": "sum"
+                      },
+                      "replaceFields": false
+                    }
+                  }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "actualRpm": 0,
+                        "condSatTemp": 3,
+                        "current": 1,
+                        "dischargePressure": 7,
+                        "dischargeTemp": 4,
+                        "evapSatTemp": 5,
+                        "percentRla": 2,
+                        "suctionPressure": 8,
+                        "suctionTemp": 6
+                      },
+                      "renameByName": {
+                        "actualRpm": "Actual RPM",
+                        "condSatTemp": "Cond Sat Temp",
+                        "current": "Current",
+                        "dischargePressure": "Discharge Pressure",
+                        "dischargeTemp": "Discharge Temp",
+                        "evapSatTemp": "Evap Sat Temp",
+                        "percentRla": "% RLA",
+                        "suctionPressure": "Suction Pressure",
+                        "suctionTemp": "Suction Temp"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 18,
+          "links": [],
+          "title": "",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*Temp/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "celsius"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Current",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "amp"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "actualRpm",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "rotrpm"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*Pressure/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "pressurekpa"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Lift",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "pressurekpa"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "percentRla",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-2": {
         "kind": "Panel",
         "spec": {
@@ -1086,6 +1304,19 @@
                       {
                         "id": "unit",
                         "value": "pressurekpa"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "percentRla",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
                       }
                     ]
                   }
@@ -2039,12 +2270,31 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
+                "name": "panel-18"
+              },
+              "height": 10,
+              "repeat": {
+                "direction": "h",
+                "maxPerRow": 6,
+                "mode": "variable",
+                "value": "compQuery"
+              },
+              "width": 24,
+              "x": 0,
+              "y": 34
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
                 "name": "panel-5"
               },
               "height": 9,
               "width": 24,
               "x": 0,
-              "y": 34
+              "y": 44
             }
           },
           {
@@ -2057,7 +2307,7 @@
               "height": 9,
               "width": 24,
               "x": 0,
-              "y": 43
+              "y": 53
             }
           }
         ]
@@ -2218,6 +2468,26 @@
           "query": "Compressor 1 : Comp1,\nCompressor 2 : Comp2,\nCompressor 3 : Comp3",
           "skipUrlSync": false,
           "valuesFormat": "csv"
+        }
+      },
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "All",
+            "value": [
+              "$__all"
+            ]
+          },
+          "hide": "dontHide",
+          "includeAll": true,
+          "multi": true,
+          "name": "compQuery",
+          "options": [],
+          "query": "[\n{\"text\": \"Compressor 1\", \"value\": \"Comp1\", \"type\": \"not\"},\n{\"text\": \"Compressor 1\", \"value\": \"Comp1\", \"type\": \"\"},\n{\"text\": \"Compressor 2\", \"value\": \"Comp2\", \"type\": \"not\"},\n{\"text\": \"Compressor 2\", \"value\": \"Comp2\", \"type\": \"\"},\n{\"text\": \"Compressor 3\", \"value\": \"Comp3\", \"type\": \"not\"},\n{\"text\": \"Compressor 3\", \"value\": \"Comp3\", \"type\": \"\"}\n]",
+          "skipUrlSync": false,
+          "valuesFormat": "json"
         }
       }
     ]
