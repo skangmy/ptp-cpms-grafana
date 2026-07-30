@@ -1205,7 +1205,7 @@
                   "showLineNumbers": false,
                   "showMiniMap": false
                 },
-                "content": "\u003ccenter\u003e\u003ch1\u003e${comps.text}\u003c/h1\u003e\u003c/center\u003e",
+                "content": "\u003ccenter\u003e\u003ch1 style=\"margin-top: 5px;\"\u003e${comps.text}\u003c/h1\u003e\u003c/center\u003e",
                 "mode": "markdown"
               }
             },
