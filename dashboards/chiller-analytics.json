@@ -2281,7 +2281,7 @@
           "refresh": "onDashboardLoad",
           "regex": "",
           "regexApplyTo": "value",
-          "skipUrlSync": false,
+          "skipUrlSync": true,
           "sort": "disabled"
         }
       },
@@ -2301,7 +2301,7 @@
           "name": "comps",
           "options": [],
           "query": "Compressor 1, \nCompressor 2,\nCompressor 3 ",
-          "skipUrlSync": false,
+          "skipUrlSync": true,
           "valuesFormat": "csv"
         }
       },
@@ -2321,7 +2321,7 @@
           "name": "compQuery",
           "options": [],
           "query": "[\n{\"comp\": \"Comp1\",\"text\": \"Compressor 1\", \"value\": \"Comp1_1\", \"op\": \"not\"},\n{\"comp\": \"Comp1\",\"text\": \"Compressor 1\", \"value\": \"Comp1_2\", \"op\": \"\"},\n{\"comp\": \"Comp2\",\"text\": \"Compressor 2\", \"value\": \"Comp2_1\", \"op\": \"not\"},\n{\"comp\": \"Comp2\",\"text\": \"Compressor 2\", \"value\": \"Comp2_2\", \"op\": \"\"},\n{\"comp\": \"Comp3\",\"text\": \"Compressor 3\", \"value\": \"Comp3_1\", \"op\": \"not\"},\n{\"comp\": \"Comp3\",\"text\": \"Compressor 3\", \"value\": \"Comp3_3\", \"op\": \"\"}\n]",
-          "skipUrlSync": false,
+          "skipUrlSync": true,
           "valuesFormat": "json"
         }
       },
@@ -2380,7 +2380,7 @@
           "refresh": "onDashboardLoad",
           "regex": "",
           "regexApplyTo": "value",
-          "skipUrlSync": false,
+          "skipUrlSync": true,
           "sort": "disabled"
         }
       },
@@ -2439,7 +2439,7 @@
           "refresh": "onDashboardLoad",
           "regex": "",
           "regexApplyTo": "value",
-          "skipUrlSync": false,
+          "skipUrlSync": true,
           "sort": "disabled"
         }
       }
