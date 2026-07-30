@@ -545,33 +545,12 @@
                     "hidden": false,
                     "query": {
                       "datasource": {
-                        "name": "cpms-postgres"
+                        "name": "cpms-influxdb"
                       },
-                      "group": "grafana-postgresql-datasource",
+                      "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "dataset": "chiller",
-                        "editorMode": "code",
-                        "format": "table",
-                        "rawQuery": true,
-                        "rawSql": "select value from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
-                        "sql": {
-                          "columns": [
-                            {
-                              "parameters": [],
-                              "type": "function"
-                            }
-                          ],
-                          "groupBy": [
-                            {
-                              "property": {
-                                "type": "string"
-                              },
-                              "type": "groupBy"
-                            }
-                          ],
-                          "limit": 50
-                        }
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"pump\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"speedFb\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${assignedChwp}\")\n  |\u003e last()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e group()\n  |\u003e map(fn: (r) =\u003e ({ r with name: \"${assignedChwp.text}\"}))\n  |\u003e keep(columns: [\"speedFb\", \"name\"])"
                       },
                       "version": "v0"
                     },
@@ -582,27 +561,17 @@
               "queryOptions": {},
               "transformations": [
                 {
-                  "group": "convertFieldType",
+                  "group": "organize",
                   "kind": "Transformation",
                   "spec": {
                     "options": {
-                      "conversions": [
-                        {
-                          "destinationType": "other",
-                          "targetField": "upper"
-                        }
-                      ],
-                      "fields": {}
-                    }
-                  }
-                },
-                {
-                  "group": "formatString",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "outputFormat": "Upper Case",
-                      "stringField": "value"
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "name": 0,
+                        "speedFb": 1
+                      },
+                      "renameByName": {}
                     }
                   }
                 }
@@ -660,161 +629,25 @@
                     ]
                   }
                 },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "none",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [],
-                  "fields": "/.*/",
-                  "values": true
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
-      "panel-15": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-postgres"
-                      },
-                      "group": "grafana-postgresql-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "dataset": "chiller",
-                        "editorMode": "code",
-                        "format": "table",
-                        "rawQuery": true,
-                        "rawSql": "select value from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
-                        "sql": {
-                          "columns": [
-                            {
-                              "parameters": [],
-                              "type": "function"
-                            }
-                          ],
-                          "groupBy": [
-                            {
-                              "property": {
-                                "type": "string"
-                              },
-                              "type": "groupBy"
-                            }
-                          ],
-                          "limit": 50
-                        }
-                      },
-                      "version": "v0"
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "speedFb",
+                      "scope": "series"
                     },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": [
-                {
-                  "group": "convertFieldType",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "conversions": [
-                        {
-                          "destinationType": "other",
-                          "targetField": "upper"
-                        }
-                      ],
-                      "fields": {}
-                    }
-                  }
-                },
-                {
-                  "group": "formatString",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "outputFormat": "Upper Case",
-                      "stringField": "value"
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "description": "",
-          "id": 15,
-          "links": [],
-          "title": "Assigned CWP",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "mappings": [
-                    {
-                      "options": {
-                        "match": "empty",
-                        "result": {
-                          "color": "light-red",
-                          "index": 1,
-                          "text": "Not Assigned"
-                        }
-                      },
-                      "type": "special"
-                    },
-                    {
-                      "options": {
-                        "match": "null+nan",
-                        "result": {
-                          "color": "light-red",
-                          "index": 2,
-                          "text": "Not Assigned"
-                        }
-                      },
-                      "type": "special"
-                    }
-                  ],
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
+                    "properties": [
                       {
-                        "color": "green",
-                        "value": 0
-                      },
-                      {
-                        "color": "red",
-                        "value": 80
+                        "id": "unit",
+                        "value": "rothz"
                       }
                     ]
                   }
-                },
-                "overrides": []
+                ]
               },
               "options": {
                 "colorMode": "none",
-                "graphMode": "area",
+                "graphMode": "none",
                 "justifyMode": "auto",
                 "orientation": "auto",
                 "percentChangeColorMode": "standard",
@@ -824,7 +657,7 @@
                   "values": true
                 },
                 "showPercentChange": false,
-                "textMode": "auto",
+                "textMode": "value",
                 "wideLayout": true
               }
             },
@@ -1119,6 +952,139 @@
                 },
                 "showPercentChange": false,
                 "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-19": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"pump\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"speedFb\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${assignedCwp}\")\n  |\u003e last()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e group()\n  |\u003e map(fn: (r) =\u003e ({ r with name: \"${assignedCwp.text}\"}))\n  |\u003e keep(columns: [\"speedFb\", \"name\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "name": 0,
+                        "speedFb": 1
+                      },
+                      "renameByName": {}
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 19,
+          "links": [],
+          "title": "Assigned CWP",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "match": "empty",
+                        "result": {
+                          "color": "light-red",
+                          "index": 0,
+                          "text": "Not Assigned"
+                        }
+                      },
+                      "type": "special"
+                    },
+                    {
+                      "options": {
+                        "match": "null+nan",
+                        "result": {
+                          "color": "light-red",
+                          "index": 1,
+                          "text": "Not Assigned"
+                        }
+                      },
+                      "type": "special"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "speedFb",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "rothz"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "none",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [],
+                  "fields": "/.*/",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "value",
                 "wideLayout": true
               }
             },
@@ -2042,7 +2008,7 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
-                "name": "panel-15"
+                "name": "panel-19"
               },
               "height": 4,
               "width": 4,
@@ -2357,6 +2323,124 @@
           "query": "[\n{\"comp\": \"Comp1\",\"text\": \"Compressor 1\", \"value\": \"Comp1_1\", \"op\": \"not\"},\n{\"comp\": \"Comp1\",\"text\": \"Compressor 1\", \"value\": \"Comp1_2\", \"op\": \"\"},\n{\"comp\": \"Comp2\",\"text\": \"Compressor 2\", \"value\": \"Comp2_1\", \"op\": \"not\"},\n{\"comp\": \"Comp2\",\"text\": \"Compressor 2\", \"value\": \"Comp2_2\", \"op\": \"\"},\n{\"comp\": \"Comp3\",\"text\": \"Compressor 3\", \"value\": \"Comp3_1\", \"op\": \"not\"},\n{\"comp\": \"Comp3\",\"text\": \"Compressor 3\", \"value\": \"Comp3_3\", \"op\": \"\"}\n]",
           "skipUrlSync": false,
           "valuesFormat": "json"
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "CHWP1",
+            "value": "chwp1"
+          },
+          "definition": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
+          "hide": "hideVariable",
+          "includeAll": false,
+          "multi": false,
+          "name": "assignedChwp",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "cpms-postgres"
+            },
+            "group": "grafana-postgresql-datasource",
+            "kind": "DataQuery",
+            "spec": {
+              "dataset": "chiller",
+              "editorMode": "code",
+              "format": "table",
+              "meta": {
+                "textField": "text",
+                "valueField": "value"
+              },
+              "query": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
+              "rawQuery": true,
+              "rawSql": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
+              "refId": "SQLVariableQueryEditor-VariableQuery",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "regexApplyTo": "value",
+          "skipUrlSync": false,
+          "sort": "disabled"
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "CWP1",
+            "value": "cwp1"
+          },
+          "definition": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
+          "hide": "hideVariable",
+          "includeAll": false,
+          "multi": false,
+          "name": "assignedCwp",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "cpms-postgres"
+            },
+            "group": "grafana-postgresql-datasource",
+            "kind": "DataQuery",
+            "spec": {
+              "dataset": "chiller",
+              "editorMode": "code",
+              "format": "table",
+              "meta": {
+                "textField": "text",
+                "valueField": "value"
+              },
+              "query": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
+              "rawQuery": true,
+              "rawSql": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
+              "refId": "SQLVariableQueryEditor-VariableQuery",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            "version": "v0"
+          },
+          "refresh": "onDashboardLoad",
+          "regex": "",
+          "regexApplyTo": "value",
+          "skipUrlSync": false,
+          "sort": "disabled"
         }
       }
     ]
