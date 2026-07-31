@@ -1179,6 +1179,240 @@
           }
         }
       },
+      "panel-20": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\n\nenergy =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"kwh\"})\n\ncooling =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"actualCapacity\")\n        |\u003e filter(fn: (r) =\u003e r._value \u003e 0.0)\n        |\u003e aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"rth\"})\n\njoin.inner(left: energy, right: cooling, \non: (l, r) =\u003e l._time == r._time, \nas: (l,r) =\u003e ({ \n  _time: l._time,\n  kwh: l.kwh,\n  rth: r.rth,\n  efficiency: if r.rth \u003e 0.0 then l.kwh / r.rth else 0.0\n}))\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "kwh": true,
+                        "rth": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "efficiency": "Efficiency"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 20,
+          "links": [],
+          "title": "Chiller Efficiency",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "bars",
+                    "fillOpacity": 100,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kW/RT"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-21": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\nimport \"date\"\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\n\nenergy =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"kwh\"})\n\ncooling =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"actualCapacity\")\n        |\u003e filter(fn: (r) =\u003e r._value \u003e 0.0)\n        |\u003e aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"rth\"})\n\njoin.inner(left: energy, right: cooling, \non: (l, r) =\u003e l._time == r._time, \nas: (l,r) =\u003e ({ \n  _time: l._time,\n  dow: date.weekDay(t: l._time),\n  hour: date.hour(t: l._time),\n  kwh: l.kwh,\n  rth: r.rth,\n  efficiency: if r.rth \u003e 0.0 then l.kwh / r.rth else 0.0\n}))\n  |\u003e group(columns: [\"dow\", \"hour\"])\n  |\u003e mean(column: \"efficiency\")\n  |\u003e group()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "timeFrom": "now-30d/d",
+                "timeShift": "1d/d"
+              },
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "kwh": true,
+                        "rth": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "efficiency": "Efficiency"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 21,
+          "links": [],
+          "title": "Chiller Efficiency",
+          "vizConfig": {
+            "group": "volkovlabs-echarts-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+              },
+              "options": {
+                "baidu": {
+                  "callback": "bmapReady",
+                  "key": ""
+                },
+                "editor": {
+                  "format": "auto"
+                },
+                "editorMode": "visual",
+                "gaode": {
+                  "key": "",
+                  "plugin": "AMap.Scale,AMap.ToolBar"
+                },
+                "getOption": "const series = context.panel.data.series.map((s) =\u003e {\n  const sData = s.fields.find((f) =\u003e f.type === 'number').values.buffer || s.fields.find((f) =\u003e f.type === 'number').values;\n  const sTime = s.fields.find((f) =\u003e f.type === 'time').values.buffer || s.fields.find((f) =\u003e f.type === 'time').values;\n  \n  return {\n    name: s.refId,\n    type: 'line',\n    showSymbol: false,\n    areaStyle: {\n      opacity: 0.1,\n    },\n    lineStyle: {\n      width: 1,\n    },\n    data: sData.map((d, i) =\u003e [sTime[i], d.toFixed(2)]),\n  };\n});\n\n/**\n * Enable Data Zoom by default\n */\nsetTimeout(() =\u003e context.panel.chart.dispatchAction({\n  type: 'takeGlobalCursor',\n  key: 'dataZoomSelect',\n  dataZoomSelectActive: true,\n}), 500);\n\n/**\n * Update Time Range on Zoom\n */\ncontext.panel.chart.on('datazoom', function (params) {\n  const startValue = params.batch[0]?.startValue;\n  const endValue = params.batch[0]?.endValue;\n  locationService.partial({ from: startValue, to: endValue });\n});\n\nreturn {\n  backgroundColor: 'transparent',\n  tooltip: {\n    trigger: 'axis',\n  },\n  legend: {\n    left: '0',\n    bottom: '0',\n    data: context.panel.data.series.map((s) =\u003e s.refId),\n    textStyle: {\n      color: 'rgba(128, 128, 128, .9)',\n    },\n  },\n  toolbox: {\n    feature: {\n      dataZoom: {\n        yAxisIndex: 'none',\n        icon: {\n          zoom: 'path://',\n          back: 'path://',\n        },\n      },\n      saveAsImage: {},\n    }\n  },\n  xAxis: {\n    type: 'time',\n  },\n  yAxis: {\n    type: 'value',\n    min: 'dataMin',\n  },\n  grid: {\n    left: '2%',\n    right: '2%',\n    top: '2%',\n    bottom: 24,\n    containLabel: true,\n  },\n  series,\n};",
+                "google": {
+                  "callback": "gmapReady",
+                  "key": ""
+                },
+                "map": "none",
+                "renderer": "canvas",
+                "themeEditor": {
+                  "config": "{}",
+                  "name": "default"
+                },
+                "visualEditor": {
+                  "code": "// prettier-ignore\nconst hours = [\n  '12a', '1a', '2a', '3a', '4a', '5a', '6a',\n  '7a', '8a', '9a', '10a', '11a',\n  '12p', '1p', '2p', '3p', '4p', '5p',\n  '6p', '7p', '8p', '9p', '10p', '11p'\n];\n// prettier-ignore\nconst days = [\n  'Saturday', 'Friday', 'Thursday',\n  'Wednesday', 'Tuesday', 'Monday', 'Sunday'\n];\n// prettier-ignore\nconst data = [[0, 0, 5], [0, 1, 1], [0, 2, 0], [0, 3, 0], [0, 4, 0], [0, 5, 0], [0, 6, 0], [0, 7, 0], [0, 8, 0], [0, 9, 0], [0, 10, 0], [0, 11, 2], [0, 12, 4], [0, 13, 1], [0, 14, 1], [0, 15, 3], [0, 16, 4], [0, 17, 6], [0, 18, 4], [0, 19, 4], [0, 20, 3], [0, 21, 3], [0, 22, 2], [0, 23, 5], [1, 0, 7], [1, 1, 0], [1, 2, 0], [1, 3, 0], [1, 4, 0], [1, 5, 0], [1, 6, 0], [1, 7, 0], [1, 8, 0], [1, 9, 0], [1, 10, 5], [1, 11, 2], [1, 12, 2], [1, 13, 6], [1, 14, 9], [1, 15, 11], [1, 16, 6], [1, 17, 7], [1, 18, 8], [1, 19, 12], [1, 20, 5], [1, 21, 5], [1, 22, 7], [1, 23, 2], [2, 0, 1], [2, 1, 1], [2, 2, 0], [2, 3, 0], [2, 4, 0], [2, 5, 0], [2, 6, 0], [2, 7, 0], [2, 8, 0], [2, 9, 0], [2, 10, 3], [2, 11, 2], [2, 12, 1], [2, 13, 9], [2, 14, 8], [2, 15, 10], [2, 16, 6], [2, 17, 5], [2, 18, 5], [2, 19, 5], [2, 20, 7], [2, 21, 4], [2, 22, 2], [2, 23, 4], [3, 0, 7], [3, 1, 3], [3, 2, 0], [3, 3, 0], [3, 4, 0], [3, 5, 0], [3, 6, 0], [3, 7, 0], [3, 8, 1], [3, 9, 0], [3, 10, 5], [3, 11, 4], [3, 12, 7], [3, 13, 14], [3, 14, 13], [3, 15, 12], [3, 16, 9], [3, 17, 5], [3, 18, 5], [3, 19, 10], [3, 20, 6], [3, 21, 4], [3, 22, 4], [3, 23, 1], [4, 0, 1], [4, 1, 3], [4, 2, 0], [4, 3, 0], [4, 4, 0], [4, 5, 1], [4, 6, 0], [4, 7, 0], [4, 8, 0], [4, 9, 2], [4, 10, 4], [4, 11, 4], [4, 12, 2], [4, 13, 4], [4, 14, 4], [4, 15, 14], [4, 16, 12], [4, 17, 1], [4, 18, 8], [4, 19, 5], [4, 20, 3], [4, 21, 7], [4, 22, 3], [4, 23, 0], [5, 0, 2], [5, 1, 1], [5, 2, 0], [5, 3, 3], [5, 4, 0], [5, 5, 0], [5, 6, 0], [5, 7, 0], [5, 8, 2], [5, 9, 0], [5, 10, 4], [5, 11, 1], [5, 12, 5], [5, 13, 10], [5, 14, 5], [5, 15, 7], [5, 16, 11], [5, 17, 6], [5, 18, 0], [5, 19, 5], [5, 20, 3], [5, 21, 4], [5, 22, 2], [5, 23, 0], [6, 0, 1], [6, 1, 0], [6, 2, 0], [6, 3, 0], [6, 4, 0], [6, 5, 0], [6, 6, 0], [6, 7, 0], [6, 8, 0], [6, 9, 0], [6, 10, 1], [6, 11, 0], [6, 12, 2], [6, 13, 1], [6, 14, 3], [6, 15, 4], [6, 16, 0], [6, 17, 0], [6, 18, 0], [6, 19, 0], [6, 20, 1], [6, 21, 2], [6, 22, 2], [6, 23, 6]]\n  .map(function (item) {\n    return [item[1], item[0], item[2] || '-'];\n  });\noption = {\n  tooltip: {\n    position: 'top'\n  },\n  grid: {\n    height: '50%',\n    top: '10%'\n  },\n  xAxis: {\n    type: 'category',\n    data: hours,\n    splitArea: {\n      show: true\n    }\n  },\n  yAxis: {\n    type: 'category',\n    data: days,\n    splitArea: {\n      show: true\n    }\n  },\n  visualMap: {\n    min: 0,\n    max: 10,\n    calculable: true,\n    orient: 'horizontal',\n    left: 'center',\n    bottom: '15%'\n  },\n  series: [\n    {\n      name: 'Punch Card',\n      type: 'heatmap',\n      data: data,\n      label: {\n        show: true\n      },\n      emphasis: {\n        itemStyle: {\n          shadowBlur: 10,\n          shadowColor: 'rgba(0, 0, 0, 0.5)'\n        }\n      }\n    }\n  ]\n};\n\nreturn option;",
+                  "dataset": [],
+                  "series": []
+                }
+              }
+            },
+            "version": "7.2.5"
+          }
+        }
+      },
       "panel-5": {
         "kind": "Panel",
         "spec": {
@@ -2144,6 +2378,32 @@
               "x": 0,
               "y": 45
             }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-20"
+              },
+              "height": 9,
+              "width": 24,
+              "x": 0,
+              "y": 54
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-21"
+              },
+              "height": 9,
+              "width": 24,
+              "x": 0,
+              "y": 63
+            }
           }
         ]
       }
@@ -2204,7 +2464,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now/d",
+      "from": "now-24h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
