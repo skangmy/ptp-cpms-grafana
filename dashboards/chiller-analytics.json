@@ -759,7 +759,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"array\"\n\nfield = [\"condSatTemp\",\"dischargeTemp\",\"evapSatTemp\",\"suctionTemp\"]\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}${compQuery.comp}\")\n  |\u003e filter(fn: (r) =\u003e ${compQuery.op} contains(value: r._field, set: field))\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "import \"array\"\n\nfield = [\"condSatTemp\",\"dischargeTemp\",\"evapSatTemp\",\"suctionTemp\", \"runHours\"]\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}${compQuery.comp}\")\n  |\u003e filter(fn: (r) =\u003e ${compQuery.op} contains(value: r._field, set: field))\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
                       },
                       "version": "v0"
                     },
@@ -803,7 +803,9 @@
                   "kind": "Transformation",
                   "spec": {
                     "options": {
-                      "excludeByName": {},
+                      "excludeByName": {
+                        "runHours": false
+                      },
                       "includeByName": {},
                       "indexByName": {
                         "actualRpm": 0,
@@ -824,6 +826,7 @@
                         "dischargeTemp": "Discharge Temp",
                         "evapSatTemp": "Evap Sat Temp",
                         "percentRla": "% RLA",
+                        "runHours": "Run Hours",
                         "suctionPressure": "Suction Pressure",
                         "suctionTemp": "Suction Temp"
                       }
@@ -932,6 +935,189 @@
                       {
                         "id": "unit",
                         "value": "percent"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "percentRla",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "text",
+                              "value": 0
+                            },
+                            {
+                              "color": "green",
+                              "value": 3
+                            },
+                            {
+                              "color": "orange",
+                              "value": 5
+                            },
+                            {
+                              "color": "red",
+                              "value": 99
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "evapSatTemp",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "orange",
+                              "value": 0
+                            },
+                            {
+                              "color": "green",
+                              "value": 1.1
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "condSatTemp",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "orange",
+                              "value": 0
+                            },
+                            {
+                              "color": "green",
+                              "value": 1.1
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "dischargeTemp",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": 0
+                            },
+                            {
+                              "color": "orange",
+                              "value": 77
+                            },
+                            {
+                              "color": "red",
+                              "value": 88
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "suctionPressure",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "red",
+                              "value": 0
+                            },
+                            {
+                              "color": "orange",
+                              "value": 179
+                            },
+                            {
+                              "color": "green",
+                              "value": 193
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "dischargePressure",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": 0
+                            },
+                            {
+                              "color": "red",
+                              "value": 1048
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Run Hours",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "noValue",
+                        "value": "0 hour"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "h"
                       }
                     ]
                   }
@@ -2615,8 +2801,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 1",
-            "value": "chiller1"
+            "text": "Chiller 3",
+            "value": "chiller3"
           },
           "hide": "dontHide",
           "includeAll": false,
@@ -2729,8 +2915,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "CHWP1",
-            "value": "chwp1"
+            "text": "CHWP3",
+            "value": "chwp3"
           },
           "definition": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
           "hide": "hideVariable",
@@ -2788,8 +2974,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "CWP1",
-            "value": "cwp1"
+            "text": "CWP3",
+            "value": "cwp3"
           },
           "definition": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
           "hide": "hideVariable",
