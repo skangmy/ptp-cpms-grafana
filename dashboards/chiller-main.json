@@ -441,10 +441,63 @@
                     },
                     "refId": "data"
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-static"
+                      },
+                      "group": "marcusolsson-static-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "frame": {
+                          "fields": [
+                            {
+                              "config": {},
+                              "name": "date",
+                              "type": "string",
+                              "values": []
+                            }
+                          ],
+                          "meta": {
+                            "custom": {
+                              "customCode": "const date = new Date(Date.now() - 7 * 86400000);\nconsole.log(date.toDateString());\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [date.toDateString()]\n  }))\n}\n\nreturn Promise.resolve(result);",
+                              "valuesEditor": "custom"
+                            }
+                          },
+                          "name": "lastWeekDate"
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
                 }
               ],
               "queryOptions": {},
               "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "lastWeek"
+                      },
+                      "configRefId": "A",
+                      "mappings": [
+                        {
+                          "fieldName": "date",
+                          "handlerKey": "displayName"
+                        }
+                      ]
+                    }
+                  }
+                },
                 {
                   "group": "organize",
                   "kind": "Transformation",
@@ -457,9 +510,16 @@
                         "lastWeek": 1,
                         "yesterday": 0
                       },
+                      "orderBy": [
+                        {
+                          "desc": true,
+                          "type": "name"
+                        }
+                      ],
+                      "orderByMode": "auto",
                       "renameByName": {
                         "diff": "Difference",
-                        "lastWeek": "Last Week Same Day",
+                        "lastWeek": "",
                         "today": "Today",
                         "yesterday": "Yesterday"
                       }
