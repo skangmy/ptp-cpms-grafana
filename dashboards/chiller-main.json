@@ -194,6 +194,126 @@
           }
         }
       },
+      "panel-11": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\nimport \"date\"\nimport \"array\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(from: date.truncate(t: now(), unit: 1d), d: 1d)\nstop = date.sub(from: now(), d: 1d)\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: date.truncate(t: now(), unit: 1d))\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "data"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 11,
+          "links": [],
+          "title": "RTH Today",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "blue",
+                    "mode": "fixed"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "RTh"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "diff",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "red",
+                              "value": 0
+                            },
+                            {
+                              "color": "transparent",
+                              "value": -0.01
+                            },
+                            {
+                              "color": "green",
+                              "value": 0.01
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "id": "color"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-4": {
         "kind": "Panel",
         "spec": {
@@ -315,7 +435,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\nimport \"date\"\nimport \"array\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(from: date.truncate(t: now(), unit: 1d), d: 1d)\nstop = date.sub(from: now(), d: 1d)\n\ntoday_data = from(bucket: \"cpms\")\n  |\u003e range(start: date.truncate(t: now(), unit: 1d))\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n\n\nytd_data = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n\n\ndefault = array.from(rows: [\n    {_value: 0.0, \"_field\": \"loadUsage\"},\n  ])\n\ntoday = union(tables: [today_data, default])\n  |\u003e group()\n  |\u003e sum(column: \"_value\")\n  |\u003e rename(columns: {_value: \"today\"})\n  |\u003e map(fn: (r) =\u003e ({ r with join_key: 1 })) \n\nytd = union(tables: [ytd_data, default])\n  |\u003e group()\n  |\u003e sum(column: \"_value\")\n  |\u003e rename(columns: {_value: \"yesterday\"})  \n  |\u003e map(fn: (r) =\u003e ({ r with join_key: 1 })) \n\njoin.inner(\n    left: today,\n    right: ytd,\n    on: (l, r) =\u003e l.join_key == r.join_key,\n    as: (l, r) =\u003e ({\n      yesterday: r.yesterday,\n      today: l.today,\n      diff: if r.yesterday \u003e 0.0 then (r.yesterday - l.today) / r.yesterday else 0.0\n    }),\n)"
+                        "query": "import \"timezone\"\nimport \"date\"\nimport \"array\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nytd_start = date.sub(from: date.truncate(t: now(), unit: 1d), d: 1d)\nytd_stop = date.truncate(t: now(), unit: 1d)\n\nlast_start = date.sub(from: ytd_start, d: 7d)\nlast_stop = date.sub(from: ytd_stop, d: 7d)\n\nytd_data = from(bucket: \"cpms\")\n  |\u003e range(start: ytd_start, stop: ytd_stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n\n\nlast_data = from(bucket: \"cpms\")\n  |\u003e range(start: last_start, stop: last_stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n\n\ndefault = array.from(rows: [\n    {_value: 0.0, \"_field\": \"loadUsage\"},\n  ])\n\nytd = union(tables: [ytd_data, default])\n  |\u003e group()\n  |\u003e sum(column: \"_value\")\n  |\u003e rename(columns: {_value: \"yesterday\"})\n  |\u003e map(fn: (r) =\u003e ({ r with join_key: 1 })) \n\nlastWk = union(tables: [last_data, default])\n  |\u003e group()\n  |\u003e sum(column: \"_value\")\n  |\u003e rename(columns: {_value: \"lastWeek\"})  \n  |\u003e map(fn: (r) =\u003e ({ r with join_key: 1 })) \n\njoin.inner(\n    left: ytd,\n    right: lastWk,\n    on: (l, r) =\u003e l.join_key == r.join_key,\n    as: (l, r) =\u003e ({\n      yesterday: l.yesterday,\n      lastWeek: r.lastWeek,\n      diff: if r.lastWeek \u003e 0.0 then (r.lastWeek - l.yesterday) / r.lastWeek else 0.0\n    }),\n)"
                       },
                       "version": "v0"
                     },
@@ -334,11 +454,12 @@
                       "includeByName": {},
                       "indexByName": {
                         "diff": 2,
-                        "today": 0,
-                        "yesterday": 1
+                        "lastWeek": 1,
+                        "yesterday": 0
                       },
                       "renameByName": {
                         "diff": "Difference",
+                        "lastWeek": "Last Week Same Day",
                         "today": "Today",
                         "yesterday": "Yesterday"
                       }
@@ -351,7 +472,7 @@
           "description": "",
           "id": 5,
           "links": [],
-          "title": "RTH Today vs Yesterday",
+          "title": "RTH Yesterday vs Same Day Last Week ",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -807,7 +928,7 @@
                 "name": "panel-4"
               },
               "height": 4,
-              "width": 5,
+              "width": 4,
               "x": 6,
               "y": 0
             }
@@ -820,8 +941,21 @@
                 "name": "panel-5"
               },
               "height": 4,
-              "width": 9,
-              "x": 11,
+              "width": 7,
+              "x": 10,
+              "y": 0
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
+                "name": "panel-11"
+              },
+              "height": 4,
+              "width": 3,
+              "x": 17,
               "y": 0
             }
           },
@@ -896,16 +1030,13 @@
       }
     ],
     "liveNow": false,
-    "preload": false,
+    "preload": true,
     "tags": [
       "cpms"
     ],
     "timeSettings": {
       "autoRefresh": "1m",
       "autoRefreshIntervals": [
-        "5s",
-        "10s",
-        "30s",
         "1m",
         "5m",
         "15m",
