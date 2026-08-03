@@ -464,7 +464,7 @@
                           ],
                           "meta": {
                             "custom": {
-                              "customCode": "const date = new Date(Date.now() - 7 * 86400000);\nconsole.log(date.toDateString());\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [date.toDateString()]\n  }))\n}\n\nreturn Promise.resolve(result);",
+                              "customCode": "const date = new Date(Date.now() - 8 * 86400000);\nconsole.log(date.toDateString());\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [date.toDateString()]\n  }))\n}\n\nreturn Promise.resolve(result);",
                               "valuesEditor": "custom"
                             }
                           },
