@@ -861,7 +861,7 @@
           "description": "",
           "id": 14,
           "links": [],
-          "title": "Total RT",
+          "title": "Current Plant RT",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -928,7 +928,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller.*/)\n  |\u003e last()\n  |\u003e keep(columns: [\"_time\",\"deviceId\", \"_value\"])\n"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller.*/)\n  |\u003e last()\n  |\u003e group()\n  |\u003e filter(fn: (r) =\u003e r._value == 2)\n  |\u003e count()\n"
                       },
                       "version": "v0"
                     },
@@ -956,7 +956,7 @@
           "description": "",
           "id": 15,
           "links": [],
-          "title": "",
+          "title": "Running Chillers",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -964,40 +964,100 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
+                    "fixedColor": "transparent",
                     "mode": "fixed"
                   },
-                  "mappings": [
-                    {
-                      "options": {
-                        "0": {
-                          "color": "#8e8e8e",
-                          "index": 0,
-                          "text": "OFF"
-                        },
-                        "1": {
-                          "color": "light-orange",
-                          "index": 1,
-                          "text": "STARTING"
-                        },
-                        "2": {
-                          "color": "green",
-                          "index": 2,
-                          "text": "RUNNING"
-                        },
-                        "3": {
-                          "color": "light-blue",
-                          "index": 3,
-                          "text": "STOPPING"
-                        },
-                        "4": {
-                          "color": "red",
-                          "index": 4,
-                          "text": "FAULT"
-                        }
-                      },
-                      "type": "value"
-                    }
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "colorMode": "background",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
                   ],
+                  "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-16": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct.*/)\n  |\u003e last()\n  |\u003e group()\n  |\u003e filter(fn: (r) =\u003e r._value == 2)\n  |\u003e count()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "30s"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "chiller(.*)",
+                      "renamePattern": "Chiller $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 16,
+          "links": [],
+          "title": "Running Cooling Towers",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "transparent",
+                    "mode": "fixed"
+                  },
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -1811,8 +1871,21 @@
                           "name": "panel-15"
                         },
                         "height": 4,
-                        "width": 8,
+                        "width": 4,
                         "x": 4,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-16"
+                        },
+                        "height": 4,
+                        "width": 4,
+                        "x": 8,
                         "y": 0
                       }
                     },
