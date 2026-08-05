@@ -1910,7 +1910,7 @@
                 "overrides": []
               },
               "options": {
-                "alignValue": "left",
+                "alignValue": "center",
                 "annotations": {
                   "clustering": -1,
                   "multiLane": false
@@ -1922,7 +1922,7 @@
                   "showLegend": true
                 },
                 "mergeValues": true,
-                "rowHeight": 0.9,
+                "rowHeight": 0.85,
                 "showValue": "auto",
                 "tooltip": {
                   "hideZeros": false,
@@ -2039,7 +2039,8 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green"
+                        "color": "green",
+                        "value": 0
                       }
                     ]
                   }
@@ -2047,7 +2048,7 @@
                 "overrides": []
               },
               "options": {
-                "alignValue": "left",
+                "alignValue": "center",
                 "annotations": {
                   "clustering": -1,
                   "multiLane": false
