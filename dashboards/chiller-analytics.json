@@ -2237,49 +2237,6 @@
           }
         }
       },
-      "panel-29": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "group": "",
-                      "kind": "DataQuery",
-                      "spec": {},
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 29,
-          "links": [],
-          "title": "New panel",
-          "vizConfig": {
-            "group": "__unconfigured-panel",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {}
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
       "panel-30": {
         "kind": "Panel",
         "spec": {
@@ -2474,6 +2431,278 @@
                     "lastNotNull"
                   ],
                   "fields": "",
+                  "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-32": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "panelId": 9,
+                        "query": "import \"join\"\n\nalarms = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"alarm\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e last()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e rename(columns: {_value: \"activeAlarms\"})\n  |\u003e set(key: \"deviceId\", value: \"${chiller}\")\n  |\u003e keep(columns: [\"activeAlarms\", \"deviceId\"])\n\nstatus = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e set(key: \"deviceId\", value: \"${chiller}\")\n\njoin.inner(left: status, right: alarms, \n  on: (l, r) =\u003e l.deviceId == r.deviceId,\n  as: (l, r) =\u003e ({ l with \n    activeAlarms: r.activeAlarms,\n    runStatus: if l.trip == 1 then \"TRIPPED\" else if l.status == 0 then \"OFF\" else \"RUNNING\",\n    remoteMode: if l.remoteMode == 1 then \"AUTO\" else \"REMOTE\",\n    autoMode: if l.auto == 1 then \"BAS\" else \"MANUAL\",\n    availability: if l.availability == 2 then \"AVAILABLE\" else if l.availability == 1 then \"MAINTENANCE\" else \"DISABLED\"\n  })\n)\n  |\u003e keep(columns: [\"runStatus\", \"remoteMode\", \"autoMode\", \"availability\", \"activeAlarms\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "actualCapacity": true,
+                        "alarm": true,
+                        "availability": false,
+                        "capacityLimitOutput": true,
+                        "condFlowSwitch": true,
+                        "condPump1": true,
+                        "condPump2": true,
+                        "control": true,
+                        "enable": true,
+                        "evapFlowSwitch": true,
+                        "evapPump1": true,
+                        "evapPump2": true,
+                        "limited": true,
+                        "loadPerc": true,
+                        "modeOutput": true,
+                        "run": true,
+                        "runEnabled": true,
+                        "setpoint": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {
+                        "autoMode": 2,
+                        "availability": 1,
+                        "remoteMode": 3,
+                        "runStatus": 0
+                      },
+                      "renameByName": {
+                        "activeAlarms": "Active Alarms",
+                        "activeSetpoint": "Set Point",
+                        "actualCapacity": "Actual Capacity",
+                        "autoMode": "Auto Mode",
+                        "availability": "Availability",
+                        "capacityLimitOutput": "Capacity Limit",
+                        "condEWT": "Cond EWT",
+                        "condLWT": "Cond LWT",
+                        "evapEWT": "Evap EWT",
+                        "evapLWT": "Evap LWT",
+                        "modeOutput": "",
+                        "remoteMode": "Remote Mode",
+                        "runStatus": "Run Status",
+                        "total_run_time_hours": "Run Hours"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 32,
+          "links": [],
+          "title": "Status",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "activeAlarms",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": 0
+                            },
+                            {
+                              "color": "light-red",
+                              "value": 1
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "availability",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "AVAILABLE": {
+                                "color": "green",
+                                "index": 0
+                              },
+                              "DISABLED": {
+                                "color": "#808080",
+                                "index": 2
+                              },
+                              "MAINTENANCE": {
+                                "color": "light-orange",
+                                "index": 1
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "runStatus",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "OFF": {
+                                "color": "#808080",
+                                "index": 0
+                              },
+                              "RUNNING": {
+                                "color": "light-green",
+                                "index": 1
+                              },
+                              "TRIPPED": {
+                                "color": "light-red",
+                                "index": 2
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "autoMode",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "BAS": {
+                                "color": "green",
+                                "index": 1
+                              },
+                              "MANUAL": {
+                                "color": "light-orange",
+                                "index": 0
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "remoteMode",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "AUTO": {
+                                "color": "green",
+                                "index": 0
+                              },
+                              "MANUAL": {
+                                "color": "light-orange",
+                                "index": 1
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "auto",
+                "orientation": "horizontal",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "/.*/",
                   "values": false
                 },
                 "showPercentChange": false,
@@ -3357,19 +3586,6 @@
                         "x": 0,
                         "y": 9
                       }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-29"
-                        },
-                        "height": 8,
-                        "width": 12,
-                        "x": 0,
-                        "y": 14
-                      }
                     }
                   ]
                 }
@@ -3455,11 +3671,24 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-32"
+                        },
+                        "height": 7,
+                        "width": 5,
+                        "x": 0,
+                        "y": 4
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-1"
                         },
                         "height": 7,
-                        "width": 16,
-                        "x": 0,
+                        "width": 6,
+                        "x": 5,
                         "y": 4
                       }
                     },
