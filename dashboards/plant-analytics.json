@@ -185,7 +185,7 @@
                 {
                   "kind": "PanelQuery",
                   "spec": {
-                    "hidden": false,
+                    "hidden": true,
                     "query": {
                       "datasource": {
                         "name": "cpms-influxdb"
@@ -358,7 +358,7 @@
                   "enableFacetedFilter": false,
                   "overflow": "ellipsis",
                   "placement": "bottom",
-                  "showLegend": true
+                  "showLegend": false
                 },
                 "tooltip": {
                   "hideZeros": false,
@@ -394,24 +394,6 @@
                       "version": "v0"
                     },
                     "refId": "A"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct.*/)\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false, timeSrc: \"_start\")\n  |\u003e filter(fn: (r) =\u003e r._value \u003e 0 and r._value \u003c= 3)\n  |\u003e map(fn: (r) =\u003e ({ r with state: if r._value == 1 then \"Starting\" else if r._value == 2 then \"Running\" else \"Stopping\"}))\n  |\u003e group(columns: [\"state\"])\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: count, createEmpty: false)\n  |\u003e keep(columns: [\"_time\",\"state\", \"_value\"])\n"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "B"
                   }
                 }
               ],
@@ -557,8 +539,284 @@
                   "enableFacetedFilter": false,
                   "overflow": "ellipsis",
                   "placement": "bottom",
+                  "showLegend": false
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller.*/)\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false, timeSrc: \"_start\")\n  |\u003e keep(columns: [\"_time\",\"deviceId\", \"state\", \"_value\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "30s"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "chiller(.*)",
+                      "renamePattern": "Chiller $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 12,
+          "links": [],
+          "title": "",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#8e8e8e",
+                          "index": 0,
+                          "text": "OFF"
+                        },
+                        "1": {
+                          "color": "light-orange",
+                          "index": 1,
+                          "text": "STARTING"
+                        },
+                        "2": {
+                          "color": "green",
+                          "index": 2,
+                          "text": "RUNNING"
+                        },
+                        "3": {
+                          "color": "light-blue",
+                          "index": 3,
+                          "text": "STOPPING"
+                        },
+                        "4": {
+                          "color": "red",
+                          "index": 4,
+                          "text": "FAULT"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "left",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
                   "showLegend": true
                 },
+                "mergeValues": true,
+                "rowHeight": 0.9,
+                "showValue": "always",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-13": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct.*/)\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false, timeSrc: \"_start\")\n  |\u003e keep(columns: [\"_time\",\"deviceId\", \"state\", \"_value\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "30s"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "ct(.*)",
+                      "renamePattern": "CT $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 13,
+          "links": [],
+          "title": "",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#8e8e8e",
+                          "index": 0,
+                          "text": "OFF"
+                        },
+                        "1": {
+                          "color": "light-orange",
+                          "index": 1,
+                          "text": "STARTING"
+                        },
+                        "2": {
+                          "color": "green",
+                          "index": 2,
+                          "text": "RUNNING"
+                        },
+                        "3": {
+                          "color": "light-blue",
+                          "index": 3,
+                          "text": "STOPPING"
+                        },
+                        "4": {
+                          "color": "red",
+                          "index": 4,
+                          "text": "FAULT"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "left",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.9,
+                "showValue": "always",
                 "tooltip": {
                   "hideZeros": false,
                   "mode": "multi",
@@ -1371,10 +1629,23 @@
                           "kind": "ElementReference",
                           "name": "panel-10"
                         },
-                        "height": 11,
+                        "height": 7,
                         "width": 24,
                         "x": 0,
                         "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-12"
+                        },
+                        "height": 5,
+                        "width": 24,
+                        "x": 0,
+                        "y": 7
                       }
                     }
                   ]
@@ -1398,10 +1669,23 @@
                           "kind": "ElementReference",
                           "name": "panel-11"
                         },
-                        "height": 12,
+                        "height": 7,
                         "width": 24,
                         "x": 0,
                         "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-13"
+                        },
+                        "height": 5,
+                        "width": 24,
+                        "x": 0,
+                        "y": 7
                       }
                     }
                   ]
@@ -1470,7 +1754,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-6h",
+      "from": "now-24h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
