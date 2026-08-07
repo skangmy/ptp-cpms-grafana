@@ -513,7 +513,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"array\"\n\nfield = [\"condSatTemp\",\"dischargeTemp\",\"evapSatTemp\",\"suctionTemp\", \"runHours\"]\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}${compQuery.comp}\")\n  |\u003e filter(fn: (r) =\u003e ${compQuery.op} contains(value: r._field, set: field))\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "import \"array\"\n\nfield = [\"condSatTemp\",\"dischargeTemp\",\"evapSatTemp\",\"suctionTemp\", \"runHours\"]\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}${compQuery.comp}\")\n  |\u003e filter(fn: (r) =\u003e ${compQuery.op} contains(value: r._field, set: field))\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with \n    suctionSuperheat: r.suctionTemp - r.evapSatTemp,\n    dischargeSuperheat: r.dischargeTemp - r.condSatTemp,\n  }))"
                       },
                       "version": "v0"
                     },
@@ -558,7 +558,7 @@
                   "spec": {
                     "options": {
                       "excludeByName": {
-                        "runHours": false
+                        "runHours": true
                       },
                       "includeByName": {},
                       "indexByName": {
@@ -577,11 +577,15 @@
                         "condSatTemp": "Cond Sat Temp",
                         "current": "Current",
                         "dischargePressure": "Discharge Pressure",
+                        "dischargeSuperHeat": "Discharge Superheat",
+                        "dischargeSuperheat": "Discharge Superheat",
                         "dischargeTemp": "Discharge Temp",
                         "evapSatTemp": "Evap Sat Temp",
                         "percentRla": "% RLA",
                         "runHours": "Run Hours",
                         "suctionPressure": "Suction Pressure",
+                        "suctionSuperHeat": "Suction Superheat",
+                        "suctionSuperheat": "Suction Superheat",
                         "suctionTemp": "Suction Temp"
                       }
                     }
@@ -872,6 +876,93 @@
                       {
                         "id": "unit",
                         "value": "h"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*heat/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "celsius"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "suctionSuperheat",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "red",
+                              "value": 0
+                            },
+                            {
+                              "color": "orange",
+                              "value": 1
+                            },
+                            {
+                              "color": "green",
+                              "value": 3
+                            },
+                            {
+                              "color": "orange",
+                              "value": 8
+                            },
+                            {
+                              "color": "red",
+                              "value": 12
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "dischargeSuperheat",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "red",
+                              "value": 0
+                            },
+                            {
+                              "color": "orange",
+                              "value": 5
+                            },
+                            {
+                              "color": "green",
+                              "value": 10
+                            },
+                            {
+                              "color": "orange",
+                              "value": 23
+                            },
+                            {
+                              "color": "red",
+                              "value": 28
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
@@ -2802,6 +2893,324 @@
           }
         }
       },
+      "panel-35": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}Chw\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"chws\" or r._field == \"chwr\" or r._field == \"flowRate\" or r._field == \"deltaT\")\n  |\u003e mean()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "activeSetpoint": false,
+                        "actualCapacity": false,
+                        "capacityLimitOutput": true,
+                        "chillerId": true,
+                        "condEWT": true,
+                        "condLWT": true,
+                        "energyFlowRate": true,
+                        "evapEWT": true,
+                        "evapLWT": false,
+                        "loadPerc": false,
+                        "modeOutput": true,
+                        "setpoint": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {
+                        "chwr": 1,
+                        "chws": 0,
+                        "deltaT": 2,
+                        "flowRate": 3
+                      },
+                      "renameByName": {
+                        "activeSetpoint": "Set Point",
+                        "actualCapacity": "Load %",
+                        "capacityLimitOutput": "Capacity Limit",
+                        "chwr": "CHWR",
+                        "chws": "CHWS",
+                        "condEWT": "Cond EWT",
+                        "condLWT": "Cond LWT",
+                        "coolingCapacity": "Cooling Capacity",
+                        "coolingLoad": "RT",
+                        "cop": "COP",
+                        "deltaT": "Delta T",
+                        "evapEWT": "Evap EWT",
+                        "evapLWT": "Evap LWT",
+                        "flowRate": "Flow Rate",
+                        "loadPerc": "Load %",
+                        "modeOutput": ""
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 35,
+          "links": [],
+          "title": "Water Temp",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "flowRate",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "m³/h"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-36": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "chiller = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\" or r._measurement == \"water\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"activeSetpoint\" or r._field == \"evapLWT\" or r._field == \"evapEWT\" or r._field == \"condLWT\" or r._field == \"condEWT\" )\n  |\u003e mean()\n  \n  \nstatus = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"condFlowSwitch\" or r[\"_field\"] == \"condPump1\" or r[\"_field\"] == \"condPump2\" or r[\"_field\"] == \"evapFlowSwitch\" or r[\"_field\"] == \"evapPump1\" or r[\"_field\"] == \"evapPump2\")\n  |\u003e last()\n\nunion(tables: [chiller, status])\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "activeSetpoint": true,
+                        "actualCapacity": false,
+                        "capacityLimitOutput": true,
+                        "chillerId": true,
+                        "condEWT": false,
+                        "condLWT": false,
+                        "energyFlowRate": true,
+                        "evapEWT": false,
+                        "evapLWT": false,
+                        "loadPerc": false,
+                        "modeOutput": true,
+                        "setpoint": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {
+                        "activeSetpoint": 0,
+                        "condEWT": 1,
+                        "condFlowSwitch": 5,
+                        "condLWT": 2,
+                        "condPump1": 6,
+                        "condPump2": 7,
+                        "evapEWT": 3,
+                        "evapFlowSwitch": 8,
+                        "evapLWT": 4,
+                        "evapPump1": 9,
+                        "evapPump2": 10
+                      },
+                      "renameByName": {
+                        "activeSetpoint": "Set Point",
+                        "actualCapacity": "Load %",
+                        "capacityLimitOutput": "Capacity Limit",
+                        "chws": "CHWS",
+                        "condEWT": "Cond EWT",
+                        "condFlowSwitch": "Cond Flow Switch",
+                        "condLWT": "Cond LWT",
+                        "condPump1": "Cond Pump 1",
+                        "condPump2": "Cond Pump 2",
+                        "coolingCapacity": "Cooling Capacity",
+                        "coolingLoad": "RT",
+                        "cop": "COP",
+                        "evapEWT": "Evap EWT",
+                        "evapFlowSwitch": "Evap Flow Switch",
+                        "evapLWT": "Evap LWT",
+                        "evapPump1": "Evap Pump 1",
+                        "evapPump2": "Evap Pump 2",
+                        "loadPerc": "Load %",
+                        "modeOutput": ""
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 36,
+          "links": [],
+          "title": "Heat Exchange Condition",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*WT/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "celsius"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*(Switch|1|2)/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "#808080",
+                                "index": 0,
+                                "text": "OFF"
+                              },
+                              "1": {
+                                "color": "blue",
+                                "index": 1,
+                                "text": "ON"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": true
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-5": {
         "kind": "Panel",
         "spec": {
@@ -3835,12 +4244,38 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-35"
+                        },
+                        "height": 5,
+                        "width": 7,
+                        "x": 0,
+                        "y": 9
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-36"
+                        },
+                        "height": 5,
+                        "width": 17,
+                        "x": 7,
+                        "y": 9
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-6"
                         },
                         "height": 13,
                         "width": 24,
                         "x": 0,
-                        "y": 9
+                        "y": 14
                       }
                     },
                     {
@@ -3859,7 +4294,7 @@
                         },
                         "width": 24,
                         "x": 0,
-                        "y": 22
+                        "y": 27
                       }
                     },
                     {
@@ -3878,7 +4313,7 @@
                         },
                         "width": 24,
                         "x": 0,
-                        "y": 24
+                        "y": 29
                       }
                     },
                     {
@@ -3891,7 +4326,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 34
+                        "y": 39
                       }
                     },
                     {
@@ -3904,7 +4339,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 43
+                        "y": 48
                       }
                     },
                     {
@@ -3917,7 +4352,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 52
+                        "y": 57
                       }
                     },
                     {
@@ -3930,7 +4365,7 @@
                         "height": 10,
                         "width": 12,
                         "x": 0,
-                        "y": 61
+                        "y": 66
                       }
                     },
                     {
@@ -3943,7 +4378,7 @@
                         "height": 10,
                         "width": 12,
                         "x": 12,
-                        "y": 61
+                        "y": 66
                       }
                     }
                   ]
