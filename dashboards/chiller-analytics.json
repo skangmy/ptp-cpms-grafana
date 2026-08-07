@@ -30,176 +30,6 @@
     "description": "",
     "editable": true,
     "elements": {
-      "panel-1": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "-- Dashboard --"
-                      },
-                      "group": "datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "panelId": 9
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-postgres"
-                      },
-                      "group": "grafana-postgresql-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "dataset": "chiller",
-                        "editorMode": "code",
-                        "format": "table",
-                        "rawQuery": true,
-                        "rawSql": "SELECT\n    chiller_id as \"chillerId\",\n    FLOOR((\n        total_runtime_seconds\n        + COALESCE(FLOOR(EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - current_started_at)))::bigint, 0)\n    ) / 3600.0) AS total_run_time_hours\nFROM chiller_runtime\nWHERE chiller_id = '${chiller}';",
-                        "sql": {
-                          "columns": [
-                            {
-                              "parameters": [],
-                              "type": "function"
-                            }
-                          ],
-                          "groupBy": [
-                            {
-                              "property": {
-                                "type": "string"
-                              },
-                              "type": "groupBy"
-                            }
-                          ],
-                          "limit": 50
-                        }
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "B"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": [
-                {
-                  "group": "joinByField",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "byField": "chillerId",
-                      "mode": "outerTabular"
-                    }
-                  }
-                },
-                {
-                  "group": "organize",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "excludeByName": {
-                        "actualCapacity": true,
-                        "capacityLimitOutput": true,
-                        "loadPerc": true,
-                        "modeOutput": true,
-                        "setpoint": true
-                      },
-                      "includeByName": {},
-                      "indexByName": {},
-                      "renameByName": {
-                        "activeSetpoint": "Set Point",
-                        "actualCapacity": "Actual Capacity",
-                        "capacityLimitOutput": "Capacity Limit",
-                        "condEWT": "Cond EWT",
-                        "condLWT": "Cond LWT",
-                        "evapEWT": "Evap EWT",
-                        "evapLWT": "Evap LWT",
-                        "modeOutput": "",
-                        "total_run_time_hours": "Run Hours"
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "description": "",
-          "id": 1,
-          "links": [],
-          "title": "Chiller Stats",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "blue",
-                        "value": 0
-                      }
-                    ]
-                  },
-                  "unit": "celsius"
-                },
-                "overrides": [
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "total_run_time_hours",
-                      "scope": "series"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "h"
-                      }
-                    ]
-                  }
-                ]
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "horizontal",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [
-                    "lastNotNull"
-                  ],
-                  "fields": "",
-                  "values": true
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
       "panel-11": {
         "kind": "Panel",
         "spec": {
@@ -2620,7 +2450,7 @@
                 "colorMode": "background",
                 "graphMode": "none",
                 "justifyMode": "auto",
-                "orientation": "horizontal",
+                "orientation": "auto",
                 "percentChangeColorMode": "standard",
                 "reduceOptions": {
                   "calcs": [
@@ -2628,6 +2458,190 @@
                   ],
                   "fields": "/.*/",
                   "values": false
+                },
+                "showPercentChange": false,
+                "textMode": "auto",
+                "wideLayout": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-33": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\" or r._measurement == \"water\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"activeSetpoint\" or r._field == \"evapLWT\" )\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "activeSetpoint": false,
+                        "actualCapacity": false,
+                        "capacityLimitOutput": true,
+                        "chillerId": true,
+                        "condEWT": true,
+                        "condLWT": true,
+                        "energyFlowRate": true,
+                        "evapEWT": true,
+                        "evapLWT": false,
+                        "loadPerc": false,
+                        "modeOutput": true,
+                        "setpoint": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {
+                        "actualCapacity": 5,
+                        "chillerId": 1,
+                        "coolingCapacity": 3,
+                        "coolingLoad": 0,
+                        "cop": 4,
+                        "energyFlowRate": 2
+                      },
+                      "renameByName": {
+                        "activeSetpoint": "Set Point",
+                        "actualCapacity": "Load %",
+                        "capacityLimitOutput": "Capacity Limit",
+                        "condEWT": "Cond EWT",
+                        "condLWT": "Cond LWT",
+                        "coolingCapacity": "Cooling Capacity",
+                        "coolingLoad": "RT",
+                        "cop": "COP",
+                        "evapEWT": "Evap EWT",
+                        "evapLWT": "Evap LWT",
+                        "loadPerc": "Load %",
+                        "modeOutput": ""
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 33,
+          "links": [],
+          "title": "Set Point",
+          "vizConfig": {
+            "group": "stat",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "blue",
+                        "value": 0
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "coolingLoad",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "RT"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "actualCapacity",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percent"
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "green",
+                              "value": 0
+                            },
+                            {
+                              "color": "light-orange",
+                              "value": 75
+                            },
+                            {
+                              "color": "red",
+                              "value": 85
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "coolingCapacity",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "kwatt"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "colorMode": "value",
+                "graphMode": "area",
+                "justifyMode": "auto",
+                "orientation": "auto",
+                "percentChangeColorMode": "standard",
+                "reduceOptions": {
+                  "calcs": [
+                    "lastNotNull"
+                  ],
+                  "fields": "",
+                  "values": true
                 },
                 "showPercentChange": false,
                 "textMode": "auto",
@@ -3554,10 +3568,10 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-9"
+                          "name": "panel-32"
                         },
-                        "height": 4,
-                        "width": 8,
+                        "height": 8,
+                        "width": 4,
                         "x": 0,
                         "y": 0
                       }
@@ -3567,11 +3581,11 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-11"
+                          "name": "panel-9"
                         },
                         "height": 4,
-                        "width": 6,
-                        "x": 8,
+                        "width": 10,
+                        "x": 4,
                         "y": 0
                       }
                     },
@@ -3606,11 +3620,11 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-32"
+                          "name": "panel-11"
                         },
-                        "height": 7,
-                        "width": 5,
-                        "x": 0,
+                        "height": 4,
+                        "width": 6,
+                        "x": 4,
                         "y": 4
                       }
                     },
@@ -3619,11 +3633,11 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-1"
+                          "name": "panel-33"
                         },
-                        "height": 7,
+                        "height": 4,
                         "width": 6,
-                        "x": 5,
+                        "x": 10,
                         "y": 4
                       }
                     },
