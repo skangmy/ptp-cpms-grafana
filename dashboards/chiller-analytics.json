@@ -2703,7 +2703,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"current\")\n  |\u003e last()\n  |\u003e keep(columns: [\"deviceId\", \"_value\"])"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"current\")\n  |\u003e last()\n  |\u003e group()\n  |\u003e filter(fn: (r) =\u003e r._value \u003e 0.01)\n  |\u003e count()"
                       },
                       "version": "v0"
                     },
@@ -2712,24 +2712,13 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": [
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "_value chiller\\dComp(.*)",
-                      "renamePattern": "Compressor $1"
-                    }
-                  }
-                }
-              ]
+              "transformations": []
             }
           },
           "description": "",
           "id": 34,
           "links": [],
-          "title": "Compressors",
+          "title": "Active Compressors",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -2737,40 +2726,15 @@
               "fieldConfig": {
                 "defaults": {
                   "color": {
+                    "fixedColor": "#ad46ff",
                     "mode": "thresholds"
                   },
-                  "mappings": [
-                    {
-                      "options": {
-                        "from": 0,
-                        "result": {
-                          "color": "#808080",
-                          "index": 0,
-                          "text": "OFF"
-                        },
-                        "to": 0.1
-                      },
-                      "type": "range"
-                    },
-                    {
-                      "options": {
-                        "from": 0.1,
-                        "result": {
-                          "color": "blue",
-                          "index": 1,
-                          "text": "ON"
-                        },
-                        "to": 1000
-                      },
-                      "type": "range"
-                    }
-                  ],
                   "noValue": "----",
                   "thresholds": {
                     "mode": "percentage",
                     "steps": [
                       {
-                        "color": "green",
+                        "color": "#56A64B",
                         "value": 0
                       }
                     ]
@@ -2817,7 +2781,7 @@
                 ]
               },
               "options": {
-                "colorMode": "background",
+                "colorMode": "value",
                 "graphMode": "none",
                 "justifyMode": "auto",
                 "orientation": "auto",
@@ -3769,7 +3733,7 @@
                           "kind": "ElementReference",
                           "name": "panel-9"
                         },
-                        "height": 5,
+                        "height": 4,
                         "width": 7,
                         "x": 4,
                         "y": 0
@@ -3782,7 +3746,7 @@
                           "kind": "ElementReference",
                           "name": "panel-34"
                         },
-                        "height": 5,
+                        "height": 4,
                         "width": 5,
                         "x": 11,
                         "y": 0
@@ -3847,10 +3811,10 @@
                           "kind": "ElementReference",
                           "name": "panel-33"
                         },
-                        "height": 4,
+                        "height": 5,
                         "width": 7,
                         "x": 4,
-                        "y": 5
+                        "y": 4
                       }
                     },
                     {
@@ -3860,10 +3824,10 @@
                           "kind": "ElementReference",
                           "name": "panel-11"
                         },
-                        "height": 4,
+                        "height": 5,
                         "width": 5,
                         "x": 11,
-                        "y": 5
+                        "y": 4
                       }
                     },
                     {
