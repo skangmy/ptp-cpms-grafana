@@ -665,82 +665,6 @@
           }
         }
       },
-      "panel-17": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"run\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\")\n  |\u003e integral(unit: 1s)"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "",
-          "id": 17,
-          "links": [],
-          "title": "Run Time",
-          "vizConfig": {
-            "group": "stat",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "blue",
-                        "value": 0
-                      }
-                    ]
-                  },
-                  "unit": "dtdhms"
-                },
-                "overrides": []
-              },
-              "options": {
-                "colorMode": "value",
-                "graphMode": "area",
-                "justifyMode": "auto",
-                "orientation": "auto",
-                "percentChangeColorMode": "standard",
-                "reduceOptions": {
-                  "calcs": [],
-                  "fields": "",
-                  "values": true
-                },
-                "showPercentChange": false,
-                "textMode": "auto",
-                "wideLayout": true
-              }
-            },
-            "version": "13.1.0"
-          }
-        }
-      },
       "panel-18": {
         "kind": "Panel",
         "spec": {
@@ -2622,7 +2546,7 @@
                                 "index": 0
                               },
                               "RUNNING": {
-                                "color": "light-green",
+                                "color": "green",
                                 "index": 1
                               },
                               "TRIPPED": {
@@ -3353,7 +3277,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\" or r[\"_measurement\"] == \"water\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with loadPerc: r.actualCapacity / float(v: ${chillerCapacity}), chillerId: \"${chiller}\"}))"
+                        "query": "import \"join\"\n\nflow = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}Chw\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e mean()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with coolingLoad: r.energyFlowRate * 78.986 , chillerId: \"${chiller}\"}))\n\nchiller = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\" or r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"actualCapacity\" or r._field == \"totalPower\" )\n  |\u003e mean()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e set(key: \"chillerId\", value: \"${chiller}\")\n\njoin.inner(left: flow, right: chiller, on: (l, r) =\u003e l.chillerId == r.chillerId, \n  as: (l, r) =\u003e ({\n    l with actualCapacity: r.actualCapacity,\n    coolingCapacity: l.coolingLoad * 3.517,\n    cop: l.coolingLoad * 3.517 / r.totalPower\n  })\n)"
                       },
                       "version": "v0"
                     },
@@ -3372,8 +3296,10 @@
                         "activeSetpoint": true,
                         "actualCapacity": false,
                         "capacityLimitOutput": true,
+                        "chillerId": true,
                         "condEWT": true,
                         "condLWT": true,
+                        "energyFlowRate": true,
                         "evapEWT": true,
                         "evapLWT": true,
                         "loadPerc": false,
@@ -3381,13 +3307,23 @@
                         "setpoint": true
                       },
                       "includeByName": {},
-                      "indexByName": {},
+                      "indexByName": {
+                        "actualCapacity": 5,
+                        "chillerId": 1,
+                        "coolingCapacity": 3,
+                        "coolingLoad": 0,
+                        "cop": 4,
+                        "energyFlowRate": 2
+                      },
                       "renameByName": {
                         "activeSetpoint": "Set Point",
-                        "actualCapacity": "Actual Capacity",
+                        "actualCapacity": "Load %",
                         "capacityLimitOutput": "Capacity Limit",
                         "condEWT": "Cond EWT",
                         "condLWT": "Cond LWT",
+                        "coolingCapacity": "Cooling Capacity",
+                        "coolingLoad": "RT",
+                        "cop": "COP",
                         "evapEWT": "Evap EWT",
                         "evapLWT": "Evap LWT",
                         "loadPerc": "Load %",
@@ -3402,7 +3338,7 @@
           "description": "",
           "id": 9,
           "links": [],
-          "title": "Current RT",
+          "title": "Performance",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -3420,14 +3356,13 @@
                         "value": 0
                       }
                     ]
-                  },
-                  "unit": "celsius"
+                  }
                 },
                 "overrides": [
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "actualCapacity",
+                      "options": "coolingLoad",
                       "scope": "series"
                     },
                     "properties": [
@@ -3440,13 +3375,13 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "loadPerc",
+                      "options": "actualCapacity",
                       "scope": "series"
                     },
                     "properties": [
                       {
                         "id": "unit",
-                        "value": "percentunit"
+                        "value": "percent"
                       },
                       {
                         "id": "thresholds",
@@ -3459,14 +3394,27 @@
                             },
                             {
                               "color": "light-orange",
-                              "value": 0.7
+                              "value": 75
                             },
                             {
                               "color": "red",
-                              "value": 0.85
+                              "value": 85
                             }
                           ]
                         }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "coolingCapacity",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "kwatt"
                       }
                     ]
                   }
@@ -3609,7 +3557,7 @@
                           "name": "panel-9"
                         },
                         "height": 4,
-                        "width": 5,
+                        "width": 8,
                         "x": 0,
                         "y": 0
                       }
@@ -3623,7 +3571,7 @@
                         },
                         "height": 4,
                         "width": 6,
-                        "x": 5,
+                        "x": 8,
                         "y": 0
                       }
                     },
@@ -3635,8 +3583,8 @@
                           "name": "panel-14"
                         },
                         "height": 4,
-                        "width": 4,
-                        "x": 11,
+                        "width": 5,
+                        "x": 14,
                         "y": 0
                       }
                     },
@@ -3646,19 +3594,6 @@
                         "element": {
                           "kind": "ElementReference",
                           "name": "panel-19"
-                        },
-                        "height": 4,
-                        "width": 4,
-                        "x": 15,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-17"
                         },
                         "height": 4,
                         "width": 5,
