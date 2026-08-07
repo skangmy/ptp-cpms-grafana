@@ -1228,11 +1228,29 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\n\nenergy =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"kwh\"})\n\ncooling =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"actualCapacity\")\n        |\u003e filter(fn: (r) =\u003e r._value \u003e 0.0)\n        |\u003e aggregateWindow(every: 1h, fn: mean, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"rth\"})\n\njoin.inner(left: energy, right: cooling, \non: (l, r) =\u003e l._time == r._time, \nas: (l,r) =\u003e ({ \n  _time: l._time,\n  kwh: l.kwh,\n  rth: r.rth,\n  efficiency: if r.rth \u003e 0.0 then l.kwh / r.rth else 0.0\n}))\n"
+                        "query": "import \"join\"\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\n\nenergy =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"kwh\"})\n\ncooling =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}Chw\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"rth\"})\n\njoin.inner(left: energy, right: cooling, \non: (l, r) =\u003e l._time == r._time, \nas: (l,r) =\u003e ({ \n  _time: l._time,\n  kwh: l.kwh,\n  rth: r.rth,\n  efficiency: if r.rth \u003e 0.0 then l.kwh / r.rth else 0.0\n}))\n"
                       },
                       "version": "v0"
                     },
                     "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\", \"_field\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
                   }
                 }
               ],
@@ -1320,7 +1338,45 @@
                   },
                   "unit": "kW/RT"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "totalPower",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.lineInterpolation",
+                        "value": "linear"
+                      },
+                      {
+                        "id": "custom.drawStyle",
+                        "value": "line"
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 1
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.gradientMode",
+                        "value": "none"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "kwatt"
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Power Consumption"
+                      }
+                    ]
+                  }
+                ]
               },
               "options": {
                 "annotations": {
@@ -1337,7 +1393,7 @@
                 },
                 "tooltip": {
                   "hideZeros": false,
-                  "mode": "single",
+                  "mode": "multi",
                   "sort": "none"
                 }
               }
