@@ -2486,16 +2486,86 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\" or r._measurement == \"water\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"activeSetpoint\" or r._field == \"evapLWT\" )\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n\n"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"chiller\" or r._measurement == \"water\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"activeSetpoint\" or r._field == \"evapLWT\" )\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n\n"
                       },
                       "version": "v0"
                     },
                     "refId": "A"
                   }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}Chw\")\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"chws\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey:[], columnKey: [\"_field\"], valueColumn: \"_value\")\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "__expr__"
+                      },
+                      "group": "__expr__",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "expression": "SELECT\n  A.activeSetpoint - 0.3 as ok,\n  A.activeSetpoint + 0.3 as warning,\n  A.activeSetpoint + 0.8 as critical\nFROM\n  A\nLIMIT\n  10",
+                        "type": "sql"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
                 }
               ],
               "queryOptions": {},
               "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "configRefId": "C",
+                      "mappings": [
+                        {
+                          "fieldName": "warning",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "orange"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        },
+                        {
+                          "fieldName": "critical",
+                          "handlerKey": "threshold1"
+                        },
+                        {
+                          "fieldName": "ok",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "green"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        }
+                      ]
+                    }
+                  }
+                },
                 {
                   "group": "organize",
                   "kind": "Transformation",
@@ -2528,6 +2598,7 @@
                         "activeSetpoint": "Set Point",
                         "actualCapacity": "Load %",
                         "capacityLimitOutput": "Capacity Limit",
+                        "chws": "CHWS",
                         "condEWT": "Cond EWT",
                         "condLWT": "Cond LWT",
                         "coolingCapacity": "Cooling Capacity",
@@ -2572,59 +2643,21 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "coolingLoad",
+                      "options": "activeSetpoint",
                       "scope": "series"
                     },
                     "properties": [
-                      {
-                        "id": "unit",
-                        "value": "RT"
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "actualCapacity",
-                      "scope": "series"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "percent"
-                      },
                       {
                         "id": "thresholds",
                         "value": {
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "green",
+                              "color": "blue",
                               "value": 0
-                            },
-                            {
-                              "color": "light-orange",
-                              "value": 75
-                            },
-                            {
-                              "color": "red",
-                              "value": 85
                             }
                           ]
                         }
-                      }
-                    ]
-                  },
-                  {
-                    "matcher": {
-                      "id": "byName",
-                      "options": "coolingCapacity",
-                      "scope": "series"
-                    },
-                    "properties": [
-                      {
-                        "id": "unit",
-                        "value": "kwatt"
                       }
                     ]
                   }
