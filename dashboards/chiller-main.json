@@ -637,7 +637,7 @@
           "description": "",
           "id": 6,
           "links": [],
-          "title": "Total Plant RT (Past 15 mintes)",
+          "title": "Total Plant RT (Past 15 minutes)",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
