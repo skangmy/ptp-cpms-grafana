@@ -1359,6 +1359,10 @@
                       {
                         "id": "unit",
                         "value": "RT"
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "left"
                       }
                     ]
                   }
