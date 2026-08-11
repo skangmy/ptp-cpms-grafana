@@ -3708,7 +3708,6 @@
                       "mode": "off"
                     }
                   },
-                  "min": 0,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -4999,6 +4998,318 @@
                   "enableFacetedFilter": false,
                   "overflow": "ellipsis",
                   "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-48": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\nfrom(bucket: \"cpms\")\n  |\u003e range(start: startTime, stop: stopTime)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"evapSatTemp\" or r[\"_field\"] == \"condSatTemp\" or r[\"_field\"] == \"suctionTemp\" or r[\"_field\"] == \"dischargeTemp\")\n  |\u003e filter(fn: (r) =\u003e r.chillerId == \"${chiller}\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with \n    suctionSuperheat: r.suctionTemp - r.evapSatTemp\n  }))\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"suctionSuperheat\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "suctionSuperheat chiller\\dComp(.*)",
+                      "renamePattern": "Comp $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 48,
+          "links": [],
+          "title": "Suction Superheats",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic",
+                    "seriesBy": "max"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.9,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "always",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "area"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "red",
+                        "value": 0
+                      },
+                      {
+                        "color": "orange",
+                        "value": 1
+                      },
+                      {
+                        "color": "green",
+                        "value": 3
+                      },
+                      {
+                        "color": "orange",
+                        "value": 8
+                      },
+                      {
+                        "color": "red",
+                        "value": 12
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "suctionSuperheat",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": []
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "min",
+                    "max",
+                    "mean"
+                  ],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-49": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\nfrom(bucket: \"cpms\")\n  |\u003e range(start: startTime, stop: stopTime)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"evapSatTemp\" or r[\"_field\"] == \"condSatTemp\" or r[\"_field\"] == \"suctionTemp\" or r[\"_field\"] == \"dischargeTemp\")\n  |\u003e filter(fn: (r) =\u003e r.chillerId == \"${chiller}\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with \n    dischargeSuperheat: r.dischargeTemp - r.condSatTemp\n  }))\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"dischargeSuperheat\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "dischargeSuperheat chiller\\dComp(.*)",
+                      "renamePattern": "Comp $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 49,
+          "links": [],
+          "title": "Discharge Superheats",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic",
+                    "seriesBy": "max"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.9,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "always",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "area"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "red",
+                        "value": 0
+                      },
+                      {
+                        "color": "orange",
+                        "value": 5
+                      },
+                      {
+                        "color": "green",
+                        "value": 10
+                      },
+                      {
+                        "color": "orange",
+                        "value": 23
+                      },
+                      {
+                        "color": "red",
+                        "value": 28
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "min",
+                    "max",
+                    "mean"
+                  ],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
                   "showLegend": true
                 },
                 "tooltip": {
@@ -6362,12 +6673,38 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-48"
+                        },
+                        "height": 13,
+                        "width": 12,
+                        "x": 0,
+                        "y": 106
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-49"
+                        },
+                        "height": 13,
+                        "width": 12,
+                        "x": 12,
+                        "y": 106
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-20"
                         },
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 106
+                        "y": 119
                       }
                     },
                     {
@@ -6380,7 +6717,7 @@
                         "height": 10,
                         "width": 12,
                         "x": 0,
-                        "y": 115
+                        "y": 128
                       }
                     },
                     {
@@ -6393,7 +6730,7 @@
                         "height": 10,
                         "width": 12,
                         "x": 12,
-                        "y": 115
+                        "y": 128
                       }
                     }
                   ]
@@ -6461,7 +6798,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-30d",
+      "from": "now-24h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -6705,8 +7042,8 @@
         "spec": {
           "allowCustomValue": true,
           "current": {
-            "text": "Weekly",
-            "value": "1w"
+            "text": "Auto",
+            "value": "v.windowPeriod"
           },
           "hide": "dontHide",
           "includeAll": false,
