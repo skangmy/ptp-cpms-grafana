@@ -3643,7 +3643,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"chws\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller.*/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"deviceId\", \"_value\"])\n\n"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\" or r._measurement == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"chws\" or r._field == \"activeSetpoint\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller.*/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"deviceId\", \"_value\"])\n\n"
                       },
                       "version": "v0"
                     },
@@ -3672,6 +3672,16 @@
                     "options": {
                       "regex": "chwr chiller(\\d)Chw",
                       "renamePattern": "Chiller $1 CHWR"
+                    }
+                  }
+                },
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "activeSetpoint chiller(.*)",
+                      "renamePattern": "Chiller $1 Setpoint"
                     }
                   }
                 }
@@ -5156,7 +5166,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-90d",
+      "from": "now-30d",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -5402,8 +5412,8 @@
           "auto_count": 30,
           "auto_min": "10s",
           "current": {
-            "text": "1w",
-            "value": "1w"
+            "text": "$__auto",
+            "value": "$__auto"
           },
           "hide": "dontHide",
           "label": "Chart Interval",
@@ -5420,7 +5430,7 @@
               "value": "1d"
             },
             {
-              "selected": true,
+              "selected": false,
               "text": "1w",
               "value": "1w"
             },
