@@ -1228,7 +1228,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\n\nenergy =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"kwh\"})\n\ncooling =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}Chw\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"rth\"})\n\njoin.inner(left: energy, right: cooling, \non: (l, r) =\u003e l._time == r._time, \nas: (l,r) =\u003e ({ \n  _time: l._time,\n  kwh: l.kwh,\n  rth: r.rth,\n  efficiency: if r.rth \u003e 0.0 then l.kwh / r.rth else 0.0\n}))\n"
+                        "query": "import \"join\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstartTime = v.timeRangeStart\nstopTime = v.timeRangeStop\n\nenergy =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"kwh\"})\n\ncooling =\n    from(bucket: \"cpms\")\n        |\u003e range(start: startTime, stop: stopTime)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"${chiller}Chw\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n        |\u003e aggregateWindow(every: 1h, fn: sum, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n        |\u003e rename(columns: {_value: \"rth\"})\n\njoin.inner(left: energy, right: cooling, \non: (l, r) =\u003e l._time == r._time, \nas: (l,r) =\u003e ({ \n  _time: l._time,\n  kwh: l.kwh,\n  rth: r.rth,\n  efficiency: if r.rth \u003e 0.0 then l.kwh / r.rth else 0.0\n}))\n"
                       },
                       "version": "v0"
                     },
@@ -3597,6 +3597,156 @@
           }
         }
       },
+      "panel-40": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"chws\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller.*/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"deviceId\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "chws chiller(\\d)Chw",
+                      "renamePattern": "Chiller $1 CHWS"
+                    }
+                  }
+                },
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "chwr chiller(\\d)Chw",
+                      "renamePattern": "Chiller $1 CHWR"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 40,
+          "links": [],
+          "title": "Water side",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 60
+                      },
+                      {
+                        "color": "red",
+                        "value": 75
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "min",
+                    "max",
+                    "mean"
+                  ],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-5": {
         "kind": "Panel",
         "spec": {
@@ -3615,7 +3765,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "data = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"percentRla\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n\navg = data\n  |\u003e group()\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e set(key: \"deviceId\", value: \"average\")\n\nunion(tables: [data, avg])\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"_value\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"deviceId\"], valueColumn: \"_value\")\n  |\u003e sort(columns: [\"_time\"])"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\ndata = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"chillerId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"compressor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"percentRla\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n\navg = data\n  |\u003e group()\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e set(key: \"deviceId\", value: \"average\")\n\nunion(tables: [data, avg])\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"_value\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"deviceId\"], valueColumn: \"_value\")\n  |\u003e sort(columns: [\"_time\"])"
                       },
                       "version": "v0"
                     },
@@ -4086,7 +4236,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"water\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${chiller}\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"water\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
                       },
                       "version": "v0"
                     },
@@ -4599,6 +4749,19 @@
                         "width": 24,
                         "x": 0,
                         "y": 14
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-40"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 23
                       }
                     }
                   ]
@@ -5202,6 +5365,46 @@
           "regexApplyTo": "value",
           "skipUrlSync": true,
           "sort": "disabled"
+        }
+      },
+      {
+        "kind": "IntervalVariable",
+        "spec": {
+          "auto": true,
+          "auto_count": 30,
+          "auto_min": "10s",
+          "current": {
+            "text": "1w",
+            "value": "1w"
+          },
+          "hide": "dontHide",
+          "label": "Chart Interval",
+          "name": "chartInterval",
+          "options": [
+            {
+              "selected": false,
+              "text": "1h",
+              "value": "1h"
+            },
+            {
+              "selected": false,
+              "text": "1d",
+              "value": "1d"
+            },
+            {
+              "selected": true,
+              "text": "1w",
+              "value": "1w"
+            },
+            {
+              "selected": false,
+              "text": "1M",
+              "value": "1M"
+            }
+          ],
+          "query": "1h,1d,1w,1M",
+          "refresh": "onTimeRangeChanged",
+          "skipUrlSync": false
         }
       }
     ]
