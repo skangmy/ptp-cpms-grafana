@@ -326,6 +326,7 @@
                     "fixedColor": "#ad46ff",
                     "mode": "thresholds"
                   },
+                  "decimals": 2,
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
