@@ -1972,7 +1972,8 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green"
+                        "color": "green",
+                        "value": 0
                       },
                       {
                         "color": "red",
@@ -3237,59 +3238,10 @@
       {
         "kind": "QueryVariable",
         "spec": {
-          "allowCustomValue": true,
-          "current": {
-            "text": "sunny",
-            "value": "sunny"
-          },
-          "definition": "",
-          "description": "",
-          "hide": "hideVariable",
-          "includeAll": false,
-          "multi": false,
-          "name": "period",
-          "options": [],
-          "query": {
-            "datasource": {
-              "name": "cpms-static"
-            },
-            "group": "marcusolsson-static-datasource",
-            "kind": "DataQuery",
-            "spec": {
-              "frame": {
-                "fields": [
-                  {
-                    "config": {},
-                    "name": "period",
-                    "type": "string",
-                    "values": []
-                  }
-                ],
-                "meta": {
-                  "custom": {
-                    "customCode": "const now = new Date();\n\nconst timeAsDecimal = now.getHours() + now.getMinutes() / 60;\n\nlet period = 'night';\nconst actualReading = Number('$radiation');\nlet clearSkyMax = 0;\n\nif (timeAsDecimal \u003e= 6.5 \u0026\u0026 timeAsDecimal \u003c 7.5) {\n  period = \"dawn\";\n  clearSkyMax = 50;\n} else if (timeAsDecimal \u003e= 7.5 \u0026\u0026 timeAsDecimal \u003c 11.5) {\n  period = \"morning\";\n  clearSkyMax = 650;\n} else if (timeAsDecimal \u003e= 11.5 \u0026\u0026 timeAsDecimal \u003c 14.5) { // 11:30 AM to 2:30 PM\n  period = \"peak\";\n  clearSkyMax = 900;\n} else if (timeAsDecimal \u003e= 14.5 \u0026\u0026 timeAsDecimal \u003c 18.5) { // 2:30 PM to 6:30 PM\n  period = \"afternoon\";\n  clearSkyMax = 700;\n} else if (timeAsDecimal \u003e= 18.5 \u0026\u0026 timeAsDecimal \u003c 19.5) { // 6:30 PM to 7:30 PM\n  period = \"sunset\";\n  clearSkyMax = 80;\n}\n\nconst validReading = Math.max(0, actualReading);\nconst ratio = Math.min(1.0, validReading / clearSkyMax);\n\nlet inferredWeather = \"\";\nif (ratio \u003e= 0.80) {\n  inferredWeather = \"sunny\";          // 80% to 100% of maximum clear sky light\n} else if (ratio \u003e= 0.40 \u0026\u0026 ratio \u003c 0.80) {\n  inferredWeather = \"partly_cloudy\";  // 40% to 79% light (moderate cloud interference)\n} else if (ratio \u003e= 0.12 \u0026\u0026 ratio \u003c 0.40) {\n  inferredWeather = \"overcast\";       // 12% to 39% light (thick cloud layers or light rain)\n} else {\n  inferredWeather = \"storm\";          // Below 12% light during daytime (very heavy storm or dark fog)\n}\n\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [period === 'night' ? 'night' : inferredWeather]\n  }))\n}\n\nreturn Promise.resolve(result);",
-                    "valuesEditor": "custom"
-                  }
-                },
-                "name": "period"
-              }
-            },
-            "version": "v0"
-          },
-          "refresh": "onDashboardLoad",
-          "regex": "",
-          "regexApplyTo": "value",
-          "skipUrlSync": false,
-          "sort": "disabled"
-        }
-      },
-      {
-        "kind": "QueryVariable",
-        "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "1569.155",
-            "value": "1569.155"
+            "text": "1591.186",
+            "value": "1591.186"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
@@ -3313,6 +3265,25 @@
           "regexApplyTo": "value",
           "skipUrlSync": false,
           "sort": "disabled"
+        }
+      },
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "current": {
+            "text": "Auto",
+            "value": "v.windowPeriod"
+          },
+          "hide": "dontHide",
+          "includeAll": false,
+          "label": "Chart Interval",
+          "multi": false,
+          "name": "chartInterval",
+          "options": [],
+          "query": "Auto : v.windowPeriod,Hourly : 1h,Daily : 1d,Weekly : 1w,Monthly : 1mo",
+          "skipUrlSync": false,
+          "valuesFormat": "csv"
         }
       }
     ]
