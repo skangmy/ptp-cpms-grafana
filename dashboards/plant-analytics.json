@@ -48,7 +48,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorHumid\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_field\", \"_start\", \"_stop\"])\n"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorHumid\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_field\", \"_start\", \"_stop\"])\n"
                       },
                       "version": "v0"
                     },
@@ -175,7 +175,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"requiredChillers\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |\u003e keep(columns: [\"_time\",\"_field\", \"_value\"])\n"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"requiredChillers\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |\u003e keep(columns: [\"_time\",\"_field\", \"_value\"])\n"
                       },
                       "version": "v0"
                     },
@@ -1292,7 +1292,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_start\", \"_stop\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_start\", \"_stop\"])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")"
                       },
                       "version": "v0"
                     },
@@ -2200,6 +2200,175 @@
           }
         }
       },
+      "panel-26": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\" or r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chws\" or r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"cws\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with _field: strings.toUpper(v: r._field)}))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * 78.986})) // convert to RT\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "energyFlowRate",
+                      "renamePattern": "Cooling Load"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 26,
+          "links": [],
+          "title": "Plant Cooling Load Trend",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "energyFlowRate",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "RT"
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "left"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [
+                    "min",
+                    "max",
+                    "mean"
+                  ],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-6": {
         "kind": "Panel",
         "spec": {
@@ -2218,7 +2387,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"strings\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\" or r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chws\" or r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"cws\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with _field: strings.toUpper(v: r._field)}))"
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\" or r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chws\" or r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"cws\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with _field: strings.toUpper(v: r._field)}))"
                       },
                       "version": "v0"
                     },
@@ -2236,7 +2405,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"strings\"\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * 78.986})) // convert to RT\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * 78.986})) // convert to RT\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
                       },
                       "version": "v0"
                     },
@@ -2387,7 +2556,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorTemp\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_field\", \"_start\", \"_stop\"])"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorTemp\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e drop(columns: [\"source\", \"category\", \"parentId\", \"_field\", \"_start\", \"_stop\"])"
                       },
                       "version": "v0"
                     },
@@ -3048,12 +3217,25 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-26"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 28
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-8"
                         },
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 28
+                        "y": 37
                       }
                     },
                     {
@@ -3066,7 +3248,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 28
+                        "y": 37
                       }
                     },
                     {
@@ -3079,7 +3261,7 @@
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 39
+                        "y": 48
                       }
                     }
                   ]
@@ -3240,8 +3422,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "1591.186",
-            "value": "1591.186"
+            "text": "1617.82",
+            "value": "1617.82"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
