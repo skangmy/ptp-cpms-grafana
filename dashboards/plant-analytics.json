@@ -956,7 +956,7 @@
           "description": "",
           "id": 15,
           "links": [],
-          "title": "Running Chillers",
+          "title": "Active Chillers",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -1047,7 +1047,7 @@
           "description": "",
           "id": 16,
           "links": [],
-          "title": "Running Cooling Towers",
+          "title": "Active CT",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -1602,12 +1602,12 @@
                         "availability": 1,
                         "chillerState": 8,
                         "coolingTowerState": 9,
-                        "emergency": 2,
-                        "health": 4,
-                        "lockout": 3,
+                        "emergency": 3,
+                        "health": 5,
+                        "lockout": 4,
                         "plantMode": 6,
                         "remoteMode": 7,
-                        "state": 5
+                        "state": 2
                       },
                       "renameByName": {
                         "availability": "Availability",
@@ -1810,6 +1810,79 @@
                         ]
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "health",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "OK"
+                              },
+                              "1": {
+                                "color": "orange",
+                                "index": 1,
+                                "text": "DEGRADED"
+                              },
+                              "2": {
+                                "color": "red",
+                                "index": 2,
+                                "text": "FAULT"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "plantMode",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "0": {
+                                "color": "green",
+                                "index": 0,
+                                "text": "NORMAL"
+                              },
+                              "1": {
+                                "color": "blue",
+                                "index": 1,
+                                "text": "WARMUP"
+                              },
+                              "2": {
+                                "color": "red",
+                                "index": 2,
+                                "text": "EMERGENCY"
+                              },
+                              "3": {
+                                "color": "#808080",
+                                "index": 3,
+                                "text": "OFF"
+                              }
+                            },
+                            "type": "value"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -1861,7 +1934,7 @@
                           "kind": "ElementReference",
                           "name": "panel-14"
                         },
-                        "height": 4,
+                        "height": 3,
                         "width": 4,
                         "x": 0,
                         "y": 0
@@ -1874,8 +1947,8 @@
                           "kind": "ElementReference",
                           "name": "panel-15"
                         },
-                        "height": 4,
-                        "width": 4,
+                        "height": 3,
+                        "width": 3,
                         "x": 4,
                         "y": 0
                       }
@@ -1887,9 +1960,9 @@
                           "kind": "ElementReference",
                           "name": "panel-16"
                         },
-                        "height": 4,
-                        "width": 4,
-                        "x": 8,
+                        "height": 3,
+                        "width": 3,
+                        "x": 7,
                         "y": 0
                       }
                     },
@@ -1903,7 +1976,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 4
+                        "y": 3
                       }
                     },
                     {
@@ -1916,7 +1989,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 10
+                        "y": 9
                       }
                     },
                     {
@@ -1929,7 +2002,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 19
+                        "y": 18
                       }
                     },
                     {
@@ -1942,7 +2015,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 19
+                        "y": 18
                       }
                     },
                     {
@@ -1955,7 +2028,7 @@
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 30
+                        "y": 29
                       }
                     }
                   ]
