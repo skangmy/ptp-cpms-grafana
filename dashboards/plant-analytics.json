@@ -1258,102 +1258,6 @@
           }
         }
       },
-      "panel-18": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-influxdb"
-                      },
-                      "group": "influxdb",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "query": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")"
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {
-                "interval": "30s"
-              },
-              "transformations": [
-                {
-                  "group": "organize",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "excludeByName": {},
-                      "includeByName": {},
-                      "indexByName": {
-                        "outdoorHumid": 1,
-                        "outdoorTemp": 0
-                      },
-                      "renameByName": {
-                        "outdoorHumid": "Humid",
-                        "outdoorTemp": "Temp"
-                      }
-                    }
-                  }
-                }
-              ]
-            }
-          },
-          "description": "",
-          "id": 18,
-          "links": [],
-          "title": "Weather",
-          "vizConfig": {
-            "group": "marcusolsson-dynamictext-panel",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {
-                  "thresholds": {
-                    "mode": "absolute",
-                    "steps": [
-                      {
-                        "color": "green",
-                        "value": 0
-                      }
-                    ]
-                  }
-                },
-                "overrides": []
-              },
-              "options": {
-                "afterRender": "const now = new Date();\n\nconst timeAsDecimal = now.getHours() + now.getMinutes() / 60;\n\nlet period = 'night';\nconst actualReading = context.data.radiation ?? 0;\n\nlet clearSkyMax = 0;\n\nif (timeAsDecimal \u003e= 6.5 \u0026\u0026 timeAsDecimal \u003c 7.5) {\n  period = \"dawn\";\n  clearSkyMax = 50;\n} else if (timeAsDecimal \u003e= 7.5 \u0026\u0026 timeAsDecimal \u003c 11.5) {\n  period = \"morning\";\n  clearSkyMax = 650;\n} else if (timeAsDecimal \u003e= 11.5 \u0026\u0026 timeAsDecimal \u003c 14.5) { // 11:30 AM to 2:30 PM\n  period = \"peak\";\n  clearSkyMax = 900;\n} else if (timeAsDecimal \u003e= 14.5 \u0026\u0026 timeAsDecimal \u003c 18.5) { // 2:30 PM to 6:30 PM\n  period = \"afternoon\";\n  clearSkyMax = 700;\n} else if (timeAsDecimal \u003e= 18.5 \u0026\u0026 timeAsDecimal \u003c 19.5) { // 6:30 PM to 7:30 PM\n  period = \"sunset\";\n  clearSkyMax = 80;\n}\n\nconst validReading = Math.max(0, actualReading);\nconst ratio = Math.min(1.0, validReading / clearSkyMax);\n\nlet inferredWeather = \"\";\nif (ratio \u003e= 0.80) {\n  inferredWeather = \"sunny\";          // 80% to 100% of maximum clear sky light\n} else if (ratio \u003e= 0.40 \u0026\u0026 ratio \u003c 0.80) {\n  inferredWeather = \"partly_cloudy\";  // 40% to 79% light (moderate cloud interference)\n} else if (ratio \u003e= 0.12 \u0026\u0026 ratio \u003c 0.40) {\n  inferredWeather = \"overcast\";       // 12% to 39% light (thick cloud layers or light rain)\n} else {\n  inferredWeather = \"storm\";          // Below 12% light during daytime (very heavy storm or dark fog)\n}\n\nconsole.log('radiation', actualReading, period, inferredWeather)\n",
-                "content": "```json\n{{{json @root}}}\n```",
-                "contentPartials": [],
-                "defaultContent": "The query didn't return any results.",
-                "editor": {
-                  "format": "auto",
-                  "language": "markdown"
-                },
-                "editors": [
-                  "afterRender"
-                ],
-                "externalStyles": [],
-                "helpers": "",
-                "renderMode": "everyRow",
-                "styles": "",
-                "wrap": true
-              }
-            },
-            "version": "6.3.0"
-          }
-        }
-      },
       "panel-19": {
         "kind": "Panel",
         "spec": {
@@ -1408,7 +1312,8 @@
           "description": "",
           "id": 19,
           "links": [],
-          "title": "Weather",
+          "title": "",
+          "transparent": true,
           "vizConfig": {
             "group": "marcusolsson-dynamictext-panel",
             "kind": "VizConfig",
@@ -1428,8 +1333,8 @@
                 "overrides": []
               },
               "options": {
-                "afterRender": "function updateSolarDashboard(actualReading) {\n  const customDate = new Date();\n\n  // 1. Force calculation specifically to Malaysia Time Zone (UTC+8)\n  const mytString = customDate.toLocaleString(\"en-US\", { timeZone: \"Asia/Kuala_Lumpur\", hour12: false });\n  const match = mytString.match(/(\\d{4})-\\d{2}-\\d{2},?\\s+(\\d{2}):(\\d{2})/);\n\n  let hour = customDate.getUTCHours() + 8;\n  let minute = customDate.getUTCMinutes();\n  if (match) {\n    hour = parseInt(match[1], 10);\n    minute = parseInt(match[2], 10);\n  }\n  hour = (hour + 24) % 24;\n  const timeAsDecimal = hour + minute / 60;\n\n  // 2. Map maximum clear sky bounds for inference calculation \n  let period = \"Night\";\n  let clearSkyMax = 0;\n\n  if (timeAsDecimal \u003e= 6.5 \u0026\u0026 timeAsDecimal \u003c 7.5) {\n    period = \"Dawn\";\n    clearSkyMax = 50;\n  } else if (timeAsDecimal \u003e= 7.5 \u0026\u0026 timeAsDecimal \u003c 11.5) {\n    period = \"Morning\";\n    clearSkyMax = 650;\n  } else if (timeAsDecimal \u003e= 11.5 \u0026\u0026 timeAsDecimal \u003c 14.5) {\n    period = \"Midday Peak\";\n    clearSkyMax = 900;\n  } else if (timeAsDecimal \u003e= 14.5 \u0026\u0026 timeAsDecimal \u003c 18.5) {\n    period = \"Afternoon\";\n    clearSkyMax = 700;\n  } else if (timeAsDecimal \u003e= 18.5 \u0026\u0026 timeAsDecimal \u003c 19.5) {\n    period = \"Sunset\";\n    clearSkyMax = 80;\n  }\n\n  // 3. Process UI output rendering updates\n  const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} MYT`;\n  document.getElementById(\"live-time-display\").innerText = timeStr;\n  document.getElementById(\"ui-actual-reading\").innerText = `${actualReading} Wh/m²/hr`;\n  document.getElementById(\"ui-time-period\").innerText = period;\n\n  const badge = document.getElementById(\"ui-weather-badge\");\n  const penetrationText = document.getElementById(\"ui-penetration-ratio\");\n\n  // Reset any prior badge color classes\n  badge.className = \"weather-badge\";\n\n  if (period === \"Night\") {\n    badge.innerText = \"Night Time\";\n    badge.classList.add(\"w-night\");\n    penetrationText.innerText = \"Sun is down (Reading is baseline 0)\";\n    return;\n  }\n\n  // Calculate light filtration levels\n  const validReading = Math.max(0, actualReading);\n  const ratio = Math.min(1.0, validReading / clearSkyMax);\n  const percentage = (ratio * 100).toFixed(0);\n  penetrationText.innerText = `Sunlight penetration: ${percentage}% of expected max`;\n\n  // 4. Classify weather state visually via CSS tags\n  if (ratio \u003e= 0.80) {\n    badge.innerText = \"☀️ Sunny / Clear\";\n    badge.classList.add(\"w-sunny\");\n  } else if (ratio \u003e= 0.40 \u0026\u0026 ratio \u003c 0.80) {\n    badge.innerText = \"⛅ Partly Cloudy\";\n    badge.classList.add(\"w-partly_cloudy\");\n  } else if (ratio \u003e= 0.12 \u0026\u0026 ratio \u003c 0.40) {\n    badge.innerText = \"☁️ Overcast / Rainy\";\n    badge.classList.add(\"w-overcast\");\n  } else {\n    badge.innerText = \"⛈️ Storm / Heavy Fog\";\n    badge.classList.add(\"w-storm\");\n  }\n}\n\n// ==========================================\n// CONNECTING TO YOUR EXISTING DATA SOURCE:\n// ==========================================\n// Replace the hardcoded number '620' below with your actual data variable.\n// Example: updateSolarDashboard(myHardwareSensor.getReading());\n\ndocument.addEventListener(\"DOMContentLoaded\", function () {\n  // Simulated Example execution on page load (620 Wh/m²/hr)\n  updateSolarDashboard(ontext.data.radiation);\n});",
-                "content": "\u003cdiv class=\"radiation-card-container\"\u003e\n    \u003cdiv class=\"radiation-card-header\"\u003e\n        \u003ch3\u003eLive Malaysia Solar Analysis\u003c/h3\u003e\n        \u003cspan class=\"myt-badge\" id=\"live-time-display\"\u003e--:-- MYT\u003c/span\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"radiation-grid\"\u003e\n        \u003cdiv class=\"radiation-metric-box\"\u003e\n            \u003cspan class=\"metric-label\"\u003eActual Sensor Reading\u003c/span\u003e\n            \u003cdiv class=\"metric-value\" id=\"ui-actual-reading\"\u003e-- Wh/m²/hr\u003c/div\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv class=\"radiation-metric-box\"\u003e\n            \u003cspan class=\"metric-label\"\u003eCurrent Solar Period\u003c/span\u003e\n            \u003cdiv class=\"metric-value\" id=\"ui-time-period\"\u003e--\u003c/div\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv class=\"radiation-metric-box full-width\"\u003e\n            \u003cspan class=\"metric-label\"\u003eInferred Weather Condition\u003c/span\u003e\n            \u003cdiv class=\"weather-badge-container\"\u003e\n                \u003cspan class=\"weather-badge\" id=\"ui-weather-badge\"\u003eDetecting...\u003c/span\u003e\n            \u003c/div\u003e\n            \u003csmall class=\"penetration-text\" id=\"ui-penetration-ratio\"\u003eSunlight penetration: --%\u003c/small\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n\u003c/div\u003e",
+                "afterRender": "function updateSolarDashboard(actualReading) {\n  const customDate = new Date();\n\n  // 1. Force calculation specifically to Malaysia Time Zone (UTC+8)\n  let hour = customDate.getHours();\n  let minute = customDate.getMinutes();\n\n  const timeAsDecimal = hour + minute / 60;\n\n  // 2. Map maximum clear sky bounds for inference calculation \n  let period = \"Night\";\n  let clearSkyMax = 0;\n\n  if (timeAsDecimal \u003e= 6.5 \u0026\u0026 timeAsDecimal \u003c 7.5) {\n    period = \"Dawn\";\n    clearSkyMax = 50;\n  } else if (timeAsDecimal \u003e= 7.5 \u0026\u0026 timeAsDecimal \u003c 11.5) {\n    period = \"Morning\";\n    clearSkyMax = 650;\n  } else if (timeAsDecimal \u003e= 11.5 \u0026\u0026 timeAsDecimal \u003c 14.5) {\n    period = \"Midday Peak\";\n    clearSkyMax = 900;\n  } else if (timeAsDecimal \u003e= 14.5 \u0026\u0026 timeAsDecimal \u003c 18.5) {\n    period = \"Afternoon\";\n    clearSkyMax = 700;\n  } else if (timeAsDecimal \u003e= 18.5 \u0026\u0026 timeAsDecimal \u003c 19.5) {\n    period = \"Sunset\";\n    clearSkyMax = 80;\n  }\n\n  // 3. Process UI output rendering updates\n  const timeStr = `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')} MYT`;\n  document.getElementById(\"live-time-display\").innerText = timeStr;\n  document.getElementById(\"ui-actual-reading\").innerText = `${Math.round(actualReading)} W/m²`;\n  document.getElementById(\"ui-time-period\").innerText = period;\n\n  const badge = document.getElementById(\"ui-weather-badge\");\n  const penetrationText = document.getElementById(\"ui-penetration-ratio\");\n\n  // Reset any prior badge color classes\n  badge.className = \"weather-badge\";\n\n  if (period === \"Night\") {\n    badge.innerText = \"Night Time\";\n    badge.classList.add(\"w-night\");\n    penetrationText.innerText = \"Sun is down (Reading is baseline 0)\";\n    return;\n  }\n\n  // Calculate light filtration levels\n  const validReading = Math.max(0, actualReading);\n  const ratio = Math.min(1.0, validReading / clearSkyMax);\n  const percentage = (ratio * 100).toFixed(0);\n  penetrationText.innerText = `Sunlight penetration: ${percentage}% of expected max`;\n\n  // 4. Classify weather state visually via CSS tags\n  if (ratio \u003e= 0.80) {\n    badge.innerText = \"☀️ Sunny / Clear\";\n    badge.classList.add(\"w-sunny\");\n  } else if (ratio \u003e= 0.40 \u0026\u0026 ratio \u003c 0.80) {\n    badge.innerText = \"⛅ Partly Cloudy\";\n    badge.classList.add(\"w-partly_cloudy\");\n  } else if (ratio \u003e= 0.12 \u0026\u0026 ratio \u003c 0.40) {\n    badge.innerText = \"☁️ Overcast / Rainy\";\n    badge.classList.add(\"w-overcast\");\n  } else {\n    badge.innerText = \"⛈️ Storm / Heavy Fog\";\n    badge.classList.add(\"w-storm\");\n  }\n}\n\nupdateSolarDashboard(context.data.radiation);\n",
+                "content": "\u003cdiv class=\"radiation-card-container\"\u003e\n    \u003cdiv class=\"radiation-card-header\"\u003e\n        \u003ch3\u003eOutdoor Solar\u003c/h3\u003e\n        \u003cspan class=\"myt-badge\" id=\"live-time-display\"\u003e--:-- MYT\u003c/span\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"radiation-grid\"\u003e\n        \u003cdiv class=\"radiation-metric-box\"\u003e\n            \u003cspan class=\"metric-label\"\u003eActual Sensor Reading\u003c/span\u003e\n            \u003cdiv class=\"metric-value\" id=\"ui-actual-reading\"\u003e-- W/m²\u003c/div\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv class=\"radiation-metric-box\"\u003e\n            \u003cspan class=\"metric-label\"\u003eCurrent Solar Period\u003c/span\u003e\n            \u003cdiv class=\"metric-value\" id=\"ui-time-period\"\u003e--\u003c/div\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv class=\"radiation-metric-box full-width\"\u003e\n            \u003cspan class=\"metric-label\"\u003eInferred Weather Condition\u003c/span\u003e\n            \u003cdiv class=\"weather-badge-container\"\u003e\n                \u003cspan class=\"weather-badge\" id=\"ui-weather-badge\"\u003eDetecting...\u003c/span\u003e\n            \u003c/div\u003e\n            \u003csmall class=\"penetration-text\" id=\"ui-penetration-ratio\"\u003eSunlight penetration: --%\u003c/small\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n\u003c/div\u003e",
                 "contentPartials": [],
                 "defaultContent": "The query didn't return any results.",
                 "editor": {
@@ -1443,8 +1348,8 @@
                 "externalStyles": [],
                 "helpers": "",
                 "renderMode": "everyRow",
-                "styles": "    .radiation-card-container {\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n        background: #ffffff;\n        border: 1px solid #e2e8f0;\n        border-radius: 12px;\n        padding: 20px;\n        max-width: 450px;\n        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);\n        margin: 15px auto;\n    }\n    .radiation-card-header {\n        display: flex;\n        justify-content: space-between;\n        align-items: center;\n        border-bottom: 1px solid #edf2f7;\n        padding-bottom: 12px;\n        margin-bottom: 16px;\n    }\n    .radiation-card-header h3 {\n        margin: 0;\n        font-size: 1.15rem;\n        color: #1a202c;\n        font-weight: 600;\n    }\n    .myt-badge {\n        background: #edf2f7;\n        color: #4a5568;\n        font-size: 0.75rem;\n        font-weight: 700;\n        padding: 4px 8px;\n        border-radius: 6px;\n        text-transform: uppercase;\n    }\n    .radiation-grid {\n        display: grid;\n        grid-template-columns: 1fr 1fr;\n        gap: 12px;\n    }\n    .radiation-metric-box {\n        background: #f7fafc;\n        border: 1px solid #edf2f7;\n        border-radius: 8px;\n        padding: 12px;\n        display: flex;\n        flex-direction: column;\n    }\n    .radiation-metric-box.full-width {\n        grid-column: span 2;\n        align-items: center;\n        text-align: center;\n    }\n    .metric-label {\n        font-size: 0.72rem;\n        text-transform: uppercase;\n        letter-spacing: 0.05em;\n        color: #718096;\n        margin-bottom: 4px;\n        font-weight: 600;\n    }\n    .metric-value {\n        font-size: 1.1rem;\n        font-weight: 700;\n        color: #2d3748;\n    }\n    .weather-badge-container {\n        margin: 6px 0;\n    }\n    .weather-badge {\n        font-size: 1.25rem;\n        font-weight: 800;\n        padding: 6px 16px;\n        border-radius: 20px;\n        display: inline-block;\n        text-transform: uppercase;\n        letter-spacing: 0.03em;\n    }\n    /* Dynamic Weather Theme Variant Classes */\n    .w-sunny { background: #feebc8; color: #c05621; }\n    .w-partly_cloudy { background: #e2e8f0; color: #4a5568; }\n    .w-overcast { background: #e2e8f0; color: #2d3748; border: 1px dashed #cbd5e0; }\n    .w-storm { background: #fed7d7; color: #9b2c2c; }\n    .w-night { background: #1a202c; color: #edf2f7; }\n    \n    .penetration-text {\n        font-size: 0.75rem;\n        color: #a0aec0;\n    }",
-                "wrap": true
+                "styles": "    .radiation-card-container {\n        font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif;\n        background: #ffffff;\n        border: 1px solid #e2e8f0;\n        border-radius: 12px;\n        padding: 20px;\n        max-width: 450px;\n        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);\n        margin: 0px auto;\n    }\n    .radiation-card-header {\n        display: flex;\n        justify-content: space-between;\n        align-items: center;\n        border-bottom: 1px solid #edf2f7;\n        padding-bottom: 12px;\n        margin-bottom: 16px;\n    }\n    .radiation-card-header h3 {\n        margin: 0;\n        font-size: 1.15rem;\n        color: #1a202c;\n        font-weight: 600;\n    }\n    .myt-badge {\n        background: #edf2f7;\n        color: #4a5568;\n        font-size: 0.75rem;\n        font-weight: 700;\n        padding: 4px 8px;\n        border-radius: 6px;\n        text-transform: uppercase;\n    }\n    .radiation-grid {\n        display: grid;\n        grid-template-columns: 1fr 1fr;\n        gap: 12px;\n    }\n    .radiation-metric-box {\n        background: #f7fafc;\n        border: 1px solid #edf2f7;\n        border-radius: 8px;\n        padding: 12px;\n        display: flex;\n        flex-direction: column;\n    }\n    .radiation-metric-box.full-width {\n        grid-column: span 2;\n        align-items: center;\n        text-align: center;\n    }\n    .metric-label {\n        font-size: 0.72rem;\n        text-transform: uppercase;\n        letter-spacing: 0.05em;\n        color: #718096;\n        margin-bottom: 4px;\n        font-weight: 600;\n    }\n    .metric-value {\n        font-size: 1.1rem;\n        font-weight: 700;\n        color: #2d3748;\n    }\n    .weather-badge-container {\n        margin: 6px 0;\n    }\n    .weather-badge {\n        font-size: 1.25rem;\n        font-weight: 800;\n        padding: 6px 16px;\n        border-radius: 20px;\n        display: inline-block;\n        text-transform: uppercase;\n        letter-spacing: 0.03em;\n    }\n    /* Dynamic Weather Theme Variant Classes */\n    .w-sunny { background: #feebc8; color: #c05621; }\n    .w-partly_cloudy { background: #e2e8f0; color: #4a5568; }\n    .w-overcast { background: #e2e8f0; color: #2d3748; border: 1px dashed #cbd5e0; }\n    .w-storm { background: #fed7d7; color: #9b2c2c; }\n    .w-night { background: #1a202c; color: #edf2f7; }\n    \n    .penetration-text {\n        font-size: 0.75rem;\n        color: #a0aec0;\n    }",
+                "wrap": false
               }
             },
             "version": "6.3.0"
@@ -2343,22 +2248,9 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-18"
-                        },
-                        "height": 3,
-                        "width": 4,
-                        "x": 14,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
                           "name": "panel-19"
                         },
-                        "height": 8,
+                        "height": 10,
                         "width": 6,
                         "x": 18,
                         "y": 0
@@ -2372,9 +2264,9 @@
                           "name": "panel-9"
                         },
                         "height": 7,
-                        "width": 24,
+                        "width": 18,
                         "x": 0,
-                        "y": 8
+                        "y": 3
                       }
                     },
                     {
@@ -2387,7 +2279,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 15
+                        "y": 10
                       }
                     },
                     {
@@ -2400,7 +2292,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 24
+                        "y": 19
                       }
                     },
                     {
@@ -2413,7 +2305,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 24
+                        "y": 19
                       }
                     },
                     {
@@ -2426,7 +2318,7 @@
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 35
+                        "y": 30
                       }
                     }
                   ]
@@ -2636,8 +2528,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "1465.871",
-            "value": "1465.871"
+            "text": "1484.152",
+            "value": "1484.152"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
