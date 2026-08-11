@@ -3291,7 +3291,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\nimport \"strings\"\n\nbucket = \"cpms\"\nwindow = 15m\n\nload =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller\\dChw/)\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      deviceId: r.deviceId,\n      loadRt: r._value * 78.986,\n    }))\n    |\u003e group()\n\n\npower =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      loadId: r.deviceId + \"Chw\",\n      powerKw: r._value,\n    }))\n    //|\u003e group(columns: [\"deviceId\"])\n    |\u003e group()\n\nrunning =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller/)\n    |\u003e aggregateWindow(every: window, fn: sum, createEmpty: false)\n    |\u003e filter(fn: (r) =\u003e r._value \u003e 10)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      running: r._value,\n    }))\n    |\u003e group()\n\nloadPower =\n  join.inner(\n    left: load,\n    right: power,\n    on: (l, r) =\u003e l._time == r._time and l.deviceId == r.loadId,\n    as: (l, r) =\u003e ({\n      _time: l._time,\n      chillerId: r.chillerId,\n      loadRt: l.loadRt,\n      powerKw: r.powerKw,\n    }),\n  )\n\njoin.inner(\n  left: loadPower,\n  right: running,\n  on: (l, r) =\u003e l._time == r._time and l.chillerId == r.chillerId,\n  as: (l, r) =\u003e ({\n    _time: l._time,\n    chillerId: l.chillerId,\n    loadRt: l.loadRt,\n    kwPerRt: if l.loadRt \u003e 0.0 then l.powerKw / l.loadRt else 0.0,\n  }),\n)\n  |\u003e filter(fn: (r) =\u003e r.loadRt \u003e 0.0 and r.kwPerRt \u003e 0.0)\n  |\u003e group(columns: [\"chillerId\"])"
+                        "query": "import \"join\"\nimport \"strings\"\n\nbucket = \"cpms\"\nwindow = 15m\n\nload =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller\\dChw/)\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      deviceId: r.deviceId,\n      loadRt: r._value * 78.986,\n    }))\n    |\u003e group()\n\n\npower =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      loadId: r.deviceId + \"Chw\",\n      powerKw: r._value,\n    }))\n    //|\u003e group(columns: [\"deviceId\"])\n    |\u003e group()\n\nrunning =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller/)\n    |\u003e aggregateWindow(every: window, fn: sum, createEmpty: false)\n    |\u003e filter(fn: (r) =\u003e r._value \u003e 10)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      running: r._value,\n    }))\n    |\u003e group()\n\nloadPower =\n  join.inner(\n    left: load,\n    right: power,\n    on: (l, r) =\u003e l._time == r._time and l.deviceId == r.loadId,\n    as: (l, r) =\u003e ({\n      _time: l._time,\n      chillerId: r.chillerId,\n      loadRt: l.loadRt,\n      powerKw: r.powerKw,\n    }),\n  )\n\njoin.inner(\n  left: loadPower,\n  right: running,\n  on: (l, r) =\u003e l._time == r._time and l.chillerId == r.chillerId,\n  as: (l, r) =\u003e ({\n    chillerId: l.chillerId,\n    loadRt: l.loadRt,\n    kwPerRt: if l.loadRt \u003e 0.0 then l.powerKw / l.loadRt else 0.0,\n  }),\n)\n  |\u003e filter(fn: (r) =\u003e r.loadRt \u003e 0.0 and r.kwPerRt \u003e 0.0)\n  |\u003e group(columns: [\"chillerId\"])"
                       },
                       "version": "v0"
                     },
@@ -3300,7 +3300,28 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "kwPerRt (.*)",
+                      "renamePattern": "Efficiency $1"
+                    }
+                  }
+                },
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "loadRt (.*)",
+                      "renamePattern": "Cooling Load $1"
+                    }
+                  }
+                }
+              ]
             }
           },
           "description": "",
@@ -3327,6 +3348,13 @@
                       "legend": false,
                       "tooltip": false,
                       "viz": false
+                    },
+                    "lineStyle": {
+                      "dash": [
+                        10,
+                        10
+                      ],
+                      "fill": "dash"
                     },
                     "pointShape": "circle",
                     "pointSize": {
@@ -3385,13 +3413,13 @@
                     "x": {
                       "matcher": {
                         "id": "byName",
-                        "options": "loadRt chiller1"
+                        "options": "Cooling Load chiller1"
                       }
                     },
                     "y": {
                       "matcher": {
                         "id": "byName",
-                        "options": "kwPerRt chiller1"
+                        "options": "Efficiency chiller1"
                       }
                     }
                   },
@@ -3408,13 +3436,13 @@
                     "x": {
                       "matcher": {
                         "id": "byName",
-                        "options": "loadRt chiller2"
+                        "options": "Cooling Load chiller2"
                       }
                     },
                     "y": {
                       "matcher": {
                         "id": "byName",
-                        "options": "kwPerRt chiller2"
+                        "options": "Efficiency chiller2"
                       }
                     }
                   },
@@ -3431,13 +3459,13 @@
                     "x": {
                       "matcher": {
                         "id": "byName",
-                        "options": "loadRt chiller3"
+                        "options": "Cooling Load chiller3"
                       }
                     },
                     "y": {
                       "matcher": {
                         "id": "byName",
-                        "options": "kwPerRt chiller3"
+                        "options": "Efficiency chiller3"
                       }
                     }
                   }
