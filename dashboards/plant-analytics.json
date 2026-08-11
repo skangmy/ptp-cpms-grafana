@@ -1146,7 +1146,7 @@
           "description": "",
           "id": 17,
           "links": [],
-          "title": "Outdoor",
+          "title": "",
           "vizConfig": {
             "group": "stat",
             "kind": "VizConfig",
@@ -2235,22 +2235,9 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-17"
-                        },
-                        "height": 3,
-                        "width": 4,
-                        "x": 10,
-                        "y": 0
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
                           "name": "panel-19"
                         },
-                        "height": 10,
+                        "height": 9,
                         "width": 6,
                         "x": 18,
                         "y": 0
@@ -2263,10 +2250,23 @@
                           "kind": "ElementReference",
                           "name": "panel-9"
                         },
-                        "height": 7,
+                        "height": 8,
                         "width": 18,
                         "x": 0,
                         "y": 3
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-17"
+                        },
+                        "height": 2,
+                        "width": 6,
+                        "x": 18,
+                        "y": 9
                       }
                     },
                     {
@@ -2279,7 +2279,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 10
+                        "y": 11
                       }
                     },
                     {
@@ -2292,7 +2292,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 19
+                        "y": 20
                       }
                     },
                     {
@@ -2305,7 +2305,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 19
+                        "y": 20
                       }
                     },
                     {
@@ -2318,7 +2318,7 @@
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 30
+                        "y": 31
                       }
                     }
                   ]
