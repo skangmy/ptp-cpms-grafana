@@ -3685,7 +3685,21 @@
                         "x": 0,
                         "y": 60
                       }
-                    },
+                    }
+                  ]
+                }
+              },
+              "title": "Summary"
+            }
+          },
+          {
+            "kind": "RowsLayoutRow",
+            "spec": {
+              "collapse": false,
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
                     {
                       "kind": "GridLayoutItem",
                       "spec": {
@@ -3696,7 +3710,7 @@
                         "height": 12,
                         "width": 17,
                         "x": 0,
-                        "y": 70
+                        "y": 0
                       }
                     },
                     {
@@ -3709,19 +3723,19 @@
                         "height": 12,
                         "width": 7,
                         "x": 17,
-                        "y": 70
+                        "y": 0
                       }
                     }
                   ]
                 }
               },
-              "title": "Summary"
+              "title": "Plant Efficiency \u0026 Energy "
             }
           },
           {
             "kind": "RowsLayoutRow",
             "spec": {
-              "collapse": false,
+              "collapse": true,
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -3761,7 +3775,7 @@
           {
             "kind": "RowsLayoutRow",
             "spec": {
-              "collapse": false,
+              "collapse": true,
               "layout": {
                 "kind": "GridLayout",
                 "spec": {
@@ -3870,8 +3884,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "1591.38",
-            "value": "1591.38"
+            "text": "1566.347",
+            "value": "1566.347"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
