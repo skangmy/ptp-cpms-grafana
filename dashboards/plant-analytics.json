@@ -2620,7 +2620,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId != \"main\" and r.deviceId != \"genset\")\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e pivot(rowKey: [], columnKey: [\"deviceId\"], valueColumn: \"_value\")\n  |\u003e group()\n"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId != \"main\" and r.deviceId != \"genset\")\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e pivot(rowKey: [], columnKey: [\"deviceId\"], valueColumn: \"_value\")\n  |\u003e group()"
                       },
                       "version": "v0"
                     },
@@ -2706,7 +2706,15 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {}
+                  }
+                }
+              ]
             }
           },
           "description": "",
@@ -2775,7 +2783,7 @@
                 {
                   "kind": "PanelQuery",
                   "spec": {
-                    "hidden": true,
+                    "hidden": false,
                     "query": {
                       "datasource": {
                         "name": "cpms-influxdb"
@@ -2783,7 +2791,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "power = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e mean()\n  |\u003e group()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\"}))\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e mean()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * 78.986}))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"power\"])\n  |\u003e map(fn: (r) =\u003e ({ r with efficiency: if r.coolingLoad \u003e 0.0 then r.power / r.coolingLoad else 0.0 }))"
+                        "query": "power = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e mean()\n  |\u003e group()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\"}))\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e mean()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * 78.986}))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"power\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    efficiency: if r.coolingLoad \u003e 0.0 then r.power / r.coolingLoad else 0.0,\n  }))"
                       },
                       "version": "v0"
                     },
@@ -2801,7 +2809,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "devicePower = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/)\n  |\u003e mean()\n  |\u003e group()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\"}))\n\ndevicePower\n  |\u003e pivot(rowKey: [], columnKey: [\"deviceId\"], valueColumn: \"_value\")"
+                        "query": "chillers = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/)\n  |\u003e mean()\n  |\u003e group()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\"}))\n\nchwps = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  //|\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chwp\\d/)\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\", deviceId: \"CHWP\"}))\n\ncwps = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  //|\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /cwp\\d/)\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\", deviceId: \"CWP\"}))\n\ncts = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /ct\\dFan\\d/)\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"power\", deviceId: \"Cooling Tower\"}))\n\n\n// chillers\nunion(tables: [chillers, chwps, cwps, cts])\n  |\u003e keep(columns: [\"deviceId\", \"_value\"])\n  // |\u003e pivot(rowKey: [], columnKey: [\"deviceId\"], valueColumn: \"_value\")"
                       },
                       "version": "v0"
                     },
@@ -2810,43 +2818,19 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": [
-                {
-                  "group": "transpose",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "firstFieldName": "Equipment",
-                      "restFieldsName": "Power"
-                    }
-                  }
-                }
-              ]
+              "transformations": []
             }
           },
           "description": "",
           "id": 31,
           "links": [],
-          "title": "New panel",
+          "title": "Plant Efficiency KPI Table",
           "vizConfig": {
-            "group": "table",
+            "group": "marcusolsson-dynamictext-panel",
             "kind": "VizConfig",
             "spec": {
               "fieldConfig": {
                 "defaults": {
-                  "color": {
-                    "mode": "thresholds"
-                  },
-                  "custom": {
-                    "align": "auto",
-                    "cellOptions": {
-                      "type": "auto"
-                    },
-                    "footer": {
-                      "reducers": []
-                    },
-                    "inspect": false
-                  },
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -2861,15 +2845,38 @@
                     ]
                   }
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "1",
+                      "scope": "series"
+                    },
+                    "properties": []
+                  }
+                ]
               },
               "options": {
-                "cellHeight": "sm",
-                "frameIndex": 1,
-                "showHeader": true
+                "afterRender": "",
+                "content": "\u003ctable\u003e\n\u003ctr\u003e\n  \u003cth\u003eEquipment\u003c/th\u003e\u003cth\u003eValue\u003c/th\u003e\n\u003c/tr\u003e\n{{#each data.[1]}}\n  \u003ctr\u003e\u003ctd\u003e{{deviceId}}\u003c/td\u003e\u003ctd class=\"valcol\"\u003e{{toFixed _value}} kW\u003c/td\u003e\u003c/tr\u003e\n{{/each}}\n  \u003ctr\u003e\u003ctd class=\"totalrow\"\u003eTotal Power\u003c/td\u003e\u003ctd class=\"totalrow\"\u003e{{toFixed data.[0].[0].power}} kW\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd class=\"totalrow\"\u003eTotal Cooling Load\u003c/td\u003e\u003ctd class=\"totalrow\"\u003e{{toFixed data.[0].[0].coolingLoad}} RT\u003c/td\u003e\u003c/tr\u003e\n  \u003ctr\u003e\u003ctd class=\"totalrow\"\u003ePlant Efficiency\u003c/td\u003e\u003ctd class=\"totalrow valcol\"\u003e{{toFixed data.[0].[0].efficiency}} kW/RT\u003c/td\u003e\u003c/tr\u003e\n\u003c/table\u003e\n",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "markdown"
+                },
+                "editors": [
+                  "styles",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"toFixed\", (v) =\u003e v.toFixed(1));",
+                "renderMode": "data",
+                "styles": ".totalrow {\n  font-weight: bold;\n}\n\n.valcol {\n  text-align: right;\n}",
+                "wrap": true
               }
             },
-            "version": "13.1.0"
+            "version": "6.3.0"
           }
         }
       },
@@ -4005,8 +4012,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "1609.465",
-            "value": "1609.465"
+            "text": "262.296",
+            "value": "262.296"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
