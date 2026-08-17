@@ -2906,7 +2906,9 @@
                   }
                 }
               ],
-              "queryOptions": {},
+              "queryOptions": {
+                "interval": "30m"
+              },
               "transformations": [
                 {
                   "group": "organize",
@@ -4244,8 +4246,8 @@
         "spec": {
           "allowCustomValue": true,
           "current": {
-            "text": "Hourly",
-            "value": "1h"
+            "text": "Auto",
+            "value": "v.windowPeriod"
           },
           "hide": "dontHide",
           "includeAll": false,
