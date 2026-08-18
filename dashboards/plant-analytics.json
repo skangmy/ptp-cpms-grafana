@@ -3281,7 +3281,7 @@
                 "legend": {
                   "calcs": [],
                   "displayMode": "list",
-                  "enableFacetedFilter": false,
+                  "enableFacetedFilter": true,
                   "overflow": "ellipsis",
                   "placement": "bottom",
                   "showLegend": true
