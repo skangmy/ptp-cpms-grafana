@@ -3141,7 +3141,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = ${chartInterval}\n\ncwps = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwp1\" or r[\"deviceId\"] == \"cwp2\" or r[\"deviceId\"] == \"cwp3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"cwp\"}))\n  |\u003e group(columns: [\"_field\"])\n\nchwps = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwp1\" or r[\"deviceId\"] == \"chwp2\" or r[\"deviceId\"] == \"chwp3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)  \n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"chwp\"}))\n  |\u003e group(columns: [\"_field\"])\n\nchillers = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\" or r[\"deviceId\"] == \"chiller2\" or r[\"deviceId\"] == \"chiller3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)  \n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"chiller\"}))\n  |\u003e group(columns: [\"_field\"])\n\ncts = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"ct1Fan1\" or r[\"deviceId\"] == \"ct1Fan2\" or r[\"deviceId\"] == \"ct2Fan1\" or r[\"deviceId\"] == \"ct2Fan2\" or r[\"deviceId\"] == \"ct3Fan1\" or r[\"deviceId\"] == \"ct3Fan2\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)  \n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"ct\"}))\n  |\u003e group(columns: [\"_field\"])\n\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * 78.986}))\n  |\u003e group(columns: [\"_field\"])\n\nunion(tables: [cwps, chwps, chillers, cts, load])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e filter(fn: (r) =\u003e date.millisecond(t: r._time) == 0)\n  |\u003e keep(columns: [\"_time\", \"coolingLoad\", \"cwp\", \"chwp\", \"chiller\", \"ct\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    cwp: if r.coolingLoad \u003e 0.0 then r.cwp / r.coolingLoad else 0.0,\n    chwp: if r.coolingLoad \u003e 0.0 then r.chwp / r.coolingLoad else 0.0,\n    chiller: if r.coolingLoad \u003e 0.0 then r.chiller / r.coolingLoad else 0.0,\n    ct: if r.coolingLoad \u003e 0.0 then r.ct / r.coolingLoad else 0.0,\n  }))"
+                        "query": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = ${chartInterval}\n\ncwps = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwp1\" or r[\"deviceId\"] == \"cwp2\" or r[\"deviceId\"] == \"cwp3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"cwp\"}))\n  |\u003e group(columns: [\"_field\"])\n\nchwps = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwp1\" or r[\"deviceId\"] == \"chwp2\" or r[\"deviceId\"] == \"chwp3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)  \n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"chwp\"}))\n  |\u003e group(columns: [\"_field\"])\n\nchillers = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\" or r[\"deviceId\"] == \"chiller2\" or r[\"deviceId\"] == \"chiller3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)  \n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"chiller\"}))\n  |\u003e group(columns: [\"_field\"])\n\ncts = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"ct1Fan1\" or r[\"deviceId\"] == \"ct1Fan2\" or r[\"deviceId\"] == \"ct2Fan1\" or r[\"deviceId\"] == \"ct2Fan2\" or r[\"deviceId\"] == \"ct3Fan1\" or r[\"deviceId\"] == \"ct3Fan2\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e group()\n  |\u003e aggregateWindow(every: bucket, fn: sum)  \n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"ct\"}))\n  |\u003e group(columns: [\"_field\"])\n\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e aggregateWindow(every: bucket, fn: mean, createEmpty: true)\n  |\u003e fill(value: 0.0)\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * 78.986}))\n  |\u003e group(columns: [\"_field\"])\n\nunion(tables: [cwps, chwps, chillers, cts, load])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e filter(fn: (r) =\u003e date.millisecond(t: r._time) == 0)\n  |\u003e keep(columns: [\"_time\", \"coolingLoad\", \"cwp\", \"chwp\", \"chiller\", \"ct\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    cwp: if r.coolingLoad \u003e 0.0 then r.cwp / r.coolingLoad else 0.0,\n    chwp: if r.coolingLoad \u003e 0.0 then r.chwp / r.coolingLoad else 0.0,\n    chiller: if r.coolingLoad \u003e 0.0 then r.chiller / r.coolingLoad else 0.0,\n    ct: if r.coolingLoad \u003e 0.0 then r.ct / r.coolingLoad else 0.0,\n  }))\n  |\u003e map(fn: (r) =\u003e ({\n    r with total: r.cwp + r.chwp + r.chiller + r.ct\n  }))"
                       },
                       "version": "v0"
                     },
@@ -3174,7 +3174,8 @@
                         "ct": "Cooling Towers",
                         "cwp": "CW Pumps",
                         "efficiency": "Efficiency",
-                        "power": ""
+                        "power": "",
+                        "total": "Total"
                       }
                     }
                   }
@@ -3245,7 +3246,25 @@
                   },
                   "unit": "kW/RT"
                 },
-                "overrides": []
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "total",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": true,
+                          "tooltip": false,
+                          "viz": true
+                        }
+                      }
+                    ]
+                  }
+                ]
               },
               "options": {
                 "annotations": {
@@ -4429,8 +4448,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "172.066",
-            "value": "172.066"
+            "text": "184.936",
+            "value": "184.936"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
