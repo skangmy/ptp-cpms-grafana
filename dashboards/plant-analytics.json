@@ -3204,8 +3204,8 @@
                     "axisPlacement": "auto",
                     "barAlignment": 0,
                     "barWidthFactor": 0.6,
-                    "drawStyle": "bars",
-                    "fillOpacity": 80,
+                    "drawStyle": "line",
+                    "fillOpacity": 60,
                     "gradientMode": "hue",
                     "hideFrom": {
                       "legend": false,
