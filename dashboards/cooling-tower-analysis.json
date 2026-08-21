@@ -1,0 +1,2313 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "dcfvtyrb3tfny8b"
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations \u0026 Alerts",
+          "query": {
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Off",
+    "description": "",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r.kind == \"cooling_tower\")\n  |\u003e last()\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e drop(columns: [\"_start\",\"_stop\",\"_measurement\", \"category\", \"kind\", \"parentId\", \"source\"])\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "ct"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"cws\" or r._field == \"cwr\" or r._field == \"deltaT\")  \n  |\u003e last()\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e drop(columns: [\"_start\",\"_stop\",\"_measurement\", \"category\", \"kind\", \"parentId\", \"source\"])\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "cws"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e last()\n",
+                        "rawQuery": true,
+                        "rawSql": "SELECT value-\u003e\u003e'target' as setpoint\nFROM public.control_params\nWHERE key='ct_fan.cws_controller';",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        },
+                        "table": "control_params"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "setpoint"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "power = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")  \n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"ct1Fan1\" or r[\"deviceId\"] == \"ct3Fan2\" or r[\"deviceId\"] == \"ct3Fan1\" or r[\"deviceId\"] == \"ct2Fan2\" or r[\"deviceId\"] == \"ct2Fan1\" or r[\"deviceId\"] == \"ct1Fan2\")\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e set(key: \"_field\", value: \"power\")\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e mean()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * 78.986}))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"power\"])\n  |\u003e map(fn: (r) =\u003e ({ r with efficiency: if r.coolingLoad \u003e 0.0 then r.power / r.coolingLoad else 0.0 }))  "
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "eff"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "power = from(bucket: \"cpms\")\n  |\u003e range(start: -1d)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")  \n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"ct1Fan1\" or r[\"deviceId\"] == \"ct3Fan2\" or r[\"deviceId\"] == \"ct3Fan1\" or r[\"deviceId\"] == \"ct2Fan2\" or r[\"deviceId\"] == \"ct2Fan1\" or r[\"deviceId\"] == \"ct1Fan2\")\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e set(key: \"_field\", value: \"power\")\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: -1d)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e mean()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * 78.986}))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"power\"])\n  |\u003e map(fn: (r) =\u003e ({ r with efficiency: if r.coolingLoad \u003e 0.0 then r.power / r.coolingLoad else 0.0 }))  "
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "eff24"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\" )\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"run\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"ct1Fan1\" or r[\"deviceId\"] == \"ct3Fan2\" or r[\"deviceId\"] == \"ct3Fan1\" or r[\"deviceId\"] == \"ct2Fan1\" or r[\"deviceId\"] == \"ct2Fan2\" or r[\"deviceId\"] == \"ct1Fan2\")\n  |\u003e last()\n  |\u003e filter(fn: (r) =\u003e r._value \u003e 0)\n  |\u003e group()\n  |\u003e count()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "fan_status"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "th = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"outdoorTemp\" or r._field == \"outdoorHumid\")\n  |\u003e last()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e mean()\n  //|\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n\nradiation = from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"radiation\")\n  |\u003e last()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e max()\n  //|\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n\nunion(tables: [th, radiation])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "outdoor"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "// const [ct] = context.data;\n// console.log(ct);\n\n// const lead = ct.find(c =\u003e c.priority == 2);\n// const lag = ct.find(c =\u003e c.priority == 1);\n\n// console.log(lead, lag)",
+                "content": "\u003csection class=\"ct-kpi-wrap\" aria-label=\"Cooling tower overall live KPI cards\"\u003e\n  \u003cdiv class=\"ct-kpi-grid\"\u003e\n    \u003cdiv class=\"ct-kpi-card ct-kpi-good\"\u003e\n      \u003cdiv class=\"ct-kpi-label\"\u003eRunning CT\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-value\"\u003e{{RunningCT data.[0]}}\u003cspan class=\"ct-kpi-unit\"\u003e / 3\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-sub\"\u003e{{CtName (CtByPriority data.[0] 2)}} Lead, {{CtName (CtByPriority data.[0] 1)}} Lag\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"ct-kpi-card ct-kpi-{{setpointStatus data.[1].[0].cws data.[2].[0].cwsSetpoint}}\"\u003e\n      \u003cdiv class=\"ct-kpi-label\"\u003eCWS vs Setpoint\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-value\"\u003e{{numberFormat data.[1].[0].cws decimalLength=1}}\u003cspan class=\"ct-kpi-unit\"\u003e / {{numberFormat data.[2].[0].cwsSetpoint decimalLength=1}} °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-sub\"\u003e{{setpointSummary data.[1].[0].cws data.[2].[0].cwsSetpoint}}\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"ct-kpi-card\"\u003e\n      \u003cdiv class=\"ct-kpi-label\"\u003eCWS | CWR | Delta T\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-value\"\u003e{{numberFormat data.[1].[0].cws decimalLength=1}}\u003cspan class=\"ct-kpi-unit\"\u003e | {{numberFormat data.[1].[0].cwr decimalLength=1}} | {{numberFormat data.[1].[0].deltaT decimalLength=1}} °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-sub\"\u003eCondenser water loop\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"ct-kpi-card ct-kpi-good\"\u003e\n      \u003cdiv class=\"ct-kpi-label\"\u003eFan Power Intensity\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-value\"\u003e{{numberFormat data.[3].[0].efficiency decimalLength=3}}\u003cspan class=\"ct-kpi-unit\"\u003e kW/RT\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-sub\"\u003e24h avg {{numberFormat data.[4].[0].efficiency decimalLength=3}} kW/RT\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"ct-kpi-card\"\u003e\n      \u003cdiv class=\"ct-kpi-label\"\u003eTotal Fan Power\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-value\"\u003e{{numberFormat data.[3].[0].power decimalLength=2}}\u003cspan class=\"ct-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-sub\"\u003e{{runningFans data.[5].[0]._value}}\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"ct-kpi-card ct-kpi-warn\"\u003e\n      \u003cdiv class=\"ct-kpi-label\"\u003eOTH and Solar\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-value\"\u003e{{numberFormat data.[6].[0].outdoorTemp decimalLength=1}}\u003cspan class=\"ct-kpi-unit\"\u003e°C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"ct-kpi-sub\"\u003eRH {{numberFormat data.[6].[0].outdoorHumid decimalLength=1}}%, solar {{numberFormat data.[6].[0].radiation decimalLength=0}} W/m2\u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/section\u003e",
+                "contentPartials": [],
+                "defaultContent": "",
+                "editor": {
+                  "format": "auto",
+                  "language": "markdown"
+                },
+                "editors": [
+                  "styles",
+                  "afterRender",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"CtName\", (id) =\u003e {\n  if (id === 'ct1') return 'CT-1';\n  if (id === 'ct2') return 'CT-2';\n  if (id === 'ct3') return 'CT-3';\n  return id;\n})\n\ncontext.handlebars.registerHelper(\"CtByPriority\", (towers, priority) =\u003e {\n  const ct = towers.find(t =\u003e t.priority === priority);\n  return ct?.deviceId ?? '--';\n})\n\ncontext.handlebars.registerHelper(\"RunningCT\", (towers) =\u003e {\n  return towers.filter(t =\u003e t.state === 2).length; // 2 = running\n});\n\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\ncontext.handlebars.registerHelper('setpointSummary', function (value, setpoint) {\n  const gap = value - setpoint;\n  if (gap \u003c 0) {\n    return `${Math.abs(gap).toFixed(1)} °C below setpoint`;\n  }\n\n  if (gap \u003e 0) {\n    return `${gap.toFixed(1)} °C above setpoint`;\n  }\n\n  return `same as setpoint`\n})\n\ncontext.handlebars.registerHelper('setpointStatus', function (value, setpoint) {\n  const gap = value - setpoint;\n  return gap \u003c= 0.1 ? 'good' : 'bad';\n})\n\ncontext.handlebars.registerHelper('runningFans', function (count) {\n  if (count === 0) return `No fan running`;\n  if (count === 1) return `1 fan running`;\n  return `${count} fans running`;\n\n})\n\n",
+                "renderMode": "data",
+                "styles": ".ct-kpi-wrap {\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n}\n.ct-kpi-head {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 8px;\n}\n.ct-kpi-title {\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: 0.3px;\n  text-transform: uppercase;\n}\n.ct-kpi-freshness {\n  font-size: 10px;\n  color: var(--color-text-secondary, #667085);\n}\n.ct-kpi-grid {\n  display: grid;\n  grid-template-columns: repeat(6, minmax(120px, 1fr));\n  gap: 8px;\n}\n.ct-kpi-card {\n  background: #fff;\n  border: 0.5px solid var(--color-border-tertiary, #d0d5dd);\n  border-radius: 6px;\n  padding: 9px 10px;\n  min-height: 78px;\n}\n.ct-kpi-label {\n  font-size: 9px;\n  color: var(--color-text-secondary, #667085);\n  letter-spacing: 0.3px;\n  text-transform: uppercase;\n}\n.ct-kpi-value {\n  margin-top: 5px;\n  font-size: 20px;\n  font-weight: 600;\n  line-height: 1.1;\n  font-variant-numeric: tabular-nums;\n}\n.ct-kpi-unit {\n  font-size: 10px;\n  font-weight: 400;\n  color: var(--color-text-secondary, #667085);\n}\n.ct-kpi-sub {\n  margin-top: 4px;\n  font-size: 10px;\n  color: var(--color-text-secondary, #667085);\n  white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.ct-kpi-good .ct-kpi-value { color: #548235; }\n.ct-kpi-warn .ct-kpi-value { color: #bf8f00; }\n.ct-kpi-bad .ct-kpi-value { color: #c00000; }",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-10": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r.kind == \"cooling_tower\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _value:\n        if r._value == 0 then \"OFF\"\n        else if r._value == 1 then \"STARTING\"\n        else if r._value == 2 then \"RUNNING\"\n        else if r._value == 3 then \"STOPPING\"\n        else if r._value == 4 then \"FAULT\"\n        else if r._value == 5 then \"UNAVAILABLE\"\n        else if r._value == 6 then \"OPEN\"\n        else \"UNKNOWN\",\n      _field: r.deviceId\n  }))\n  |\u003e keep(columns: [\"_time\", \"_value\", \"_field\"])\n  |\u003e group(columns: [\"_field\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "ct(.*)",
+                      "renamePattern": "CT$1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 10,
+          "links": [],
+          "title": "Run Status",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "FAULT": {
+                          "color": "#DC2626",
+                          "index": 4
+                        },
+                        "OFF": {
+                          "color": "#9ca3af",
+                          "index": 0
+                        },
+                        "OPEN": {
+                          "color": "#0891B2",
+                          "index": 6
+                        },
+                        "RUNNING": {
+                          "color": "#16A34A",
+                          "index": 2
+                        },
+                        "STARTING": {
+                          "color": "#f59e0b",
+                          "index": 1
+                        },
+                        "STOPPING": {
+                          "color": "#2563EB",
+                          "index": 3
+                        },
+                        "UNAVAILABLE": {
+                          "color": "#475569",
+                          "index": 5
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "left",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": false
+                },
+                "mergeValues": true,
+                "rowHeight": 0.9,
+                "showValue": "auto",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-11": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "hour = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r.kind == \"cooling_tower\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 1m, fn: last, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _value: if r._value == 2 then 1.0 else 0.0\n  }))\n  |\u003e integral(unit: 1h)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _field: \"runtimeHours\"\n  }))\n  |\u003e keep(columns: [\"deviceId\", \"_field\", \"_value\"])\n\ncount = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r.kind == \"cooling_tower\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 1m, fn: last, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _value: if r._value == 2 then 1 else 0\n  }))\n  |\u003e difference(nonNegative: false)\n  |\u003e filter(fn: (r) =\u003e r._value == 1)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e count(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _field: \"startCount\",\n      _value: float(v: r._value)\n  }))\n  |\u003e keep(columns: [\"deviceId\", \"_field\", \"_value\"])\n\n\nunion(tables: [hour, count])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ( { \n    r with avgPerStart: if not exists r.startCount or r.startCount == 0 then r.runtimeHours else r.runtimeHours / r.startCount,\n    startCount: if not exists r.startCount then 0.0 else r.startCount\n  }))\n  |\u003e group()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-static"
+                      },
+                      "group": "marcusolsson-static-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "frame": {
+                          "fields": [
+                            {
+                              "config": {},
+                              "name": "max",
+                              "type": "number",
+                              "values": [
+                                0
+                              ]
+                            }
+                          ],
+                          "meta": {
+                            "custom": {
+                              "customCode": "const duration = (+'${__to}' - +'${__from}') / 3600000;\n\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [duration]\n  }))\n}\n\nreturn Promise.resolve(result);",
+                              "valuesEditor": "custom"
+                            }
+                          },
+                          "name": "max"
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "max_duration"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "runtimeHours"
+                      },
+                      "configRefId": "max_duration",
+                      "mappings": [
+                        {
+                          "fieldName": "max",
+                          "handlerKey": "max"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "group": "calculateField",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "alias": "Share",
+                      "mode": "unary",
+                      "reduce": {
+                        "reducer": "sum"
+                      },
+                      "unary": {
+                        "fieldName": "runtimeHours",
+                        "operator": "percent"
+                      }
+                    }
+                  }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "Share": 2,
+                        "avgPerStart": 3,
+                        "deviceId": 0,
+                        "runtimeHours": 1,
+                        "startCount": 4
+                      },
+                      "renameByName": {
+                        "Share": "",
+                        "avgPerStart": "Avg Run Hours / Start",
+                        "deviceId": "CT",
+                        "runtimeHours": "Run Hours",
+                        "startCount": "Starts"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 11,
+          "links": [],
+          "title": "Runtime Comparison",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "runtimeHours",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "h"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge",
+                          "valueDisplayMode": "text"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "percentage",
+                          "steps": [
+                            {
+                              "color": "super-light-blue",
+                              "value": 0
+                            },
+                            {
+                              "color": "light-blue",
+                              "value": 60
+                            },
+                            {
+                              "color": "blue",
+                              "value": 80
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "deviceId",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "pattern": "ct(\\d)",
+                              "result": {
+                                "index": 0,
+                                "text": "CT$1"
+                              }
+                            },
+                            "type": "regex"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Share",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "avgPerStart",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "h"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "md",
+                "frameIndex": 0,
+                "showHeader": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"outdoorTemp\")\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e yield(name: \"mean\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e yield(name: \"mean\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cws\")\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e yield(name: \"mean\")"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r.kind == \"cooling_tower\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: true)\n  |\u003e fill(usePrevious: true)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: if r._value == 2 then 1 else 0, _field: \"activeCT\" }))\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: sum, createEmpty: false)\n  |\u003e keep(columns: [\"_field\", \"_value\", \"_time\"])\n\n  "
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "D"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 12,
+          "links": [],
+          "title": "Tower Staging",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "activeCT",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Total Running CT"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "short"
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "left"
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 20
+                      },
+                      {
+                        "id": "max",
+                        "value": 3
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "outdoorTemp"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Outdoor Temp"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cwsSetpoint"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "CWS Setpoint"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cws"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "CWS"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-13": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select value-\u003e\u003e'targetByOutdoorTemp' as range, value-\u003e\u003e'target' as target\nfrom control_params \nwhere key = 'ct_fan.cws_controller'",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"cwsSetpoint\")\n  |\u003e last()\n  |\u003e map(fn: (r) =\u003e ({ cwsSetpoint: r._value }))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "convertFieldType",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "conversions": [
+                        {
+                          "destinationType": "other",
+                          "enumConfig": {
+                            "text": [
+                              "[{\"max\": 28, \"min\": 27, \"target\": 27}, {\"max\": 30, \"min\": 28, \"target\": 28}]"
+                            ]
+                          },
+                          "targetField": "range"
+                        }
+                      ],
+                      "fields": {}
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 13,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "",
+                "content": "\u003cdiv class=\"ct-setpoint-card\"\u003e\n  \u003cdiv class=\"ct-setpoint-head\"\u003eDynamic CWS Setpoint\u003c/div\u003e\n\n  \u003ctable class=\"ct-setpoint-table\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth\u003eOutdoor Temp Range\u003c/th\u003e\n        \u003cth\u003eCWS Setpoint\u003c/th\u003e\n        \u003cth\u003eStatus\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n    \u003ctbody\u003e\n      {{#each data.[0].[0].range}}\n      \u003ctr\u003e\n        \u003ctd\u003e{{min}} - {{max}} °C\u003c/td\u003e\u003ctd\u003e{{target}} °C\u003c/td\u003e\n        {{#if (isActive target ../data.[1].[0].cwsSetpoint)}}\n        \u003ctd\u003e\u003cspan class=\"ct-setpoint-status\"\u003eACTIVE\u003c/span\u003e\u003c/td\u003e\n        {{else}}\n        \u003ctd class=\"ct-setpoint-muted\"\u003e-\u003c/td\u003e\n        {{/if}}\n      \u003c/tr\u003e\n      {{/each}}\n      {{{defaultRow data.[0].[0].range data.[0].[0].target data.[1].[0].cwsSetpoint}}}\n    \u003c/tbody\u003e\n  \u003c/table\u003e\n\u003c/div\u003e",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "none",
+                  "language": "html"
+                },
+                "editors": [
+                  "styles",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"isActive\", (target, setpoint) =\u003e {\n  console.log(target, setpoint, target == setpoint);\n  return target == setpoint;\n})\n\ncontext.handlebars.registerHelper(\"defaultRow\", (range, defaultTarget, setpoint) =\u003e {\n  const last = range[range.length - 1];\n  const isActive = defaultTarget == setpoint;\n  return `\n  \u003ctr\u003e\n    \u003ctd\u003e\u0026gt;= ${last.max} °C\u003c/td\u003e\n    \u003ctd\u003e${defaultTarget} °C\u003c/td\u003e\n    \u003ctd ${isActive ? '' : 'class=\"ct-setpoint-muted\"'}\u003e${isActive ? '\u003cspan class=\"ct-setpoint-status\"\u003eACTIVE\u003c/span\u003e' : '-'}\u003c/td\u003e\n  \u003c/tr\u003e`\n})",
+                "renderMode": "data",
+                "styles": ".ct-setpoint-table {\n    width: 100%;\n    border-collapse: collapse;\n    font-family: Inter, Arial, sans-serif;\n    font-size: 13px;\n    color: #111827;\n    background: #ffffff;\n  }\n\n  .ct-setpoint-card {\n    width: 100%;\n    border: 1px solid #e5e7eb;\n    border-radius: 8px;\n    background: #ffffff;\n    overflow: hidden;\n  }\n\n  .ct-setpoint-head {\n    padding: 10px 12px;\n    border-bottom: 1px solid #e5e7eb;\n    font-weight: 700;\n    font-size: 13px;\n  }\n\n  .ct-setpoint-table th,\n  .ct-setpoint-table td {\n    padding: 9px 12px;\n    border-bottom: 1px solid #f1f5f9;\n    text-align: left;\n    white-space: nowrap;\n  }\n\n  .ct-setpoint-table th {\n    color: #6b7280;\n    font-weight: 600;\n    font-size: 11px;\n    text-transform: uppercase;\n  }\n\n  .ct-setpoint-table tr:last-child td {\n    border-bottom: 0;\n  }\n\n  .ct-setpoint-table tr.active {\n    background: #dcfce7;\n    box-shadow: inset 4px 0 0 #16a34a;\n  }\n\n  .ct-setpoint-status {\n    display: inline-block;\n    padding: 2px 7px;\n    border-radius: 999px;\n    font-size: 11px;\n    font-weight: 700;\n    color: #166534;\n    background: #bbf7d0;\n  }\n\n  .ct-setpoint-muted {\n    color: #9ca3af;\n  }",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"priority\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct/)\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |\u003e keep(columns:[\"deviceId\", \"_time\", \"_value\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "ct(.*)",
+                      "renamePattern": "CT$1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 3,
+          "links": [],
+          "title": "",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#8e8e8e",
+                          "index": 0,
+                          "text": "STANDBY"
+                        },
+                        "1": {
+                          "color": "light-blue",
+                          "index": 1,
+                          "text": "LAG"
+                        },
+                        "2": {
+                          "color": "green",
+                          "index": 2,
+                          "text": "LEAD"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "center",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.85,
+                "showValue": "auto",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r.kind == \"cooling_tower\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"state\" or r[\"_field\"] == \"priority\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}\")  \n  |\u003e last()\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e drop(columns: [\"_start\",\"_stop\",\"_measurement\", \"category\", \"kind\", \"parentId\", \"source\"])\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"ctFan\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"speedFb\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}Fan1\" or r[\"deviceId\"] == \"${coolingTower}Fan2\")  \n  |\u003e last()\n  |\u003e pivot(rowKey: [], columnKey: [\"deviceId\"], valueColumn: \"_value\")\n  |\u003e drop(columns: [\"_start\",\"_stop\",\"_measurement\", \"category\", \"kind\", \"parentId\", \"source\"])\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}Fan1\" or r[\"deviceId\"] == \"${coolingTower}Fan2\")  \n  |\u003e mean()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e drop(columns: [\"_start\",\"_stop\",\"_measurement\", \"category\", \"kind\", \"parentId\", \"source\"])\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"trip\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}Fan1\" or r[\"deviceId\"] == \"${coolingTower}Fan2\")  \n  |\u003e last()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  |\u003e set(key: \"_field\", value: \"alarms\")\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e drop(columns: [\"_start\",\"_stop\",\"_measurement\", \"category\", \"kind\", \"parentId\", \"source\"])\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "D"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"state\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}\")\n  |\u003e map(fn: (r) =\u003e ({ r with _value: if r._value == 2 then 1 else 0 }))\n  |\u003e integral(unit: 1m)"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "E"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "ct\\dFan(.*)",
+                      "renamePattern": "Fan$1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 5,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "",
+                "content": "\u003carticle class=\"ct-detail-card {{stateClass data.[0].[0].state}}\" aria-label=\"Cooling tower CT-1 live status\"\u003e\n  \u003cdiv class=\"ct-detail-head\"\u003e\n    \u003cdiv class=\"ct-detail-title\"\u003e\n      \u003cdiv class=\"ct-detail-name\"\u003e{{variableValue \"${coolingTower:text}\"}}\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-badge {{priority data.[0].[0].priority}}\"\u003e{{priority data.[0].[0].priority}}\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-state\"\u003e\n      \u003cspan class=\"ct-detail-dot\" aria-hidden=\"true\"\u003e\u003c/span\u003e\n      \u003cspan\u003eRunning\u003c/span\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003cdiv class=\"ct-detail-grid\"\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eRun Status\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value ct-detail-ok\"\u003eRunning\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eActive Alarm\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value ct-detail-{{alarmClass data.[3].[0].alarms}}\"\u003e{{data.[3].[0].alarms}}\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eFan Speed 1\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value\"\u003e{{numberFormat data.[1].[0].Fan1 decimalLength=2}}\u003cspan class=\"ct-detail-unit\"\u003e Hz\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eFan Speed 2\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value\"\u003e{{numberFormat data.[1].[0].Fan2 decimalLength=2}}\u003cspan class=\"ct-detail-unit\"\u003e Hz\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eFan Power\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value\"\u003e{{numberFormat data.[2].[0].totalPower decimalLength=1}}\u003cspan class=\"ct-detail-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eCurrent Runtime\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value\"\u003e{{runTime data.[4].[0]._value}}\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eTotal Runtime\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value\"\u003e----\u003cspan class=\"ct-detail-unit\"\u003e h\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-detail-metric\"\u003e\n      \u003cdiv class=\"ct-detail-label\"\u003eStart Count\u003c/div\u003e\n      \u003cdiv class=\"ct-detail-value\"\u003e----\u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/article\u003e\n",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "markdown"
+                },
+                "editors": [
+                  "helpers",
+                  "styles"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"priority\", priority =\u003e {\n  if (priority === 2) return \"lead\";\n  if (priority === 1) return \"lag\";\n  return \"standby\";\n})\n\ncontext.handlebars.registerHelper(\"state\", (state) =\u003e {\n  if (state === 0) return \"stopped\";\n  if (state === 1) return \"starting\";\n  if (state === 2) return \"running\";\n  if (state === 3) return \"stopping\";\n  if (state === 4) return \"fault\";\n  return \"unvailable\";\n})\n\ncontext.handlebars.registerHelper(\"stateClass\", (state) =\u003e {\n  if (state === 0) return \"stopped\";\n  if (state === 1) return \"running\";\n  if (state === 2) return \"running\";\n  if (state === 3) return \"stopped\";\n  if (state === 4) return \"error\";\n  return \"unvailable\";\n})\n\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\ncontext.handlebars.registerHelper('alarmClass', activeAlarms =\u003e {\n  if (activeAlarms === 0) return 'ok';\n  if (activeAlarms === 1) return 'warn';\n  return 'bad'\n})\n\ncontext.handlebars.registerHelper('runTime', runtime =\u003e {\n  const hour = Math.floor(runtime / 60);\n  const min = Math.round(runtime % 60);\n  return `${hour}h ${min}m`\n})\n",
+                "renderMode": "data",
+                "styles": ".ct-detail-card {\n  width: 100%;\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n  background: #fff;\n  border: 0.5px solid var(--color-border-tertiary, #d0d5dd);\n  border-radius: 6px;\n  padding: 10px;\n}\n.ct-detail-card.running {\n  border-color: #d9ead3;\n  background: #f7fbf4;\n}\n.ct-detail-card.stopped {\n  border-color: #e5e7eb;\n  background: #fafafa;\n}\n.ct-detail-card.error,\n.ct-detail-card.trip {\n  border-color: #f2b8b5;\n  background: #fff5f5;\n}\n.ct-detail-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 8px;\n  margin-bottom: 10px;\n}\n.ct-detail-title {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  min-width: 0;\n}\n.ct-detail-name {\n  font-size: 14px;\n  font-weight: 700;\n}\n.ct-detail-badge {\n  border-radius: 999px;\n  font-size: 9px;\n  font-weight: 700;\n  letter-spacing: 0.4px;\n  padding: 3px 7px;\n  text-transform: uppercase;\n}\n.ct-detail-badge.lead {\n  background: #d9ead3;\n  color: #548235;\n}\n.ct-detail-badge.lag {\n  background: #d9eaf7;\n  color: #2f75b5;\n}\n.ct-detail-badge.standby {\n  background: #f2f4f7;\n  color: #667085;\n}\n.ct-detail-state {\n  display: flex;\n  align-items: center;\n  gap: 6px;\n  font-size: 11px;\n  font-weight: 700;\n  text-transform: uppercase;\n}\n.ct-detail-dot {\n  width: 8px;\n  height: 8px;\n  border-radius: 50%;\n  background: #548235;\n}\n.ct-detail-card.stopped .ct-detail-dot {\n  background: #98a2b3;\n}\n.ct-detail-card.error .ct-detail-dot,\n.ct-detail-card.trip .ct-detail-dot {\n  background: #c00000;\n}\n.ct-detail-card.running .ct-detail-state {\n  color: #548235;\n}\n.ct-detail-card.stopped .ct-detail-state {\n  color: #667085;\n}\n.ct-detail-card.error .ct-detail-state,\n.ct-detail-card.trip .ct-detail-state {\n  color: #c00000;\n}\n.ct-detail-grid {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 8px;\n}\n.ct-detail-metric {\n  min-width: 0;\n  border-top: 1px solid rgba(102, 112, 133, 0.18);\n  padding-top: 6px;\n}\n.ct-detail-label {\n  color: var(--color-text-secondary, #667085);\n  font-size: 9px;\n  letter-spacing: 0.3px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.ct-detail-value {\n  margin-top: 3px;\n  font-size: 14px;\n  font-weight: 700;\n  font-variant-numeric: tabular-nums;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.ct-detail-unit {\n  color: var(--color-text-secondary, #667085);\n  font-size: 9px;\n  font-weight: 400;\n}\n.ct-detail-ok {\n  color: #548235;\n}\n.ct-detail-warn {\n  color: #bf8f00;\n}\n.ct-detail-bad {\n  color: #c00000;\n}\n@media (max-width: 360px) {\n  .ct-detail-grid {\n    grid-template-columns: 1fr;\n  }\n}",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"cws\" or r._field == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 6,
+          "links": [],
+          "title": "CW and Setpoint",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cwr",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "CWR"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "super-light-red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CWR"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cws"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CWS"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "deltaT"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-green",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CW ΔT"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cwsSetpoint"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.drawStyle",
+                        "value": "line"
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "Setpoint"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"ctFan\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"speedCmd\" or r[\"_field\"] == \"speedFb\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"ct1Fan1\" or r.deviceId == \"ct1Fan2\" or r.deviceId == \"ct2Fan1\" or r.deviceId == \"ct2Fan2\" or r.deviceId == \"ct3Fan1\" or r.deviceId == \"ct3Fan2\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"deviceId\", \"_value\"])\n  |\u003e sort(columns: [\"_time\", \"deviceId\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": true,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "speedCmd ct(.*)Fan(.*)",
+                      "renamePattern": "[CT$1-$2] Command"
+                    }
+                  }
+                },
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "speedFb ct(.*)Fan(.*)",
+                      "renamePattern": "[CT$1-$2] Feedback"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 7,
+          "links": [],
+          "title": "CT Fan Speed",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "axisSoftMax": 50,
+                    "axisSoftMin": 0,
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "rothz"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"ct1Fan1\" or r.deviceId == \"ct1Fan2\" or r.deviceId == \"ct2Fan1\" or r.deviceId == \"ct2Fan2\" or r.deviceId == \"ct3Fan1\" or r.deviceId == \"ct3Fan2\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"deviceId\", \"_value\"])\n  |\u003e sort(columns: [\"_time\", \"deviceId\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": true,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "totalPower ct(.*)Fan(.*)",
+                      "renamePattern": "[CT$1-$2] Power"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 8,
+          "links": [],
+          "title": "CT Fan Power",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kwatt"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"ct1Fan1\" or r.deviceId == \"ct1Fan2\" or r.deviceId == \"ct2Fan1\" or r.deviceId == \"ct2Fan2\" or r.deviceId == \"ct3Fan1\" or r.deviceId == \"ct3Fan2\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  \nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * 78.986}))\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.energyFlowRate \u003e 0 then r.totalPower / r.energyFlowRate else 0.0\n  }))\n  |\u003e sort(columns: [\"_time\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": true,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {
+                        "energyFlowRate": true,
+                        "totalPower": true
+                      },
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "efficiency": "Efficiency",
+                        "energyFlowRate": ""
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 9,
+          "links": [],
+          "title": "Power Intensity",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "decimals": 3,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kW/RT"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "TabsLayout",
+      "spec": {
+        "tabs": [
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-1"
+                        },
+                        "height": 3,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-3"
+                        },
+                        "height": 8,
+                        "width": 16,
+                        "x": 0,
+                        "y": 3
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-13"
+                        },
+                        "height": 8,
+                        "width": 8,
+                        "x": 16,
+                        "y": 3
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-5"
+                        },
+                        "height": 8,
+                        "repeat": {
+                          "direction": "h",
+                          "maxPerRow": 3,
+                          "mode": "variable",
+                          "value": "coolingTower"
+                        },
+                        "width": 24,
+                        "x": 0,
+                        "y": 11
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Overall Live"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-6"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-7"
+                        },
+                        "height": 11,
+                        "width": 24,
+                        "x": 0,
+                        "y": 9
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-8"
+                        },
+                        "height": 11,
+                        "width": 24,
+                        "x": 0,
+                        "y": 20
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        },
+                        "height": 11,
+                        "width": 24,
+                        "x": 0,
+                        "y": 31
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Overall Trends"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-10"
+                        },
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-11"
+                        },
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 8
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-12"
+                        },
+                        "height": 10,
+                        "width": 24,
+                        "x": 0,
+                        "y": 16
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Runtime \u0026 Staging"
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preferences": {
+      "layout": {
+        "kind": "GridLayout",
+        "spec": {
+          "items": []
+        }
+      }
+    },
+    "preload": false,
+    "tags": [
+      "cpms",
+      "cpms-analysis"
+    ],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-6h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "Cooling Tower Analysis",
+    "variables": [
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "All",
+            "value": "$__all"
+          },
+          "hide": "hideVariable",
+          "includeAll": true,
+          "multi": false,
+          "name": "coolingTower",
+          "options": [],
+          "query": "CT-1 : ct1,CT-2 : ct2,CT-3 : ct3",
+          "skipUrlSync": false,
+          "valuesFormat": "csv"
+        }
+      },
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "current": {
+            "text": "Auto",
+            "value": "v.windowPeriod"
+          },
+          "hide": "dontHide",
+          "includeAll": false,
+          "label": "Chart Interval",
+          "multi": false,
+          "name": "chartInterval",
+          "options": [],
+          "query": "Auto : v.windowPeriod,Hourly : 1h,Daily : 1d,Weekly : 1w,Monthly : 1mo",
+          "skipUrlSync": false,
+          "valuesFormat": "csv"
+        }
+      }
+    ]
+  }
+}
