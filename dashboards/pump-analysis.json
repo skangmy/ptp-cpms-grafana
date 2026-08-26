@@ -1,0 +1,3713 @@
+{
+  "apiVersion": "dashboard.grafana.app/v2",
+  "kind": "Dashboard",
+  "metadata": {
+    "name": "dffwbryjsgyl8gd"
+  },
+  "spec": {
+    "annotations": [
+      {
+        "kind": "AnnotationQuery",
+        "spec": {
+          "builtIn": true,
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations \u0026 Alerts",
+          "query": {
+            "datasource": {
+              "name": "-- Grafana --"
+            },
+            "group": "grafana",
+            "kind": "DataQuery",
+            "spec": {},
+            "version": "v0"
+          }
+        }
+      }
+    ],
+    "cursorSync": "Tooltip",
+    "description": "",
+    "editable": true,
+    "elements": {
+      "panel-1": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwp1\" or r.deviceId == \"chwp2\" or r.deviceId == \"chwp3\")\n  |\u003e last()\n  |\u003e sort(columns: [\"deviceId\"])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e group()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "chwp_run"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwp1\" or r.deviceId == \"cwp2\" or r.deviceId == \"cwp3\")\n  |\u003e last()\n  |\u003e sort(columns: [\"deviceId\"])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e group()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "cwp_run"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "chwp = from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwp1\" or r.deviceId == \"chwp2\" or r.deviceId == \"chwp3\"  )\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e set(key: \"type\", value:\"chwp\")\n  \ncwp = from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwp1\" or r.deviceId == \"cwp2\" or r.deviceId == \"cwp3\")\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()\n  |\u003e set(key: \"type\", value: \"cwp\")\n  \nunion(tables: [chwp, cwp])\n  |\u003e pivot(rowKey: [], columnKey: [\"type\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with total: r.chwp + r.cwp }))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e mean()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "chw_deltat"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -5m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwHeader\")\n  |\u003e mean()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "cw_deltat"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select (value-\u003e\u003e'target')::float as setpoint, (value-\u003e\u003e'deadband')::float as deadband, 'chwp' as type from control_params where key = 'chwp.delta_t_controller'\nunion all\nselect (value-\u003e\u003e'target')::float as setpoint, (value-\u003e\u003e'deadband')::float as deadband, 'cwp' as type from control_params where key = 'cwp.delta_t_controller'\n",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "D"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 1,
+          "links": [],
+          "title": "Live Status",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "",
+                "content": "\u003csection class=\"pump-kpi-wrap\" aria-label=\"Pump overall live KPI cards\"\u003e\n  \u003cdiv class=\"pump-kpi-grid\"\u003e\n    \u003cdiv class=\"pump-kpi-card pump-kpi-good\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eCHWP Running\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{runningPumpsCount data.[0]}}\u003cspan class=\"pump-kpi-unit\"\u003e / 3\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-sub\"\u003e{{runningPumps data.[0]}} running\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"pump-kpi-card pump-kpi-good\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eCWP Running\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{runningPumpsCount data.[1]}}\u003cspan class=\"pump-kpi-unit\"\u003e / 3\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-sub\"\u003e{{runningPumps data.[1]}} running\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"pump-kpi-card\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eTotal CHWP Power\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{numberFormat data.[2].[0].chwp\n        decimalLength=1}}\u003cspan class=\"pump-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"pump-kpi-card\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eTotal CWP Power\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{numberFormat data.[2].[0].cwp\n        decimalLength=1}}\u003cspan class=\"pump-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"pump-kpi-card pump-kpi-{{setpointStatus data.[3].[0].deltaT data.[5].[0].setpoint}}\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eCHW Header ΔT vs Setpoint\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{numberFormat data.[3].[0].deltaT\n        decimalLength=1}}\u003cspan class=\"pump-kpi-unit\"\u003e / {{numberFormat data.[5].[0].setpoint\n        decimalLength=1}} °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-sub\"\u003e{{setpointSummary data.[3].[0].deltaT data.[5].[0].setpoint}}\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"pump-kpi-card pump-kpi-{{setpointStatus data.[4].[0].deltaT data.[5].[1].setpoint}}\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eCW Header ΔT vs Setpoint\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{numberFormat data.[4].[0].deltaT\n        decimalLength=1}}\u003cspan class=\"pump-kpi-unit\"\u003e / {{numberFormat data.[5].[1].setpoint\n            decimalLength=1}} °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-sub\"\u003e{{setpointSummary data.[4].[0].deltaT data.[5].[1].setpoint}}\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"pump-kpi-card pump-kpi-good\"\u003e\n      \u003cdiv class=\"pump-kpi-label\"\u003eTotal Pump Power\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-value\"\u003e{{numberFormat data.[2].[0].total\n        decimalLength=1}}\u003cspan class=\"pump-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"pump-kpi-sub\"\u003eCHWP + CWP\u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/section\u003e",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "styles",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"runningPumpsCount\", data =\u003e {\n  return data.filter(d =\u003e d.run === 1).length;\n});\n\ncontext.handlebars.registerHelper(\"runningPumps\", data =\u003e {\n  const running = data.filter(d =\u003e d.run === 1);\n  if (running.length === 0) return 'None';\n  return running.map(r =\u003e r.deviceId.toUpperCase()).join(', ');\n});\n\ncontext.handlebars.registerHelper(\"log\", (...message) =\u003e {\n  console.log(message);\n})\n\n\ncontext.handlebars.registerHelper('setpointSummary', function (value, setpoint) {\n  const gap = value - setpoint;\n  if (gap \u003c 0) {\n    return `${Math.abs(gap).toFixed(1)} °C below setpoint`;\n  }\n\n  if (gap \u003e 0) {\n    return `${gap.toFixed(1)} °C above setpoint`;\n  }\n\n  return `same as setpoint`\n})\n\ncontext.handlebars.registerHelper('setpointStatus', function (value, setpoint) {\n  const gap = value - setpoint;\n  const threshold = Number(context.grafana.replaceVariables('${setpointThreshold}'));\n  return gap \u003c= threshold ? 'good' : 'bad';\n});\n\n\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\n",
+                "renderMode": "data",
+                "styles": ".pump-kpi-wrap {\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n}\n.pump-kpi-head {\n  display: flex;\n  justify-content: space-between;\n  align-items: center;\n  margin-bottom: 10px;\n}\n.pump-kpi-title {\n  font-size: 16px;\n  font-weight: 600;\n  letter-spacing: 0.3px;\n  text-transform: uppercase;\n}\n.pump-kpi-freshness {\n  font-size: 13px;\n  color: var(--color-text-secondary, #667085);\n}\n.pump-kpi-grid {\n  display: grid;\n  grid-template-columns: repeat(7, minmax(143px, 1fr));\n  gap: 10px;\n}\n.pump-kpi-card {\n  min-height: 101px;\n  padding: 12px 13px;\n  border: 0.5px solid var(--color-border-tertiary, #d0d5dd);\n  border-radius: 6px;\n  background: #fff;\n}\n.pump-kpi-label {\n  font-size: 12px;\n  font-weight: 600;\n  letter-spacing: 0.3px;\n  color: var(--color-text-secondary, #667085);\n  text-transform: uppercase;\n}\n.pump-kpi-value {\n  margin-top: 7px;\n  font-size: 26px;\n  font-weight: 600;\n  line-height: 1.1;\n  font-variant-numeric: tabular-nums;\n}\n.pump-kpi-unit {\n  font-size: 13px;\n  font-weight: 400;\n  color: var(--color-text-secondary, #667085);\n}\n.pump-kpi-sub {\n  margin-top: 5px;\n  font-size: 13px;\n  color: var(--color-text-secondary, #667085);\n  // white-space: nowrap;\n  overflow: hidden;\n  text-overflow: ellipsis;\n}\n.pump-kpi-good .pump-kpi-value { color: #548235; }\n.pump-kpi-warn .pump-kpi-value { color: #bf8f00; }\n.pump-kpi-bad .pump-kpi-value { color: #c00000; }\n\n@media (max-width: 1280px) {\n  .pump-kpi-grid {\n    grid-template-columns: repeat(4, minmax(169px, 1fr));\n  }\n}\n\n@media (max-width: 720px) {\n  .pump-kpi-grid {\n    grid-template-columns: repeat(2, minmax(156px, 1fr));\n  }\n}",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-11": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n",
+                        "rawQuery": true,
+                        "rawSql": "with data as (\n  select (value-\u003e\u003e'target')::float as target, (value-\u003e\u003e'deadband')::float as deadband from control_params cp where key = 'chwp.delta_t_controller'\n)\nselect target, target - deadband as low, target + deadband as high from data\n",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "target"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "deltaT"
+                      },
+                      "configRefId": "target",
+                      "mappings": [
+                        {
+                          "fieldName": "target",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "purple"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        },
+                        {
+                          "fieldName": "low",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "blue"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        },
+                        {
+                          "fieldName": "high",
+                          "handlerKey": "threshold1"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "Setpoint = purple dashed line ",
+          "id": 11,
+          "links": [],
+          "title": "CHW ΔT vs Target and Deadband",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic",
+                    "seriesBy": "last"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "displayName": "CHW ΔT",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": false
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-12": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n",
+                        "rawQuery": true,
+                        "rawSql": "with data as (\n  select (value-\u003e\u003e'target')::float as target, (value-\u003e\u003e'deadband')::float as deadband from control_params cp where key = 'cwp.delta_t_controller'\n)\nselect target, target - deadband as low, target + deadband as high from data\n",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "target"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "deltaT"
+                      },
+                      "configRefId": "target",
+                      "mappings": [
+                        {
+                          "fieldName": "target",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "purple"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        },
+                        {
+                          "fieldName": "low",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "blue"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        },
+                        {
+                          "fieldName": "high",
+                          "handlerKey": "threshold1"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 12,
+          "links": [],
+          "title": "CW ΔT vs Target and Deadband",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic",
+                    "seriesBy": "last"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineStyle": {
+                      "fill": "solid"
+                    },
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "line"
+                    }
+                  },
+                  "displayName": "CW ΔT",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": false
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-13": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\n\nbucket = \"cpms\"\n\nchwpIds = [\"chwp1\", \"chwp2\", \"chwp3\"]\ncwpIds = [\"cwp1\", \"cwp2\", \"cwp3\"]\n\ngjhToRt = 78.986\n\nchwpPower =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: chwpIds))\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n    |\u003e group()\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n    |\u003e set(key: \"_field\", value: \"power\")\n\nchwRt =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwHeader\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n    |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * gjhToRt }))\n    |\u003e set(key: \"_field\", value: \"rt\")\n\nunion(tables: [chwpPower, chwRt])\n  |\u003e group()\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with efficiency: r.power / r.rt }))\n  |\u003e keep(columns: [\"_time\", \"efficiency\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 13,
+          "links": [],
+          "title": "CHW Pump power intensity",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "dark-blue",
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "displayName": "CHW Efficiency",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kW/RT"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-14": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = \"cpms\"\n\ncwpIds = [\"cwp1\", \"cwp2\", \"cwp3\"]\n\ngjhToRt = 78.986\n\nchwpPower =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: cwpIds))\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n    |\u003e group()\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n    |\u003e set(key: \"_field\", value: \"power\")\n\nchwRt =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n    |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * gjhToRt }))\n    |\u003e set(key: \"_field\", value: \"rt\")\n\nunion(tables: [chwpPower, chwRt])\n  |\u003e group()\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with efficiency: r.power / r.rt }))\n  |\u003e keep(columns: [\"_time\", \"efficiency\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 14,
+          "links": [],
+          "title": "CW Pump power intensity",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "dark-yellow",
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "displayName": "CW Efficiency",
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "light-yellow",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kW/RT"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-15": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = \"cpms\"\n\nchwpIds = [\"chwp1\", \"chwp2\", \"chwp3\"]\n\nfrom(bucket: bucket)\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: chwpIds))\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_value\", \"deviceId\"])\n  |\u003e map(fn: (r) =\u003e ({ r with deviceId: strings.toUpper(v: r.deviceId)}))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 15,
+          "links": [],
+          "title": "CHW Pump Power",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "dark-blue",
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kwatt"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-16": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = \"cpms\"\n\npumpIds = [\"cwp1\", \"cwp2\", \"cwp3\"]\n\nfrom(bucket: bucket)\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: pumpIds))\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_value\", \"deviceId\"])\n  |\u003e map(fn: (r) =\u003e ({ r with deviceId: strings.toUpper(v: r.deviceId)}))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 16,
+          "links": [],
+          "title": "CW Pump Power",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "fixedColor": "dark-blue",
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": true,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kwatt"
+                },
+                "overrides": []
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-18": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = \"cpms\"\n\npumpIds = [\"chwp1\", \"chwp2\", \"chwp3\"]\n\nhour = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e filter(fn: (r) =\u003e contains(set: pumpIds, value: r.deviceId))\n  |\u003e aggregateWindow(every: 1m, fn: last, createEmpty: false)\n  |\u003e integral(unit: 1h)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _field: \"runtimeHours\"\n  }))\n  |\u003e keep(columns: [\"deviceId\", \"_field\", \"_value\"])\n\ncount = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e filter(fn: (r) =\u003e contains(set: pumpIds, value: r.deviceId))\n  |\u003e aggregateWindow(every: 1m, fn: last, createEmpty: false)\n  |\u003e difference(nonNegative: false)\n  |\u003e filter(fn: (r) =\u003e r._value == 1)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e count(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _field: \"startCount\",\n      _value: float(v: r._value)\n  }))\n  |\u003e keep(columns: [\"deviceId\", \"_field\", \"_value\"])\n\n\nunion(tables: [hour, count])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ( { \n    r with avgPerStart: if not exists r.startCount or r.startCount == 0 then r.runtimeHours else r.runtimeHours / r.startCount,\n    startCount: if not exists r.startCount then 0.0 else r.startCount\n  }))\n  |\u003e group()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-static"
+                      },
+                      "group": "marcusolsson-static-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "frame": {
+                          "fields": [
+                            {
+                              "config": {},
+                              "name": "max",
+                              "type": "number",
+                              "values": [
+                                0
+                              ]
+                            }
+                          ],
+                          "meta": {
+                            "custom": {
+                              "customCode": "const duration = (+'${__to}' - +'${__from}') / 3600000;\n\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [duration]\n  }))\n}\n\nreturn Promise.resolve(result);",
+                              "valuesEditor": "custom"
+                            }
+                          },
+                          "name": "max"
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "max_duration"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "runtimeHours"
+                      },
+                      "configRefId": "max_duration",
+                      "mappings": [
+                        {
+                          "fieldName": "max",
+                          "handlerKey": "max"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "group": "calculateField",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "alias": "Share",
+                      "mode": "unary",
+                      "reduce": {
+                        "reducer": "sum"
+                      },
+                      "unary": {
+                        "fieldName": "runtimeHours",
+                        "operator": "percent"
+                      }
+                    }
+                  }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "Share": 2,
+                        "avgPerStart": 3,
+                        "deviceId": 0,
+                        "runtimeHours": 1,
+                        "startCount": 4
+                      },
+                      "renameByName": {
+                        "Share": "",
+                        "avgPerStart": "Avg Run Hours / Start",
+                        "deviceId": "CHWP",
+                        "runtimeHours": "Run Hours",
+                        "startCount": "Starts"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 18,
+          "links": [],
+          "title": "CHWP Runtime Comparison",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "runtimeHours",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "h"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge",
+                          "valueDisplayMode": "text"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "percentage",
+                          "steps": [
+                            {
+                              "color": "super-light-blue",
+                              "value": 0
+                            },
+                            {
+                              "color": "light-blue",
+                              "value": 60
+                            },
+                            {
+                              "color": "blue",
+                              "value": 80
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "deviceId",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "pattern": "chwp(\\d)",
+                              "result": {
+                                "index": 0,
+                                "text": "CHWP$1"
+                              }
+                            },
+                            "type": "regex"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Share",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "avgPerStart",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "h"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "md",
+                "frameIndex": 0,
+                "showHeader": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-19": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nbucket = \"cpms\"\n\npumpIds = [\"cwp1\", \"cwp2\", \"cwp3\"]\n\nhour = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e filter(fn: (r) =\u003e contains(set: pumpIds, value: r.deviceId))\n  |\u003e aggregateWindow(every: 1m, fn: last, createEmpty: false)\n  |\u003e integral(unit: 1h)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _field: \"runtimeHours\"\n  }))\n  |\u003e keep(columns: [\"deviceId\", \"_field\", \"_value\"])\n\ncount = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e filter(fn: (r) =\u003e contains(set: pumpIds, value: r.deviceId))\n  |\u003e aggregateWindow(every: 1m, fn: last, createEmpty: false)\n  |\u003e difference(nonNegative: false)\n  |\u003e filter(fn: (r) =\u003e r._value == 1)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e count(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n      r with\n      _field: \"startCount\",\n      _value: float(v: r._value)\n  }))\n  |\u003e keep(columns: [\"deviceId\", \"_field\", \"_value\"])\n\n\nunion(tables: [hour, count])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ( { \n    r with avgPerStart: if not exists r.startCount or r.startCount == 0 then r.runtimeHours else r.runtimeHours / r.startCount,\n    startCount: if not exists r.startCount then 0.0 else r.startCount\n  }))\n  |\u003e group()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-static"
+                      },
+                      "group": "marcusolsson-static-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "frame": {
+                          "fields": [
+                            {
+                              "config": {},
+                              "name": "max",
+                              "type": "number",
+                              "values": [
+                                0
+                              ]
+                            }
+                          ],
+                          "meta": {
+                            "custom": {
+                              "customCode": "const duration = (+'${__to}' - +'${__from}') / 3600000;\n\nconst result = {\n  ...frame,\n  fields: frame.fields.map((field) =\u003e ({\n    ...field,\n    values: [duration]\n  }))\n}\n\nreturn Promise.resolve(result);",
+                              "valuesEditor": "custom"
+                            }
+                          },
+                          "name": "max"
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "max_duration"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "runtimeHours"
+                      },
+                      "configRefId": "max_duration",
+                      "mappings": [
+                        {
+                          "fieldName": "max",
+                          "handlerKey": "max"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "group": "calculateField",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "alias": "Share",
+                      "mode": "unary",
+                      "reduce": {
+                        "reducer": "sum"
+                      },
+                      "unary": {
+                        "fieldName": "runtimeHours",
+                        "operator": "percent"
+                      }
+                    }
+                  }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "Share": 2,
+                        "avgPerStart": 3,
+                        "deviceId": 0,
+                        "runtimeHours": 1,
+                        "startCount": 4
+                      },
+                      "renameByName": {
+                        "Share": "",
+                        "avgPerStart": "Avg Run Hours / Start",
+                        "deviceId": "CWP",
+                        "runtimeHours": "Run Hours",
+                        "startCount": "Starts"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 19,
+          "links": [],
+          "title": "CWP Runtime Comparison",
+          "vizConfig": {
+            "group": "table",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "custom": {
+                    "align": "auto",
+                    "cellOptions": {
+                      "type": "auto"
+                    },
+                    "footer": {
+                      "reducers": []
+                    },
+                    "inspect": false
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "runtimeHours",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "h"
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "mode": "lcd",
+                          "type": "gauge",
+                          "valueDisplayMode": "text"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "percentage",
+                          "steps": [
+                            {
+                              "color": "super-light-blue",
+                              "value": 0
+                            },
+                            {
+                              "color": "light-blue",
+                              "value": 60
+                            },
+                            {
+                              "color": "blue",
+                              "value": 80
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "deviceId",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "pattern": "cwp(\\d)",
+                              "result": {
+                                "index": 0,
+                                "text": "CWP$1"
+                              }
+                            },
+                            "type": "regex"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Share",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "percentunit"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "avgPerStart",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "h"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "cellHeight": "md",
+                "frameIndex": 0,
+                "showHeader": true
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-2": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "-- Dashboard --"
+                      },
+                      "group": "datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "panelId": 1,
+                        "queryType": "randomWalk"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\ndevices = [\"chwp1\", \"chwp2\", \"chwp3\"]\nspeed =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pump\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"speedFb\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: devices))\n    |\u003e last()\n    |\u003e group()\n\nrun =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: devices))\n    |\u003e last()\n    |\u003e filter(fn: (r) =\u003e r._value == 1)\n    |\u003e keep(columns: [\"deviceId\"])\n    |\u003e group()\n\njoin.inner(left: speed, right: run, \n  on: (l, r) =\u003e l.deviceId == r.deviceId,\n  as: (l, r) =\u003e l\n)\n  |\u003e group()\n  |\u003e mean()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "chwp_hz"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\ndevices = [\"cwp1\", \"cwp2\", \"cwp3\"]\nspeed =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pump\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"speedFb\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: devices))\n    |\u003e last()\n    |\u003e group()\n\nrun =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: devices))\n    |\u003e last()\n    |\u003e filter(fn: (r) =\u003e r._value == 1)\n    |\u003e keep(columns: [\"deviceId\"])\n    |\u003e group()\n\njoin.inner(left: speed, right: run, \n  on: (l, r) =\u003e l.deviceId == r.deviceId,\n  as: (l, r) =\u003e l\n)\n  |\u003e group()\n  |\u003e mean()\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "cwp_hz"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 2,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "",
+                "content": "\u003csection class=\"pump-dt-card\" aria-label=\"Pump delta T controller status\"\u003e\n  \u003cdiv class=\"pump-dt-head\"\u003e\n    \u003cdiv class=\"pump-dt-title\"\u003ePump ΔT Controller\u003c/div\u003e\n    \u003cdiv class=\"pump-dt-note\"\u003eLive control status\u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003ctable class=\"pump-dt-table\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth\u003eLoop\u003c/th\u003e\n        \u003cth\u003eActual\u003c/th\u003e\n        \u003cth\u003eTarget\u003c/th\u003e\n        \u003cth\u003eDeadband\u003c/th\u003e\n        \u003cth\u003eAvg Hz\u003c/th\u003e\n        \u003cth\u003eStatus\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n    \u003ctbody\u003e\n      \u003ctr\u003e\n        \u003ctd\u003eCHW\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-value\"\u003e{{numberFormat data.[3].[0].deltaT\n        decimalLength=1}}\u003c/span\u003e\u003cspan class=\"pump-dt-unit\"\u003e °C\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-value\"\u003e{{numberFormat data.[5].[0].setpoint\n        decimalLength=1}}\u003c/span\u003e\u003cspan class=\"pump-dt-unit\"\u003e °C\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e±{{numberFormat data.[5].[0].deadband\n        decimalLength=1}}\u003cspan class=\"pump-dt-unit\"\u003e °C\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-value\"\u003e{{numberFormat data.[6].[0]._value\n        decimalLength=1}}\u003c/span\u003e\u003cspan class=\"pump-dt-unit\"\u003e Hz\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-status {{deadbandStatus data.[3].[0].deltaT data.[5].[0].setpoint data.[5].[0].deadband}}\"\u003e{{deadbandSummary data.[3].[0].deltaT data.[5].[0].setpoint data.[5].[0].deadband}}\u003c/span\u003e\u003c/td\u003e\n      \u003c/tr\u003e\n      \u003ctr\u003e\n        \u003ctd\u003eCW\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-value\"\u003e{{numberFormat data.[4].[0].deltaT\n        decimalLength=1}}\u003c/span\u003e\u003cspan class=\"pump-dt-unit\"\u003e °C\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-value\"\u003e{{numberFormat data.[5].[1].setpoint\n        decimalLength=1}}\u003c/span\u003e\u003cspan class=\"pump-dt-unit\"\u003e °C\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e±{{numberFormat data.[5].[1].deadband\n        decimalLength=1}}\u003cspan class=\"pump-dt-unit\"\u003e °C\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-value\"\u003e{{numberFormat data.[7].[0]._value\n        decimalLength=1}}\u003c/span\u003e\u003cspan class=\"pump-dt-unit\"\u003e Hz\u003c/span\u003e\u003c/td\u003e\n        \u003ctd\u003e\u003cspan class=\"pump-dt-status {{deadbandStatus data.[4].[0].deltaT data.[5].[1].setpoint data.[5].[1].deadband}}\"\u003e{{deadbandSummary data.[4].[0].deltaT data.[5].[1].setpoint data.[5].[1].deadband}}\u003c/span\u003e\u003c/td\u003e\n      \u003c/tr\u003e\n    \u003c/tbody\u003e\n  \u003c/table\u003e\n\u003c/section\u003e\n",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "markdown"
+                },
+                "editors": [
+                  "styles",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper('deadbandStatus', function (actual, target, deadband) {\n  const lowLimit = target - deadband;\n  const highLimit = target + deadband;\n  if (actual \u003c lowLimit) {\n    return 'low';\n  }\n\n  if (actual \u003e highLimit) {\n    return 'high';\n  }\n\n\n  return `good`\n})\n\ncontext.handlebars.registerHelper('deadbandSummary', function (actual, target, deadband) {\n  const lowLimit = target - deadband;\n  const highLimit = target + deadband;\n  if (actual \u003c lowLimit) {\n    return 'LOW ΔT';\n  }\n\n  if (actual \u003e highLimit) {\n    return 'HIGH ΔT';\n  }\n\n\n  return `IN BAND`\n})\n\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\n",
+                "renderMode": "data",
+                "styles": ".pump-dt-card {\n  width: 100%;\n  min-width: 390px;\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n  background: #fff;\n  border: 0.5px solid var(--color-border-tertiary, #d0d5dd);\n  border-radius: 6px;\n  overflow: hidden;\n}\n.pump-dt-head {\n  display: flex;\n  justify-content: space-between;\n  gap: 16px;\n  padding: 13px 16px;\n  border-bottom: 1px solid #eef2f6;\n}\n.pump-dt-title {\n  font-size: 16px;\n  font-weight: 700;\n}\n.pump-dt-note {\n  font-size: 13px;\n  color: var(--color-text-secondary, #667085);\n  white-space: nowrap;\n}\n.pump-dt-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 16px;\n}\n.pump-dt-table th,\n.pump-dt-table td {\n  padding: 10px 13px;\n  border-bottom: 1px solid #eef2f6;\n  text-align: left;\n  white-space: nowrap;\n}\n.pump-dt-table th {\n  font-size: 12px;\n  font-weight: 700;\n  letter-spacing: 0.3px;\n  color: var(--color-text-secondary, #667085);\n  text-transform: uppercase;\n  background: #f8fafc;\n}\n.pump-dt-table tr:last-child td {\n  border-bottom: 0;\n}\n.pump-dt-value {\n  font-weight: 700;\n  font-variant-numeric: tabular-nums;\n}\n.pump-dt-unit {\n  font-size: 13px;\n  font-weight: 400;\n  color: var(--color-text-secondary, #667085);\n}\n.pump-dt-status {\n  display: inline-block;\n  padding: 3px 9px;\n  border-radius: 999px;\n  font-size: 13px;\n  font-weight: 700;\n}\n.pump-dt-status.good {\n  color: #166534;\n  background: #dcfce7;\n}\n.pump-dt-status.low,\n.pump-dt-status.high {\n  color: #92400e;\n  background: #fef3c7;\n}",
+                "wrap": true
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-20": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\ndevices = [\"chwp1\",\"chwp2\",\"chwp3\",\"cwp1\",\"cwp2\",\"cwp3\"]\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"run\" or r[\"_field\"] == \"trip\")\n  |\u003e filter(fn: (r) =\u003e contains(set: devices, value: r.deviceId))\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with state: if r.trip == 1.0 then 2.0 else r.run,\n    deviceId: strings.toUpper(v: r.deviceId)\n  }))\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"state\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "state (.*)",
+                      "renamePattern": "$1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 20,
+          "links": [],
+          "title": "Pump status",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#888888",
+                          "index": 2,
+                          "text": "OFF"
+                        },
+                        "1": {
+                          "color": "green",
+                          "index": 1,
+                          "text": "RUN"
+                        },
+                        "2": {
+                          "color": "red",
+                          "index": 0,
+                          "text": "TRIP"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "left",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.9,
+                "showValue": "never",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-21": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"math\"\n\ndurationInMinutes = float(v: int(v: v.timeRangeStop) - int(v: v.timeRangeStart)) / 60000000000.0\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwp1\" or r[\"deviceId\"] == \"chwp2\" or r[\"deviceId\"] == \"chwp3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"speedFb\")\n  |\u003e aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with\n    cat: math.floor(x: r._value / 5.0) * 5.0,\n    _value: 1.0,\n  }))\n  |\u003e map(fn: (r) =\u003e ({ r with\n    category: if r.cat == 0.0 then \"OFF\" else string(v: r.cat) + \" - \" + string(v: r.cat + 5.0) + \" Hz\",\n  }))\n  |\u003e group(columns: [\"category\", \"deviceId\"])\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({\n    r with _value: float(v: r._value) / durationInMinutes\n  }))\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"category\"], valueColumn: \"_value\")\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "formatString",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "outputFormat": "Upper Case",
+                      "stringField": "deviceId"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 21,
+          "links": [],
+          "title": "CHWP Speed Distribution",
+          "vizConfig": {
+            "group": "barchart",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 0,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "max": 1,
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percentunit"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "OFF"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#b9b9b9",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "30 - 35 Hz"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "barRadius": 0.05,
+                "barWidth": 0.95,
+                "fullHighlight": false,
+                "groupWidth": 0.8,
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "orientation": "auto",
+                "showValue": "auto",
+                "stacking": "normal",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                },
+                "xField": "time",
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 100
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-22": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"math\"\n\ndurationInMinutes = float(v: int(v: v.timeRangeStop) - int(v: v.timeRangeStart)) / 60000000000.0\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwp1\" or r[\"deviceId\"] == \"cwp2\" or r[\"deviceId\"] == \"cwp3\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"speedFb\")\n  |\u003e aggregateWindow(every: 1m, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with\n    cat: math.floor(x: r._value / 5.0) * 5.0,\n    _value: 1.0,\n  }))\n  |\u003e map(fn: (r) =\u003e ({ r with\n    category: if r.cat == 0.0 then \"OFF\" else string(v: r.cat) + \" - \" + string(v: r.cat + 5.0) + \" Hz\",\n  }))\n  |\u003e group(columns: [\"category\", \"deviceId\"])\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({\n    r with _value: float(v: r._value) / durationInMinutes\n  }))\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"category\"], valueColumn: \"_value\")\n  |\u003e group()"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "formatString",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "outputFormat": "Upper Case",
+                      "stringField": "deviceId"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 22,
+          "links": [],
+          "title": "CWP Speed Distribution",
+          "vizConfig": {
+            "group": "barchart",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "fillOpacity": 100,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "lineWidth": 0,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "max": 1,
+                  "min": 0,
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "percentunit"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "OFF"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "#b9b9b9",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "30 - 35 Hz"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "barRadius": 0.05,
+                "barWidth": 0.95,
+                "fullHighlight": false,
+                "groupWidth": 0.8,
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "orientation": "auto",
+                "showValue": "auto",
+                "stacking": "normal",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                },
+                "xField": "time",
+                "xTickLabelRotation": 0,
+                "xTickLabelSpacing": 100
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-3": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT availability, control_mode\nFROM public.control_status\nWHERE equipment_id='${chwp}';",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "control_status"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "builder",
+                        "format": "table",
+                        "query": "pumpId = \"${chwp}\"\nchillerChwId = \"${chwp.chiller}Chw\"\n\npump =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pump\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"speedCmd\" or r._field == \"speedFb\" or r._field == \"power\" or r._field == \"pressure\")\n    |\u003e last()\n\npressure =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pressure\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"pressure\")\n    |\u003e last()\n\npower =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e last()\n\nstatus =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\" or r._field == \"trip\" or r._field == \"auto\")\n    |\u003e last()\n\nflow =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == chillerChwId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"flowRate\")\n    |\u003e last()\n    |\u003e set(key: \"_field\", value: \"flowRate\")\n\nruntime = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e integral(unit: 1m)\n  |\u003e set(key: \"_field\", value: \"runtime\")\n\nunion(tables: [pump, status, flow, pressure, power, runtime])\n  |\u003e group()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n",
+                        "rawSql": ""
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "pump_data"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 3,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "",
+                "content": "\u003carticle class=\"pump-status-card {{stateClass data.[1].[0].run data.[1].[0].trip}}\" aria-label=\"Pump {{variableValue \"\n  ${chpw}\"}} live status\"\u003e\n  \u003cdiv class=\"pump-status-head\"\u003e\n    \u003cdiv class=\"pump-status-title\"\u003e\n      \u003cdiv class=\"pump-status-name\"\u003e{{variableValue \"${chwp:text}\"}}\u003c/div\u003e\n      \u003cdiv class=\"pump-status-badge {{#if (eq (variableValue \" ${chwp.chiller}\") \"\" )}}unassigned{{/if}}\"\u003e{{assignedChr\n        (variableValue \"${chwp.chiller}\")}}\n      \u003c/div\u003e\n      {{{autoBadge data.[1].[0].auto data.[0].[0].control_mode}}}\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-state\"\u003e\n      \u003cspan class=\"pump-status-dot\" aria-hidden=\"true\"\u003e\u003c/span\u003e\n      \u003cspan\u003e\n        {{state data.[1].[0].run data.[1].[0].trip}}\n      \u003c/span\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003cdiv class=\"pump-status-grid\"\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003eSpeed\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].speedFb\n        decimalLength=1}}\u003cspan class=\"pump-status-unit\"\u003e Hz\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003ePower\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].totalPower\n        decimalLength=2}}\u003cspan class=\"pump-status-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003eFlow\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].flowRate\n        decimalLength=2}}\u003cspan class=\"pump-status-unit\"\u003e m3/h\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003ePressure\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].pressure\n        decimalLength=2}}\u003cspan class=\"pump-status-unit\"\u003e barg\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003eCurrent Runtime\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{runTime data.[1].[0].runtime}}\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/article\u003e",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "styles",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"priority\", priority =\u003e {\n  if (priority === 2) return \"lead\";\n  if (priority === 1) return \"lag\";\n  return \"standby\";\n})\n\ncontext.handlebars.registerHelper(\"state\", (run, trip) =\u003e {\n  if (trip == 1) return \"tripped\";\n\n  return run == 1 ? \"running\" : \"stopped\";\n})\n\ncontext.handlebars.registerHelper(\"stateClass\", (run, trip) =\u003e {\n  if (trip == 1) return \"trip\";\n\n  return run == 1 ? \"running\" : \"stopped\";\n})\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  if (value == null) return '--';\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\ncontext.handlebars.registerHelper('alarmClass', activeAlarms =\u003e {\n  if (activeAlarms === 0) return 'ok';\n  if (activeAlarms === 1) return 'warn';\n  return 'bad'\n})\n\ncontext.handlebars.registerHelper('runTime', runtime =\u003e {\n  const hour = Math.floor(runtime / 60);\n  const min = Math.round(runtime % 60);\n  return `${hour}h ${min}m`\n})\n\ncontext.handlebars.registerHelper('assignedChr', value =\u003e {\n  if (!value) return 'not assigned';\n  return 'serving ' + value;\n})\n\ncontext.handlebars.registerHelper('autoBadge', (autoMode, controlMode) =\u003e {\n  if (autoMode === 1 \u0026\u0026 controlMode === \"AUTO\") { \n    return `\u003cspan class=\"pump-status-mode auto\"\u003eAUTO\u003c/span\u003e`;\n  }\n\n  let result = '';\n\n  if (autoMode === 0) {\n    result += `\u003cspan class=\"pump-status-mode manual\"\u003eMANUAL\u003c/span\u003e`\n  }\n  if (controlMode !== 'AUTO') {\n    result += `\u003cspan class=\"pump-status-mode remote\"\u003eREMOTE\u003c/span\u003e`\n  }\n\n  return result;\n})",
+                "renderMode": "data",
+                "styles": ".pump-status-card {\n  width: 100%;\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n  background: #f7fbf4;\n  border: 0.5px solid #d9ead3;\n  border-radius: 6px;\n  padding: 13px;\n}\n.pump-status-card.running {\n  background: #f7fbf4;\n  border-color: #d9ead3;\n}\n.pump-status-card.stopped {\n  background: #fafafa;\n  border-color: #e5e7eb;\n}\n.pump-status-card.trip,\n.pump-status-card.error {\n  background: #fff5f5;\n  border-color: #f2b8b5;\n}\n.pump-status-card.unavailable {\n  background: #f8f9fa;\n  border-color: #d0d5dd;\n  opacity: 0.78;\n}\n.pump-status-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 10px;\n  margin-bottom: 13px;\n}\n.pump-status-title {\n  display: flex;\n  align-items: center;\n  gap: 9px;\n  min-width: 0;\n}\n.pump-status-name {\n  font-size: 17px;\n  font-weight: 700;\n}\n.pump-status-badge {\n  border-radius: 999px;\n  background: #eaf2ff;\n  color: #2f75b5;\n  font-size: 12px;\n  font-weight: 700;\n  letter-spacing: 0.3px;\n  padding: 4px 9px;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.pump-status-badge.standby {\n  background: #f2f4f7;\n  color: #667085;\n}\n.pump-status-badge.unassigned {\n  background: #fef3c7;\n  color: #92400e;\n}\n.pump-status-mode {\n  display: inline-block;\n  border-radius: 999px;\n  padding: 3px 9px;\n  font-size: 13px;\n  font-weight: 700;\n}\n.pump-status-mode.auto {\n  background: #dcfce7;\n  color: #166534;\n}\n.pump-status-mode.manual {\n  background: #fef3c7;\n  color: #92400e;\n}\n.pump-status-mode.remote {\n  background: #ffedd5;\n  color: #9a3412;\n}\n.pump-status-mode.local {\n  background: #fee2e2;\n  color: #991b1b;\n}\n.pump-status-state {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-size: 14px;\n  font-weight: 700;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.pump-status-dot {\n  width: 10px;\n  height: 10px;\n  border-radius: 50%;\n  background: #548235;\n}\n.pump-status-card.running .pump-status-state {\n  color: #548235;\n}\n.pump-status-card.stopped .pump-status-dot {\n  background: #98a2b3;\n}\n.pump-status-card.stopped .pump-status-state {\n  color: #667085;\n}\n.pump-status-card.trip .pump-status-dot,\n.pump-status-card.error .pump-status-dot {\n  background: #c00000;\n}\n.pump-status-card.trip .pump-status-state,\n.pump-status-card.error .pump-status-state {\n  color: #c00000;\n}\n.pump-status-card.unavailable .pump-status-dot {\n  background: #667085;\n}\n.pump-status-card.unavailable .pump-status-state {\n  color: #667085;\n}\n.pump-status-grid {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 10px;\n}\n.pump-status-metric {\n  min-width: 0;\n  border-top: 1px solid rgba(84, 130, 53, 0.16);\n  padding-top: 8px;\n}\n.pump-status-label {\n  color: var(--color-text-secondary, #667085);\n  font-size: 12px;\n  letter-spacing: 0.3px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.pump-status-value {\n  margin-top: 3px;\n  font-size: 18px;\n  font-weight: 700;\n  font-variant-numeric: tabular-nums;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.pump-status-unit {\n  color: var(--color-text-secondary, #667085);\n  font-size: 12px;\n  font-weight: 400;\n}\n.pump-status-ok {\n  color: #548235;\n}\n.pump-status-warn {\n  color: #bf8f00;\n}\n.pump-status-bad {\n  color: #c00000;\n}\n@media (max-width: 360px) {\n  .pump-status-grid {\n    grid-template-columns: 1fr;\n  }\n}",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-4": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "SELECT availability, control_mode\nFROM public.control_status\nWHERE equipment_id='${cwp}';",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "control_status"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "builder",
+                        "format": "table",
+                        "query": "pumpId = \"${cwp}\"\nchillerCwId = \"${cwp.chiller}Cw\"\n\npump =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pump\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"speedCmd\" or r._field == \"speedFb\" or r._field == \"power\" or r._field == \"pressure\")\n    |\u003e last()\n\npressure =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pressure\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"pressure\")\n    |\u003e last()\n\npower =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e last()\n\nstatus =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\" or r._field == \"trip\" or r._field == \"auto\")\n    |\u003e last()\n\nflow =\n  from(bucket: \"cpms\")\n    |\u003e range(start: -5m)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == chillerCwId)\n    |\u003e filter(fn: (r) =\u003e r._field == \"flowRate\")\n    |\u003e last()\n    |\u003e set(key: \"_field\", value: \"flowRate\")\n\nruntime = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == pumpId)\n  |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n  |\u003e integral(unit: 1m)\n  |\u003e set(key: \"_field\", value: \"runtime\")\n\nunion(tables: [pump, status, flow, pressure, power, runtime])\n  |\u003e group()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n",
+                        "rawSql": ""
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "pump_data"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 4,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "",
+                "content": "\u003carticle class=\"pump-status-card {{stateClass data.[1].[0].run data.[1].[0].trip}}\" aria-label=\"Pump {{variableValue \"\n  ${chpw}\"}} live status\"\u003e\n  \u003cdiv class=\"pump-status-head\"\u003e\n    \u003cdiv class=\"pump-status-title\"\u003e\n      \u003cdiv class=\"pump-status-name\"\u003e{{variableValue \"${cwp:text}\"}}\u003c/div\u003e\n      \u003cdiv class=\"pump-status-badge {{#if (eq (variableValue \" ${cwp.chiller}\") \"\" )}}unassigned{{/if}}\"\u003e{{assignedChr\n        (variableValue \"${cwp.chiller}\")}}\n      \u003c/div\u003e\n      {{{autoBadge data.[1].[0].auto data.[0].[0].control_mode}}}\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-state\"\u003e\n      \u003cspan class=\"pump-status-dot\" aria-hidden=\"true\"\u003e\u003c/span\u003e\n      \u003cspan\u003e\n        {{state data.[1].[0].run data.[1].[0].trip}}\n      \u003c/span\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003cdiv class=\"pump-status-grid\"\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003eSpeed\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].speedFb\n        decimalLength=1}}\u003cspan class=\"pump-status-unit\"\u003e Hz\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003ePower\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].totalPower\n        decimalLength=2}}\u003cspan class=\"pump-status-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003eFlow\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].flowRate\n        decimalLength=2}}\u003cspan class=\"pump-status-unit\"\u003e m3/h\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003ePressure\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{numberFormat data.[1].[0].pressure\n        decimalLength=2}}\u003cspan class=\"pump-status-unit\"\u003e barg\u003c/span\u003e\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n      \u003cdiv class=\"pump-status-label\"\u003eCurrent Runtime\u003c/div\u003e\n      \u003cdiv class=\"pump-status-value\"\u003e{{runTime data.[1].[0].runtime}}\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"pump-status-metric\"\u003e\n\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/article\u003e",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "styles",
+                  "helpers"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper(\"priority\", priority =\u003e {\n  if (priority === 2) return \"lead\";\n  if (priority === 1) return \"lag\";\n  return \"standby\";\n})\n\ncontext.handlebars.registerHelper(\"state\", (run, trip) =\u003e {\n  if (trip == 1) return \"tripped\";\n\n  return run == 1 ? \"running\" : \"stopped\";\n})\n\ncontext.handlebars.registerHelper(\"stateClass\", (run, trip) =\u003e {\n  if (trip == 1) return \"trip\";\n\n  return run == 1 ? \"running\" : \"stopped\";\n})\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  if (value == null) return '--';\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\ncontext.handlebars.registerHelper('alarmClass', activeAlarms =\u003e {\n  if (activeAlarms === 0) return 'ok';\n  if (activeAlarms === 1) return 'warn';\n  return 'bad'\n})\n\ncontext.handlebars.registerHelper('runTime', runtime =\u003e {\n  const hour = Math.floor(runtime / 60);\n  const min = Math.round(runtime % 60);\n  return `${hour}h ${min}m`\n})\n\ncontext.handlebars.registerHelper('assignedChr', value =\u003e {\n  if (!value) return 'not assigned';\n  return 'serving ' + value;\n})\n\ncontext.handlebars.registerHelper('autoBadge', (autoMode, controlMode) =\u003e {\n  if (autoMode === 1 \u0026\u0026 controlMode === \"AUTO\") { \n    return `\u003cspan class=\"pump-status-mode auto\"\u003eAUTO\u003c/span\u003e`;\n  }\n\n  let result = '';\n\n  if (autoMode === 0) {\n    result += `\u003cspan class=\"pump-status-mode manual\"\u003eMANUAL\u003c/span\u003e`\n  }\n  if (controlMode !== 'AUTO') {\n    result += `\u003cspan class=\"pump-status-mode remote\"\u003eREMOTE\u003c/span\u003e`\n  }\n\n  return result;\n})",
+                "renderMode": "data",
+                "styles": ".pump-status-card {\n  width: 100%;\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n  background: #f7fbf4;\n  border: 0.5px solid #d9ead3;\n  border-radius: 6px;\n  padding: 13px;\n}\n.pump-status-card.running {\n  background: #f7fbf4;\n  border-color: #d9ead3;\n}\n.pump-status-card.stopped {\n  background: #fafafa;\n  border-color: #e5e7eb;\n}\n.pump-status-card.trip,\n.pump-status-card.error {\n  background: #fff5f5;\n  border-color: #f2b8b5;\n}\n.pump-status-card.unavailable {\n  background: #f8f9fa;\n  border-color: #d0d5dd;\n  opacity: 0.78;\n}\n.pump-status-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 10px;\n  margin-bottom: 13px;\n}\n.pump-status-title {\n  display: flex;\n  align-items: center;\n  gap: 9px;\n  min-width: 0;\n}\n.pump-status-name {\n  font-size: 17px;\n  font-weight: 700;\n}\n.pump-status-badge {\n  border-radius: 999px;\n  background: #eaf2ff;\n  color: #2f75b5;\n  font-size: 12px;\n  font-weight: 700;\n  letter-spacing: 0.3px;\n  padding: 4px 9px;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.pump-status-badge.standby {\n  background: #f2f4f7;\n  color: #667085;\n}\n.pump-status-badge.unassigned {\n  background: #fef3c7;\n  color: #92400e;\n}\n.pump-status-mode {\n  display: inline-block;\n  border-radius: 999px;\n  padding: 3px 9px;\n  font-size: 13px;\n  font-weight: 700;\n}\n.pump-status-mode.auto {\n  background: #dcfce7;\n  color: #166534;\n}\n.pump-status-mode.manual {\n  background: #fef3c7;\n  color: #92400e;\n}\n.pump-status-mode.remote {\n  background: #ffedd5;\n  color: #9a3412;\n}\n.pump-status-mode.local {\n  background: #fee2e2;\n  color: #991b1b;\n}\n.pump-status-state {\n  display: flex;\n  align-items: center;\n  gap: 8px;\n  font-size: 14px;\n  font-weight: 700;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.pump-status-dot {\n  width: 10px;\n  height: 10px;\n  border-radius: 50%;\n  background: #548235;\n}\n.pump-status-card.running .pump-status-state {\n  color: #548235;\n}\n.pump-status-card.stopped .pump-status-dot {\n  background: #98a2b3;\n}\n.pump-status-card.stopped .pump-status-state {\n  color: #667085;\n}\n.pump-status-card.trip .pump-status-dot,\n.pump-status-card.error .pump-status-dot {\n  background: #c00000;\n}\n.pump-status-card.trip .pump-status-state,\n.pump-status-card.error .pump-status-state {\n  color: #c00000;\n}\n.pump-status-card.unavailable .pump-status-dot {\n  background: #667085;\n}\n.pump-status-card.unavailable .pump-status-state {\n  color: #667085;\n}\n.pump-status-grid {\n  display: grid;\n  grid-template-columns: repeat(2, minmax(0, 1fr));\n  gap: 10px;\n}\n.pump-status-metric {\n  min-width: 0;\n  border-top: 1px solid rgba(84, 130, 53, 0.16);\n  padding-top: 8px;\n}\n.pump-status-label {\n  color: var(--color-text-secondary, #667085);\n  font-size: 12px;\n  letter-spacing: 0.3px;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  text-transform: uppercase;\n  white-space: nowrap;\n}\n.pump-status-value {\n  margin-top: 3px;\n  font-size: 18px;\n  font-weight: 700;\n  font-variant-numeric: tabular-nums;\n  overflow: hidden;\n  text-overflow: ellipsis;\n  white-space: nowrap;\n}\n.pump-status-unit {\n  color: var(--color-text-secondary, #667085);\n  font-size: 12px;\n  font-weight: 400;\n}\n.pump-status-ok {\n  color: #548235;\n}\n.pump-status-warn {\n  color: #bf8f00;\n}\n.pump-status-bad {\n  color: #c00000;\n}\n@media (max-width: 360px) {\n  .pump-status-grid {\n    grid-template-columns: 1fr;\n  }\n}",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
+      "panel-5": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\ndevices = [\"chwp1\",\"chwp2\",\"chwp3\",\"cwp1\",\"cwp2\",\"cwp3\"]\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"run\" or r[\"_field\"] == \"trip\")\n  |\u003e filter(fn: (r) =\u003e contains(set: devices, value: r.deviceId))\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: last, createEmpty: false)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with state: if r.trip == 1.0 then 2.0 else r.run,\n    deviceId: strings.toUpper(v: r.deviceId)\n  }))\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"state\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "state (.*)",
+                      "renamePattern": "$1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 5,
+          "links": [],
+          "title": "Pump status",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#888888",
+                          "index": 2,
+                          "text": "OFF"
+                        },
+                        "1": {
+                          "color": "green",
+                          "index": 1,
+                          "text": "RUN"
+                        },
+                        "2": {
+                          "color": "red",
+                          "index": 0,
+                          "text": "TRIP"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "left",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.9,
+                "showValue": "never",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-7": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"chwr\" or r[\"_field\"] == \"chws\" or r._field == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n",
+                        "rawQuery": true,
+                        "rawSql": "with data as (\n  select (value-\u003e\u003e'target')::float as target, (value-\u003e\u003e'deadband')::float as deadband from control_params cp where key = 'chwp.delta_t_controller'\n)\nselect target, target - deadband as low, target + deadband as high from data\n",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "target"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "deltaT"
+                      },
+                      "configRefId": "target",
+                      "mappings": [
+                        {
+                          "fieldName": "target",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "purple"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "Setpoint = purple dashed line ",
+          "id": 7,
+          "links": [],
+          "title": "CHW and Setpoint ❄️",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "chwr",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "CHWR"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "super-light-red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "chws",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CHWS"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "deltaT"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-green",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CHW ΔT"
+                      },
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-8": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"cws\" or r._field == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n",
+                        "rawQuery": true,
+                        "rawSql": "select (value-\u003e\u003e'target')::float as target from control_params cp where key = 'cwp.delta_t_controller'",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "target"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": [
+                {
+                  "group": "configFromData",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "applyTo": {
+                        "id": "byName",
+                        "options": "deltaT"
+                      },
+                      "configRefId": "target",
+                      "mappings": [
+                        {
+                          "fieldName": "target",
+                          "handlerArguments": {
+                            "threshold": {
+                              "color": "purple"
+                            }
+                          },
+                          "handlerKey": "threshold1"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 8,
+          "links": [],
+          "title": "CW and Setpoint 🌧️",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 10,
+                    "gradientMode": "hue",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cws",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "CWS"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "super-light-red",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "cwr",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CWR"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "deltaT"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "light-green",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "displayName",
+                        "value": "CW ΔT"
+                      },
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "table",
+                  "enableFacetedFilter": true,
+                  "overflow": "ellipsis",
+                  "placement": "right",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-9": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"join\"\n\nbucket = \"cpms\"\n\nchwpIds = [\"chwp1\", \"chwp2\", \"chwp3\"]\ncwpIds = [\"cwp1\", \"cwp2\", \"cwp3\"]\n\nchwpSpeed =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pump\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"speedFb\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: chwpIds))\n    |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n    |\u003e group(columns: [\"_time\"])\n    |\u003e mean()\n    |\u003e set(key: \"_field\", value: \"CHWP Avg Speed\")\n\nchwDeltaT =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwHeader\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"deltaT\")\n    |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n    |\u003e set(key: \"_field\", value: \"CHW ΔT\")\n\ncwpSpeed =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"pump\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"speedFb\")\n    |\u003e filter(fn: (r) =\u003e contains(value: r.deviceId, set: cwpIds))\n    |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n    |\u003e group(columns: [\"_time\"])\n    |\u003e mean()\n    |\u003e set(key: \"_field\", value: \"CWP Avg Speed\")\n\ncwDeltaT =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"deltaT\")\n    |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n    |\u003e set(key: \"_field\", value: \"CW ΔT\")\n\nunion(tables: [chwpSpeed, chwDeltaT, cwpSpeed, cwDeltaT])\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003egroup(columns: [\"_field\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 9,
+          "links": [],
+          "title": "Pump speed vs loop ΔT",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "celsius"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/.*Speed/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "rothz"
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "left"
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      }
+    },
+    "layout": {
+      "kind": "TabsLayout",
+      "spec": {
+        "tabs": [
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-1"
+                        },
+                        "height": 6,
+                        "width": 16,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-2"
+                        },
+                        "height": 6,
+                        "width": 8,
+                        "x": 16,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-3"
+                        },
+                        "height": 8,
+                        "repeat": {
+                          "direction": "h",
+                          "maxPerRow": 3,
+                          "mode": "variable",
+                          "value": "chwp"
+                        },
+                        "width": 24,
+                        "x": 0,
+                        "y": 6
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-4"
+                        },
+                        "height": 8,
+                        "repeat": {
+                          "direction": "h",
+                          "maxPerRow": 3,
+                          "mode": "variable",
+                          "value": "cwp"
+                        },
+                        "width": 24,
+                        "x": 0,
+                        "y": 14
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Overall Live"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-5"
+                        },
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-7"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 8
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-8"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 17
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-9"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 26
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-11"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 35
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-12"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 44
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-13"
+                        },
+                        "height": 9,
+                        "width": 12,
+                        "x": 0,
+                        "y": 53
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-14"
+                        },
+                        "height": 9,
+                        "width": 12,
+                        "x": 12,
+                        "y": 53
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-15"
+                        },
+                        "height": 9,
+                        "width": 12,
+                        "x": 0,
+                        "y": 62
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-16"
+                        },
+                        "height": 9,
+                        "width": 12,
+                        "x": 12,
+                        "y": 62
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Overall Trend"
+            }
+          },
+          {
+            "kind": "TabsLayoutTab",
+            "spec": {
+              "layout": {
+                "kind": "GridLayout",
+                "spec": {
+                  "items": [
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-18"
+                        },
+                        "height": 8,
+                        "width": 12,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-19"
+                        },
+                        "height": 8,
+                        "width": 12,
+                        "x": 12,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-20"
+                        },
+                        "height": 8,
+                        "width": 24,
+                        "x": 0,
+                        "y": 8
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-21"
+                        },
+                        "height": 13,
+                        "width": 12,
+                        "x": 0,
+                        "y": 16
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-22"
+                        },
+                        "height": 13,
+                        "width": 12,
+                        "x": 12,
+                        "y": 16
+                      }
+                    }
+                  ]
+                }
+              },
+              "title": "Runtime"
+            }
+          }
+        ]
+      }
+    },
+    "links": [],
+    "liveNow": false,
+    "preferences": {
+      "layout": {
+        "kind": "GridLayout",
+        "spec": {
+          "items": []
+        }
+      }
+    },
+    "preload": false,
+    "tags": [
+      "cpms",
+      "cpms-analytics"
+    ],
+    "timeSettings": {
+      "autoRefresh": "",
+      "autoRefreshIntervals": [
+        "5s",
+        "10s",
+        "30s",
+        "1m",
+        "5m",
+        "15m",
+        "30m",
+        "1h",
+        "2h",
+        "1d"
+      ],
+      "fiscalYearStartMonth": 0,
+      "from": "now-12h",
+      "hideTimepicker": false,
+      "timezone": "browser",
+      "to": "now"
+    },
+    "title": "Pump Analysis",
+    "variables": [
+      {
+        "kind": "CustomVariable",
+        "spec": {
+          "allowCustomValue": true,
+          "current": {
+            "text": "Auto",
+            "value": "v.windowPeriod"
+          },
+          "hide": "dontHide",
+          "includeAll": false,
+          "label": "Chart Interval",
+          "multi": false,
+          "name": "chartInterval",
+          "options": [],
+          "query": "Auto : v.windowPeriod,Hourly : 1h,Daily : 1d,Weekly : 1w,Monthly : 1mo",
+          "skipUrlSync": false,
+          "valuesFormat": "csv"
+        }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "current": {
+            "text": "0.5",
+            "value": "0.5"
+          },
+          "description": "Set point threshold",
+          "hide": "hideVariable",
+          "name": "setpointThreshold",
+          "query": "0.5",
+          "skipUrlSync": true
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "All",
+            "value": [
+              "$__all"
+            ]
+          },
+          "definition": "with devices as (select unnest(array['chwp1', 'chwp2', 'chwp3']) as id, unnest(array['CHWP1', 'CHWP2', 'CHWP3']) as text),\nchillers as (select value::text as value, equipment_id as chiller from control_params where key = 'chiller.chwpId')\nselect * from devices d left join chillers c on c.value = concat('\"', d.id, '\"')\n\n",
+          "hide": "hideVariable",
+          "includeAll": true,
+          "multi": true,
+          "name": "chwp",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "cpms-postgres"
+            },
+            "group": "grafana-postgresql-datasource",
+            "kind": "DataQuery",
+            "spec": {
+              "dataset": "chiller",
+              "editorMode": "code",
+              "format": "table",
+              "meta": {
+                "textField": "text",
+                "valueField": "id"
+              },
+              "query": "with devices as (select unnest(array['chwp1', 'chwp2', 'chwp3']) as id, unnest(array['CHWP1', 'CHWP2', 'CHWP3']) as text),\nchillers as (select value::text as value, equipment_id as chiller from control_params where key = 'chiller.chwpId')\nselect * from devices d left join chillers c on c.value = concat('\"', d.id, '\"')\n\n",
+              "rawQuery": true,
+              "rawSql": "with devices as (select unnest(array['chwp1', 'chwp2', 'chwp3']) as id, unnest(array['CHWP1', 'CHWP2', 'CHWP3']) as text),\nchillers as (select value::text as value, equipment_id as chiller from control_params where key = 'chiller.chwpId')\nselect * from devices d left join chillers c on c.value = concat('\"', d.id, '\"')\n\n",
+              "refId": "SQLVariableQueryEditor-VariableQuery",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            "version": "v0"
+          },
+          "refresh": "onTimeRangeChanged",
+          "regex": "",
+          "regexApplyTo": "value",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      },
+      {
+        "kind": "QueryVariable",
+        "spec": {
+          "allowCustomValue": false,
+          "current": {
+            "text": "All",
+            "value": [
+              "$__all"
+            ]
+          },
+          "definition": "with devices as (select unnest(array['cwp1', 'cwp2', 'cwp3']) as id, unnest(array['CWP1', 'CWP2', 'CWP3']) as text),\nchillers as (select value::text as value, equipment_id as chiller from control_params where key = 'chiller.cwpId')\nselect * from devices d left join chillers c on c.value = concat('\"', d.id, '\"')\n\n",
+          "hide": "hideVariable",
+          "includeAll": true,
+          "multi": true,
+          "name": "cwp",
+          "options": [],
+          "query": {
+            "datasource": {
+              "name": "cpms-postgres"
+            },
+            "group": "grafana-postgresql-datasource",
+            "kind": "DataQuery",
+            "spec": {
+              "dataset": "chiller",
+              "editorMode": "code",
+              "format": "table",
+              "meta": {
+                "textField": "text",
+                "valueField": "id"
+              },
+              "query": "with devices as (select unnest(array['cwp1', 'cwp2', 'cwp3']) as id, unnest(array['CWP1', 'CWP2', 'CWP3']) as text),\nchillers as (select value::text as value, equipment_id as chiller from control_params where key = 'chiller.cwpId')\nselect * from devices d left join chillers c on c.value = concat('\"', d.id, '\"')\n\n",
+              "rawQuery": true,
+              "rawSql": "with devices as (select unnest(array['cwp1', 'cwp2', 'cwp3']) as id, unnest(array['CWP1', 'CWP2', 'CWP3']) as text),\nchillers as (select value::text as value, equipment_id as chiller from control_params where key = 'chiller.cwpId')\nselect * from devices d left join chillers c on c.value = concat('\"', d.id, '\"')\n\n",
+              "refId": "SQLVariableQueryEditor-VariableQuery",
+              "sql": {
+                "columns": [
+                  {
+                    "parameters": [],
+                    "type": "function"
+                  }
+                ],
+                "groupBy": [
+                  {
+                    "property": {
+                      "type": "string"
+                    },
+                    "type": "groupBy"
+                  }
+                ],
+                "limit": 50
+              }
+            },
+            "version": "v0"
+          },
+          "refresh": "onTimeRangeChanged",
+          "regex": "",
+          "regexApplyTo": "value",
+          "skipUrlSync": false,
+          "sort": "alphabeticalAsc"
+        }
+      }
+    ]
+  }
+}
