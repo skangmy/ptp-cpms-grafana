@@ -5608,7 +5608,7 @@
                     },
                     "insertNulls": false,
                     "lineWidth": 0,
-                    "spanNulls": false
+                    "spanNulls": 3600000
                   },
                   "mappings": [
                     {
@@ -6825,7 +6825,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-24h",
+      "from": "now-6h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -6837,8 +6837,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "Chiller 1",
-            "value": "chiller1"
+            "text": "Chiller 3",
+            "value": "chiller3"
           },
           "hide": "hideVariable",
           "includeAll": false,
@@ -6951,8 +6951,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "CHWP1",
-            "value": "chwp1"
+            "text": "CHWP3",
+            "value": "chwp3"
           },
           "definition": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.chwpId' and equipment_id = '${chiller}'",
           "hide": "hideVariable",
@@ -7010,8 +7010,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "CWP1",
-            "value": "cwp1"
+            "text": "CWP3",
+            "value": "cwp3"
           },
           "definition": "select value, replace(upper(value::text), '\"', '')  as text from control_params where key = 'chiller.cwpId' and equipment_id = '${chiller}'",
           "hide": "hideVariable",
