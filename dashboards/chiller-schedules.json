@@ -1277,7 +1277,11 @@
                           },
                           "enabled": true,
                           "permission": {
-                            "mode": "",
+                            "field": {
+                              "name": "can_edit",
+                              "source": "A"
+                            },
+                            "mode": "query",
                             "userRole": []
                           }
                         },
@@ -1351,7 +1355,11 @@
                           },
                           "enabled": true,
                           "permission": {
-                            "mode": "",
+                            "field": {
+                              "name": "can_edit",
+                              "source": "A"
+                            },
+                            "mode": "query",
                             "userRole": []
                           }
                         },
