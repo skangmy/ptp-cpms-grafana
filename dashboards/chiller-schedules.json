@@ -789,7 +789,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "with data as (select id, holiday_date, name, mode, enabled, true as can_edit from holiday_schedule\norder by holiday_date)\nselect 'p_' || id as selected, * from data\nunion all\nselect '' as selected, -1, '1900-01-01' as holiday_date, null as name, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
+                        "rawSql": "with data as (select id, holiday_date, name, mode, enabled, true as can_edit from holiday_schedule\norder by holiday_date)\nselect 'p_' || id as selected, * from data\nunion all\nselect 'p_-1' as selected, -1, '1900-01-01' as holiday_date, null as name, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
                         "sql": {
                           "columns": [
                             {
@@ -884,6 +884,17 @@
                     "fixedColor": "transparent",
                     "mode": "fixed"
                   },
+                  "mappings": [
+                    {
+                      "options": {
+                        "1900-01-01": {
+                          "index": 0,
+                          "text": "---"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
