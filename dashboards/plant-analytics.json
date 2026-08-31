@@ -1917,7 +1917,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field != \"requiredChillers\" and r._field != \"requiredCoolingTowers\" and r._field != \"runningChillers\" and r._field != \"runningCoolingTowers\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r._field != \"requiredChillers\" and r._field != \"requiredCoolingTowers\" and r._field != \"runningChillers\" and r._field != \"runningCoolingTowers\")\n  |\u003e filter(fn: (r) =\u003e r._field != \"requestOn\" and r._field != \"requestOnSource\" and r._field != \"chwsSetpoint\" and r._field != \"cwsSetpoint\")\n  |\u003e last()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
                       },
                       "version": "v0"
                     },
@@ -5077,8 +5077,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "369.21",
-            "value": "369.21"
+            "text": "92.277",
+            "value": "92.277"
           },
           "definition": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: -15m)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"outdoor\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"radiation\")\n  |\u003e last() \n  |\u003e group()\n  |\u003e max()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")",
           "hide": "hideVariable",
