@@ -5442,11 +5442,11 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "71.42002222222241",
-            "value": "71.42002222222241"
+            "text": "71.44045055555576",
+            "value": "71.44045055555576"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
-          "hide": "dontHide",
+          "hide": "hideVariable",
           "includeAll": false,
           "multi": false,
           "name": "operatingHours",
@@ -5465,7 +5465,7 @@
           "refresh": "onTimeRangeChanged",
           "regex": "",
           "regexApplyTo": "value",
-          "skipUrlSync": false,
+          "skipUrlSync": true,
           "sort": "disabled"
         }
       }
