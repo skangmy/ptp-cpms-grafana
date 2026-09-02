@@ -106,7 +106,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "with data as ( select severity, count(*) as count from alarm_state where status != 'CLEARED' group by severity)\nselect \n  (select count from data where severity = 'WARNING') as warning,\n  coalesce((select count from data where severity = 'CRITICAL'), 0) as critical",
+                        "rawSql": "with data as ( select severity, count(*) as count from alarm_state where status != 'CLEARED' group by severity)\nselect \n  coalesce((select count from data where severity = 'WARNING'), 0) as warning,\n  coalesce((select count from data where severity = 'CRITICAL'), 0) as critical",
                         "sql": {
                           "columns": [
                             {
@@ -5423,8 +5423,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "71.48911500000015",
-            "value": "71.48911500000015"
+            "text": "71.31471388888897",
+            "value": "71.31471388888897"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
