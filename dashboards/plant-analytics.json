@@ -4521,7 +4521,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e\n    r._measurement == \"plantStatus\" and\n    r.deviceId == \"plant1\" \n  )\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\" or r._field == \"emergency\" or r._field == \"lockout\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with\n    \"Plant Status\":\n      if r.lockout == 1 then \"Lockout\"\n      else if r.emergency == 1 then \"Emergency\"\n      else if r.state == 0 then \"Off\"\n      else if r.state == 1 then \"Starting\"\n      else if r.state == 2 then \"Running\"\n      else if r.state == 3 then \"Stopping\"\n      else if r.state == 4 then \"Faulty\"\n      else if r.state == 5 then \"Unavailable\"\n      else \"Unknown\",\n  }))\n  |\u003e keep(columns: [\"_time\", \"Plant Status\"])"
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e\n    r._measurement == \"plantStatus\" and\n    r.deviceId == \"plant1\" \n  )\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\" or r._field == \"emergency\" or r._field == \"lockout\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: true)\n  |\u003e fill(usePrevious: true)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with\n    \"Plant Status\":\n      if r.lockout == 1 then \"Lockout\"\n      else if r.emergency == 1 then \"Emergency\"\n      else if r.state == 0 then \"Off\"\n      else if r.state == 1 then \"Starting\"\n      else if r.state == 2 then \"Running\"\n      else if r.state == 3 then \"Stopping\"\n      else if r.state == 4 then \"Faulty\"\n      else if r.state == 5 then \"Unavailable\"\n      else \"Unknown\",\n  }))\n  |\u003e keep(columns: [\"_time\", \"Plant Status\"])"
                       },
                       "version": "v0"
                     },
@@ -5423,8 +5423,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "71.4291800000002",
-            "value": "71.4291800000002"
+            "text": "71.48911500000015",
+            "value": "71.48911500000015"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
