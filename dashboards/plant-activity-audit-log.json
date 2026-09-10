@@ -440,6 +440,25 @@
               "queryOptions": {},
               "transformations": [
                 {
+                  "group": "convertFieldType",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "conversions": [
+                        {
+                          "destinationType": "string",
+                          "targetField": "old_value"
+                        },
+                        {
+                          "destinationType": "string",
+                          "targetField": "new_value"
+                        }
+                      ],
+                      "fields": {}
+                    }
+                  }
+                },
+                {
                   "group": "organize",
                   "kind": "Transformation",
                   "spec": {
@@ -622,6 +641,44 @@
                         "id": "custom.filterable"
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Old Value",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.inspect",
+                        "value": true
+                      },
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "json-view"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "New Value",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.cellOptions",
+                        "value": {
+                          "type": "json-view"
+                        }
+                      },
+                      {
+                        "id": "custom.inspect",
+                        "value": true
+                      }
+                    ]
                   }
                 ]
               },
@@ -662,7 +719,7 @@
                 "kind": "ElementReference",
                 "name": "panel-2"
               },
-              "height": 19,
+              "height": 21,
               "width": 24,
               "x": 0,
               "y": 19
