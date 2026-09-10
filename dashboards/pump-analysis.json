@@ -333,7 +333,7 @@
           "description": "Setpoint = purple dashed line ",
           "id": 11,
           "links": [],
-          "title": "CHW ΔT vs Target and Deadband",
+          "title": "CHW ΔT vs Target and Deadband 🌡️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -534,7 +534,7 @@
           "description": "",
           "id": 12,
           "links": [],
-          "title": "CW ΔT vs Target and Deadband",
+          "title": "CW ΔT vs Target and Deadband 🌡️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -657,7 +657,7 @@
           "description": "",
           "id": 13,
           "links": [],
-          "title": "CHW Pump power intensity",
+          "title": "CHW Pump Power Intensity ⚡",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -777,7 +777,7 @@
           "description": "",
           "id": 14,
           "links": [],
-          "title": "CW Pump power intensity",
+          "title": "CW Pump Power Intensity ⚡",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -897,7 +897,7 @@
           "description": "",
           "id": 15,
           "links": [],
-          "title": "CHW Pump Power",
+          "title": "CHW Pump Power ⚡",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -1016,7 +1016,7 @@
           "description": "",
           "id": 16,
           "links": [],
-          "title": "CW Pump Power",
+          "title": "CW Pump Power ⚡",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -2490,7 +2490,7 @@
           "description": "",
           "id": 5,
           "links": [],
-          "title": "Pump status",
+          "title": "Pump Status ⚙️",
           "vizConfig": {
             "group": "state-timeline",
             "kind": "VizConfig",
@@ -3107,7 +3107,7 @@
           "description": "",
           "id": 9,
           "links": [],
-          "title": "Pump speed vs loop ΔT",
+          "title": "Pump Speed vs Loop ΔT ⚙️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
