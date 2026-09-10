@@ -1232,7 +1232,7 @@
           "description": "",
           "id": 18,
           "links": [],
-          "title": "CHWP Runtime Comparison",
+          "title": "CHWP Runtime Comparison ⏱️",
           "vizConfig": {
             "group": "table",
             "kind": "VizConfig",
@@ -1500,7 +1500,7 @@
           "description": "",
           "id": 19,
           "links": [],
-          "title": "CWP Runtime Comparison",
+          "title": "CWP Runtime Comparison ⏱️",
           "vizConfig": {
             "group": "table",
             "kind": "VizConfig",
@@ -1802,7 +1802,7 @@
           "description": "",
           "id": 20,
           "links": [],
-          "title": "Pump status",
+          "title": "Pump Status ⚙️",
           "vizConfig": {
             "group": "state-timeline",
             "kind": "VizConfig",
@@ -1932,7 +1932,7 @@
           "description": "",
           "id": 21,
           "links": [],
-          "title": "CHWP Speed Distribution",
+          "title": "CHWP Speed Distribution ⚙️",
           "vizConfig": {
             "group": "barchart",
             "kind": "VizConfig",
@@ -2086,7 +2086,7 @@
           "description": "",
           "id": 22,
           "links": [],
-          "title": "CWP Speed Distribution",
+          "title": "CWP Speed Distribution ⚙️",
           "vizConfig": {
             "group": "barchart",
             "kind": "VizConfig",
