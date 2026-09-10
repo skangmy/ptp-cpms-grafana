@@ -294,6 +294,48 @@
                         "value": 182
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Equipment ID",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "mappings",
+                        "value": [
+                          {
+                            "options": {
+                              "chiller": {
+                                "index": 0
+                              }
+                            },
+                            "type": "value"
+                          },
+                          {
+                            "options": {
+                              "pattern": "chiller(\\d)",
+                              "result": {
+                                "index": 1,
+                                "text": "Chiller $1"
+                              }
+                            },
+                            "type": "regex"
+                          },
+                          {
+                            "options": {
+                              "pattern": "ct(\\d)",
+                              "result": {
+                                "index": 2,
+                                "text": "CT $1"
+                              }
+                            },
+                            "type": "regex"
+                          }
+                        ]
+                      }
+                    ]
                   }
                 ]
               },
@@ -630,6 +672,18 @@
       }
     },
     "links": [
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/plant-activity-audit-log.json"
+      },
       {
         "asDropdown": true,
         "icon": "external link",
