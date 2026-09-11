@@ -5367,6 +5367,230 @@
           }
         }
       },
+      "panel-40": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nchwp = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwp1\" or r[\"deviceId\"] == \"chwp2\" or r[\"deviceId\"] == \"chwp3\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group()\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e set(key: \"_field\", value: \"CHWP\")\n  |\u003e group()  \n\n\nchr = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chiller1\" or r[\"deviceId\"] == \"chiller2\" or r[\"deviceId\"] == \"chiller3\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group()\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e set(key: \"_field\", value: \"Chiller\")\n  |\u003e group()  \n\nfan = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"ct1Fan1\" or r[\"deviceId\"] == \"ct1Fan2\" or r[\"deviceId\"] == \"ct2Fan1\" or r[\"deviceId\"] == \"ct2Fan2\" or r[\"deviceId\"] == \"ct3Fan1\" or r[\"deviceId\"] == \"ct3Fan2\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group()\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e set(key: \"_field\", value: \"Fans\")\n  |\u003e group()\n\ncwp = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwp1\" or r[\"deviceId\"] == \"cwp2\" or r[\"deviceId\"] == \"cwp3\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group()\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e set(key: \"_field\", value: \"CWP\")\n  |\u003e group()\n\nunion(tables: [cwp, fan, chr, chwp])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ \n    r with Total: r.CHWP + r.CWP + r.Fans + r.Chiller\n  }))\n\n  |\u003e keep(columns: [\"CWP\", \"CHWP\", \"Chiller\", \"Fans\", \"Total\", \"_time\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "30m"
+              },
+              "transformations": [
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "CHWP": 3,
+                        "CWP": 4,
+                        "Chiller": 1,
+                        "Fans": 2,
+                        "_time": 0
+                      },
+                      "renameByName": {}
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 40,
+          "links": [],
+          "title": "Power Consumption Breakdown Trend",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "left",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 50,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 0,
+                    "pointSize": 1,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "normal"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "kwatt"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CHWP"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "purple",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Chiller"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Fans"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "orange",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CWP"
+                    },
+                    "properties": [
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "super-light-green",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": true,
+                          "tooltip": false,
+                          "viz": true
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "transparent",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": false,
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-5": {
         "kind": "Panel",
         "spec": {
@@ -6541,7 +6765,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-23"
+                          "name": "panel-40"
                         },
                         "height": 12,
                         "width": 24,
@@ -6554,9 +6778,9 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-24"
+                          "name": "panel-23"
                         },
-                        "height": 6,
+                        "height": 12,
                         "width": 24,
                         "x": 0,
                         "y": 99
@@ -6567,20 +6791,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-26"
-                        },
-                        "height": 6,
-                        "width": 24,
-                        "x": 0,
-                        "y": 105
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-34"
+                          "name": "panel-24"
                         },
                         "height": 6,
                         "width": 24,
@@ -6593,7 +6804,7 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
-                          "name": "panel-36"
+                          "name": "panel-26"
                         },
                         "height": 6,
                         "width": 24,
@@ -6606,12 +6817,38 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-34"
+                        },
+                        "height": 6,
+                        "width": 24,
+                        "x": 0,
+                        "y": 123
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-36"
+                        },
+                        "height": 6,
+                        "width": 24,
+                        "x": 0,
+                        "y": 129
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-28"
                         },
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 123
+                        "y": 135
                       }
                     },
                     {
@@ -6624,7 +6861,7 @@
                         "height": 5,
                         "width": 24,
                         "x": 0,
-                        "y": 135
+                        "y": 147
                       }
                     },
                     {
@@ -6637,7 +6874,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 140
+                        "y": 152
                       }
                     },
                     {
@@ -6650,7 +6887,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 146
+                        "y": 158
                       }
                     },
                     {
@@ -6663,7 +6900,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 152
+                        "y": 164
                       }
                     },
                     {
@@ -6676,7 +6913,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 0,
-                        "y": 158
+                        "y": 170
                       }
                     },
                     {
@@ -6689,7 +6926,7 @@
                         "height": 11,
                         "width": 12,
                         "x": 12,
-                        "y": 158
+                        "y": 170
                       }
                     },
                     {
@@ -6702,7 +6939,7 @@
                         "height": 11,
                         "width": 24,
                         "x": 0,
-                        "y": 169
+                        "y": 181
                       }
                     },
                     {
@@ -6715,7 +6952,7 @@
                         "height": 10,
                         "width": 24,
                         "x": 0,
-                        "y": 180
+                        "y": 192
                       }
                     }
                   ]
@@ -6922,8 +7159,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "9.980456666666665",
-            "value": "9.980456666666665"
+            "text": "10.137349999999998",
+            "value": "10.137349999999998"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
