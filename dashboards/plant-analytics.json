@@ -2231,7 +2231,9 @@
                   }
                 }
               ],
-              "queryOptions": {},
+              "queryOptions": {
+                "interval": "30m"
+              },
               "transformations": []
             }
           },
@@ -6875,8 +6877,8 @@
         "spec": {
           "allowCustomValue": true,
           "current": {
-            "text": "Auto",
-            "value": "v.windowPeriod"
+            "text": "Hourly",
+            "value": "1h"
           },
           "hide": "hideVariable",
           "includeAll": false,
