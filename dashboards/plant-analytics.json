@@ -4980,6 +4980,157 @@
           }
         }
       },
+      "panel-39": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"status\" or r[\"_measurement\"] == \"pressure\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"pressure\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /cwp\\d/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"deviceId\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with deviceId: strings.toUpper(v: r.deviceId)}))\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "1m"
+              },
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 39,
+          "links": [],
+          "title": "Pump Pressure",
+          "vizConfig": {
+            "group": "timeseries",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "palette-classic"
+                  },
+                  "custom": {
+                    "axisBorderShow": false,
+                    "axisCenteredZero": false,
+                    "axisColorMode": "text",
+                    "axisLabel": "",
+                    "axisPlacement": "auto",
+                    "barAlignment": 0,
+                    "barWidthFactor": 0.6,
+                    "drawStyle": "line",
+                    "fillOpacity": 0,
+                    "gradientMode": "none",
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineInterpolation": "linear",
+                    "lineWidth": 1,
+                    "pointSize": 5,
+                    "scaleDistribution": {
+                      "type": "linear"
+                    },
+                    "showPoints": "auto",
+                    "showValues": false,
+                    "spanNulls": false,
+                    "stacking": {
+                      "group": "A",
+                      "mode": "none"
+                    },
+                    "thresholdsStyle": {
+                      "mode": "off"
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  },
+                  "unit": "barg"
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "difference",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 50
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "hidden"
+                      },
+                      {
+                        "id": "min",
+                        "value": -1
+                      },
+                      {
+                        "id": "max",
+                        "value": 5
+                      }
+                    ]
+                  }
+                ]
+              },
+              "options": {
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "calcs": [],
+                  "displayMode": "list",
+                  "enableFacetedFilter": true,
+                  "facetedFilterPinned": false,
+                  "overflow": "wrap",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
       "panel-4": {
         "kind": "Panel",
         "spec": {
@@ -6544,12 +6695,25 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-39"
+                        },
+                        "height": 11,
+                        "width": 24,
+                        "x": 0,
+                        "y": 169
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-29"
                         },
                         "height": 10,
                         "width": 24,
                         "x": 0,
-                        "y": 169
+                        "y": 180
                       }
                     }
                   ]
@@ -6756,8 +6920,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "9.804093888888888",
-            "value": "9.804093888888888"
+            "text": "9.914326111111109",
+            "value": "9.914326111111109"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
