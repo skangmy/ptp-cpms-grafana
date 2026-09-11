@@ -1756,9 +1756,10 @@
                       "mode": "none"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "dashed+area"
                     }
                   },
+                  "max": 120,
                   "min": 0,
                   "thresholds": {
                     "mode": "absolute",
@@ -1766,6 +1767,18 @@
                       {
                         "color": "green",
                         "value": 0
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 80
+                      },
+                      {
+                        "color": "red",
+                        "value": 100
+                      },
+                      {
+                        "color": "purple",
+                        "value": 105
                       }
                     ]
                   },
