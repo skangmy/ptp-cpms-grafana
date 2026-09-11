@@ -1712,7 +1712,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Shows compressor motor loading as a percentage of nameplate RLA. OEM Maximum Amps = 100% RLA; at 5% above the maximum limit, compressor unloading begins.\n\n0–80%      Normal | \n80–100%    High load | \n100%       OEM maximum | \n≥105%      Unloading region",
           "id": 19,
           "links": [],
           "title": "Compressor RLA %",
@@ -1971,7 +1971,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Shows compressor speed and motor current to monitor compressor loading and response to changing load. ",
           "id": 20,
           "links": [],
           "title": "Compressor RPM \u0026 Current",
@@ -2665,7 +2665,7 @@
                       "mode": "none"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "dashed+area"
                     }
                   },
                   "thresholds": {
@@ -2674,6 +2674,18 @@
                       {
                         "color": "green",
                         "value": 0
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 0.6
+                      },
+                      {
+                        "color": "orange",
+                        "value": 0.8
+                      },
+                      {
+                        "color": "red",
+                        "value": 2.7
                       }
                     ]
                   },
@@ -2840,7 +2852,7 @@
                       "mode": "none"
                     },
                     "thresholdsStyle": {
-                      "mode": "off"
+                      "mode": "dashed+area"
                     }
                   },
                   "thresholds": {
@@ -2849,6 +2861,18 @@
                       {
                         "color": "green",
                         "value": 0
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 0.6
+                      },
+                      {
+                        "color": "orange",
+                        "value": 0.8
+                      },
+                      {
+                        "color": "red",
+                        "value": 2.7
                       }
                     ]
                   },
@@ -5186,8 +5210,8 @@
                           "kind": "ElementReference",
                           "name": "panel-19"
                         },
-                        "height": 10,
-                        "width": 24,
+                        "height": 11,
+                        "width": 12,
                         "x": 0,
                         "y": 130
                       }
@@ -5199,10 +5223,10 @@
                           "kind": "ElementReference",
                           "name": "panel-20"
                         },
-                        "height": 10,
-                        "width": 24,
-                        "x": 0,
-                        "y": 140
+                        "height": 11,
+                        "width": 12,
+                        "x": 12,
+                        "y": 130
                       }
                     }
                   ]
