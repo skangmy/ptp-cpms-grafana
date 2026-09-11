@@ -431,7 +431,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\nimport \"strings\"\n\nbucket = \"cpms\"\nwindow = 15m\n\nload =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller\\dChw/)\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      deviceId: r.deviceId,\n      loadRt: r._value * 78.986,\n    }))\n    |\u003e group()\n\n\npower =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      loadId: r.deviceId + \"Chw\",\n      powerKw: r._value,\n    }))\n    //|\u003e group(columns: [\"deviceId\"])\n    |\u003e group()\n\nrunning =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller/)\n    |\u003e aggregateWindow(every: window, fn: sum, createEmpty: false)\n    |\u003e filter(fn: (r) =\u003e r._value \u003e 10)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      running: r._value,\n    }))\n    |\u003e group()\n\nloadPower =\n  join.inner(\n    left: load,\n    right: power,\n    on: (l, r) =\u003e l._time == r._time and l.deviceId == r.loadId,\n    as: (l, r) =\u003e ({\n      _time: l._time,\n      chillerId: r.chillerId,\n      loadRt: l.loadRt,\n      powerKw: r.powerKw,\n    }),\n  )\n\njoin.inner(\n  left: loadPower,\n  right: running,\n  on: (l, r) =\u003e l._time == r._time and l.chillerId == r.chillerId,\n  as: (l, r) =\u003e ({\n    chillerId: l.chillerId,\n    loadRt: l.loadRt,\n    kwPerRt: if l.loadRt \u003e 0.0 then l.powerKw / l.loadRt else 0.0,\n  }),\n)\n  |\u003e filter(fn: (r) =\u003e r.loadRt \u003e 0.0 and r.kwPerRt \u003e 0.0)\n  |\u003e group(columns: [\"chillerId\"])"
+                        "query": "import \"join\"\nimport \"strings\"\n\nbucket = \"cpms\"\nwindow = 15m\n\nload =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller\\dChw/)\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      deviceId: r.deviceId,\n      loadRt: r._value * 78.986,\n    }))\n    |\u003e group()\n\n\npower =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"power\")\n    |\u003e filter(fn: (r) =\u003e r.category == \"chiller\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"totalPower\")\n    |\u003e aggregateWindow(every: window, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      loadId: r.deviceId + \"Chw\",\n      powerKw: r._value,\n    }))\n    //|\u003e group(columns: [\"deviceId\"])\n    |\u003e group()\n\nrunning =\n  from(bucket: bucket)\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"run\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller/)\n    |\u003e aggregateWindow(every: window, fn: sum, createEmpty: false)\n    |\u003e filter(fn: (r) =\u003e r._value \u003e 10)\n    |\u003e map(fn: (r) =\u003e ({\n      _time: r._time,\n      chillerId: r.deviceId,\n      running: r._value,\n    }))\n    |\u003e group()\n\nloadPower =\n  join.inner(\n    left: load,\n    right: power,\n    on: (l, r) =\u003e l._time == r._time and l.deviceId == r.loadId,\n    as: (l, r) =\u003e ({\n      _time: l._time,\n      chillerId: r.chillerId,\n      loadRt: l.loadRt,\n      powerKw: r.powerKw,\n    }),\n  )\n\njoin.inner(\n  left: loadPower,\n  right: running,\n  on: (l, r) =\u003e l._time == r._time and l.chillerId == r.chillerId,\n  as: (l, r) =\u003e ({\n    _field: l.chillerId,\n    loadRt: l.loadRt,\n    _value: if l.loadRt \u003e 0.0 then l.powerKw / l.loadRt else 0.0,\n  }),\n)\n  |\u003e filter(fn: (r) =\u003e r.loadRt \u003e 0.0 and r._value \u003e 0.0)\n  |\u003e pivot(rowKey: [\"loadRt\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
                       },
                       "version": "v0"
                     },
@@ -446,18 +446,8 @@
                   "kind": "Transformation",
                   "spec": {
                     "options": {
-                      "regex": "kwPerRt (.*)",
-                      "renamePattern": "Efficiency $1"
-                    }
-                  }
-                },
-                {
-                  "group": "renameByRegex",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "regex": "loadRt (.*)",
-                      "renamePattern": "Cooling Load $1"
+                      "regex": "chiller(\\d)",
+                      "renamePattern": "Chiller$1"
                     }
                   }
                 }
@@ -481,7 +471,7 @@
                     "axisBorderShow": false,
                     "axisCenteredZero": false,
                     "axisColorMode": "text",
-                    "axisLabel": "",
+                    "axisLabel": "Efficiency",
                     "axisPlacement": "auto",
                     "fillOpacity": 90,
                     "hideFrom": {
@@ -498,7 +488,7 @@
                     },
                     "pointShape": "circle",
                     "pointSize": {
-                      "fixed": 5
+                      "fixed": 10
                     },
                     "pointStrokeWidth": 1,
                     "scaleDistribution": {
@@ -524,10 +514,32 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "kwPerRt",
+                      "options": "loadRt",
                       "scope": "series"
                     },
-                    "properties": []
+                    "properties": [
+                      {
+                        "id": "custom.axisLabel",
+                        "value": "Cooling Load"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "RT"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byRegexp",
+                      "options": "/Chiller.*/",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "kW/RT"
+                      }
+                    ]
                   }
                 ]
               },
@@ -539,7 +551,7 @@
                   "placement": "bottom",
                   "showLegend": true
                 },
-                "mapping": "manual",
+                "mapping": "auto",
                 "series": [
                   {
                     "frame": {
@@ -548,65 +560,10 @@
                         "options": 0
                       }
                     },
-                    "name": {
-                      "fixed": "Chiller1"
-                    },
                     "x": {
                       "matcher": {
                         "id": "byName",
-                        "options": "Cooling Load chiller1"
-                      }
-                    },
-                    "y": {
-                      "matcher": {
-                        "id": "byName",
-                        "options": "Efficiency chiller1"
-                      }
-                    }
-                  },
-                  {
-                    "frame": {
-                      "matcher": {
-                        "id": "byIndex",
-                        "options": 1
-                      }
-                    },
-                    "name": {
-                      "fixed": "Chiller2"
-                    },
-                    "x": {
-                      "matcher": {
-                        "id": "byName",
-                        "options": "Cooling Load chiller2"
-                      }
-                    },
-                    "y": {
-                      "matcher": {
-                        "id": "byName",
-                        "options": "Efficiency chiller2"
-                      }
-                    }
-                  },
-                  {
-                    "frame": {
-                      "matcher": {
-                        "id": "byIndex",
-                        "options": 2
-                      }
-                    },
-                    "name": {
-                      "fixed": "Chiller3"
-                    },
-                    "x": {
-                      "matcher": {
-                        "id": "byName",
-                        "options": "Cooling Load chiller3"
-                      }
-                    },
-                    "y": {
-                      "matcher": {
-                        "id": "byName",
-                        "options": "Efficiency chiller3"
+                        "options": "loadRt"
                       }
                     }
                   }
@@ -1220,7 +1177,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"strings\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e set(key: \"_field\", value: \"power\")\n  |\u003e group()\n\nrt = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\dChw/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with deviceId: strings.substring(v: r.deviceId, start: 0, end: 8) }))\n  |\u003e set(key: \"_field\", value: \"coolingLoad\")\n  |\u003e group()\n\nunion(tables: [rt, power])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    deviceId: r.deviceId,\n    efficiency: r.power / (r.coolingLoad * ${GJ_TO_RT})\n  }))\n  |\u003e sort(columns: [\"efficiency\"], desc: true)\n"
+                        "query": "import \"strings\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e set(key: \"_field\", value: \"power\")\n  |\u003e group()\n\nrt = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\dChw/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with deviceId: strings.substring(v: r.deviceId, start: 0, end: 8) }))\n  |\u003e set(key: \"_field\", value: \"coolingLoad\")\n  |\u003e group()\n\nunion(tables: [rt, power])\n  |\u003e pivot(rowKey: [\"deviceId\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    deviceId: r.deviceId,\n    efficiency: if r.coolingLoad \u003e 0.0 then r.power / (r.coolingLoad * ${GJ_TO_RT}) else 0.0\n  }))\n  |\u003e sort(columns: [\"efficiency\"], desc: true)\n"
                       },
                       "version": "v0"
                     },
@@ -1229,7 +1186,24 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "sortBy",
+                  "kind": "Transformation",
+                  "spec": {
+                    "disabled": true,
+                    "options": {
+                      "fields": {},
+                      "sort": [
+                        {
+                          "desc": true,
+                          "field": "efficiency"
+                        }
+                      ]
+                    }
+                  }
+                }
+              ]
             }
           },
           "description": "",
@@ -2355,10 +2329,10 @@
               ]
             }
           },
-          "description": "",
+          "description": "Monitors evaporator saturated temperature and suction temperature to assess refrigerant-side operating conditions.",
           "id": 22,
           "links": [],
-          "title": "Evaporator Side Temperature",
+          "title": "Evaporator \u0026 Suction Temperature",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -2510,10 +2484,10 @@
               ]
             }
           },
-          "description": "",
+          "description": "Monitors condenser saturated temperature and discharge temperature to assess condenser and compressor operating conditions.",
           "id": 23,
           "links": [],
-          "title": "Condenser Side Temperature",
+          "title": "Condenser \u0026 Discharge Temperature",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -2647,7 +2621,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Indicates evaporator heat-transfer condition and can be used to monitor tube fouling. \n\nTypical Daikin approach is 0.6–0.8°C; an increase of 2°C or more from the baseline may indicate excessive dirt/fouling.\n\nBaseline: 0.7 °C",
           "id": 24,
           "links": [],
           "title": "Evaporator Approach",
@@ -2822,7 +2796,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Indicates condenser heat-transfer condition and can be used to monitor tube fouling. \n\n\nTypical Daikin approach is 0.6–0.8°C; an increase of 2°C or more from the baseline may indicate excessive dirt/fouling.\n\nBaseline: 0.7 °C",
           "id": 25,
           "links": [],
           "title": "Condenser Approach",
@@ -2979,7 +2953,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Shows the refrigerant pressure difference between discharge and suction.",
           "id": 26,
           "links": [],
           "title": "Lift",
@@ -3141,7 +3115,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Suction Superheat = Suction Temperature − Evaporator Saturated Temperature.\n\nFull-load reference: 0.3–1.2°C.",
           "id": 27,
           "links": [],
           "title": "Suction Superheat",
@@ -3299,7 +3273,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Discharge Superheat = Discharge Temperature − Condenser Saturated Temperature.\n\nFull-load reference: 3–7°C.",
           "id": 28,
           "links": [],
           "title": "Discharge Superheat",
@@ -3422,7 +3396,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"math\"\n\nchillerId = \"${selected_chiller}\"\n\npackageWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"water\" and r.deviceId == chillerId)\n        |\u003e filter(fn: (r) =\u003e r._field == \"evapLWT\")\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nheaderWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(\n            fn: (r) =\u003e\n                r._measurement == \"flow\" and\n                    ((r.deviceId == \"chwHeader\" and r._field == \"chws\"))\n        )\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nunion(tables: [packageWater, headerWater])\n\t|\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n    |\u003e map(\n        fn: (r) =\u003e ({\n            r with\n            agreement: math.abs(x: r.evapLWT - r.chws),\n        })\n    )\n"
+                        "query": "import \"math\"\n\nchillerId = \"${selected_chiller}\"\n\npackageWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"water\" and r.deviceId == chillerId)\n        |\u003e filter(fn: (r) =\u003e r._field == \"evapLWT\")\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nheaderWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(\n            fn: (r) =\u003e\n                r._measurement == \"flow\" and\n                    ((r.deviceId == \"chwHeader\" and r._field == \"chws\"))\n        )\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nunion(tables: [packageWater, headerWater])\n\t|\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n    |\u003e map(\n        fn: (r) =\u003e ({\n            r with\n            agreement: math.abs(x: r.evapLWT - r.chws),\n            threshold: 0.6\n        })\n    )\n"
                       },
                       "version": "v0"
                     },
@@ -3467,7 +3441,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Compares Evaporator Leaving Water Temperature (Evap LWT) and Chilled Water Supply Temperature (CHWS) to verify sensor/data consistency. \n\nTemperature Difference ≤0.6°C indicates acceptable agreement; \u003e0.6°C requires checking. \n\nThis is a sensor validation criterion, not a Daikin equipment limit.",
           "id": 29,
           "links": [],
           "title": "Evap LWT vs CHWS Agreement",
@@ -3514,6 +3488,7 @@
                       "mode": "off"
                     }
                   },
+                  "decimals": 1,
                   "min": 0,
                   "thresholds": {
                     "mode": "absolute",
@@ -3542,6 +3517,41 @@
                             10
                           ],
                           "fill": "dash"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "threshold",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "displayName",
+                        "value": "Agreement Threshold"
+                      },
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "dash": [
+                            10,
+                            10
+                          ],
+                          "fill": "dash"
+                        }
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
+                      },
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": true,
+                          "tooltip": false,
+                          "viz": false
                         }
                       }
                     ]
@@ -3806,7 +3816,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"math\"\n\nchillerId = \"${selected_chiller}\"\n\npackageWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"water\" and r.deviceId == chillerId)\n        |\u003e filter(fn: (r) =\u003e r._field == \"condEWT\")\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nheaderWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(\n            fn: (r) =\u003e\n                r._measurement == \"flow\" and\n                    ((r.deviceId == \"cwHeader\" and r._field == \"cws\"))\n        )\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nunion(tables: [packageWater, headerWater])\n\t|\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n    |\u003e map(\n        fn: (r) =\u003e ({\n            r with\n            agreement: math.abs(x: r.condEWT - r.cws),\n        })\n    )\n"
+                        "query": "import \"math\"\n\nchillerId = \"${selected_chiller}\"\n\npackageWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"water\" and r.deviceId == chillerId)\n        |\u003e filter(fn: (r) =\u003e r._field == \"condEWT\")\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nheaderWater =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(\n            fn: (r) =\u003e\n                r._measurement == \"flow\" and\n                    ((r.deviceId == \"cwHeader\" and r._field == \"cws\"))\n        )\n        |\u003e aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: false)\n        |\u003e group()\n\nunion(tables: [packageWater, headerWater])\n\t|\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n    |\u003e map(\n        fn: (r) =\u003e ({\n            r with\n            agreement: math.abs(x: r.condEWT - r.cws),\n            threshold: 0.6\n        })\n    )\n"
                       },
                       "version": "v0"
                     },
@@ -3847,11 +3857,25 @@
                       "renamePattern": "Agreement"
                     }
                   }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {},
+                      "renameByName": {
+                        "threshold": "Agreement Threshold"
+                      }
+                    }
+                  }
                 }
               ]
             }
           },
-          "description": "",
+          "description": "Compares Condenser Entering Water Temperature (Cond EWT) and Condenser Water Supply Temperature (CWS) to verify sensor/data consistency. \n\nTemperature Difference ≤0.6°C indicates acceptable agreement; \u003e0.6°C requires checking. \n\nThis is a sensor validation criterion, not a Daikin equipment limit.",
           "id": 30,
           "links": [],
           "title": "Cond EWT vs CWS Agreement",
@@ -3898,6 +3922,7 @@
                       "mode": "off"
                     }
                   },
+                  "decimals": 1,
                   "min": 0,
                   "thresholds": {
                     "mode": "absolute",
@@ -3914,10 +3939,26 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "Avg",
+                      "options": "Agreement",
+                      "scope": "series"
+                    },
+                    "properties": []
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "threshold",
                       "scope": "series"
                     },
                     "properties": [
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": true,
+                          "tooltip": false,
+                          "viz": false
+                        }
+                      },
                       {
                         "id": "custom.lineStyle",
                         "value": {
@@ -3927,6 +3968,10 @@
                           ],
                           "fill": "dash"
                         }
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
                       }
                     ]
                   }
@@ -3948,7 +3993,7 @@
                 "tooltip": {
                   "hideZeros": false,
                   "mode": "multi",
-                  "sort": "none"
+                  "sort": "asc"
                 }
               }
             },
@@ -4717,8 +4762,12 @@
                   "multiLane": false
                 },
                 "legend": {
-                  "calcs": [],
-                  "displayMode": "list",
+                  "calcs": [
+                    "min",
+                    "max",
+                    "mean"
+                  ],
+                  "displayMode": "table",
                   "enableFacetedFilter": false,
                   "overflow": "ellipsis",
                   "placement": "bottom",
@@ -4781,9 +4830,9 @@
                           "name": "panel-3"
                         },
                         "height": 9,
-                        "width": 15,
+                        "width": 24,
                         "x": 0,
-                        "y": 5
+                        "y": 7
                       }
                     },
                     {
@@ -4802,7 +4851,7 @@
                         },
                         "width": 24,
                         "x": 0,
-                        "y": 14
+                        "y": 16
                       }
                     },
                     {
@@ -4815,7 +4864,7 @@
                         "height": 2,
                         "width": 24,
                         "x": 0,
-                        "y": 37
+                        "y": 39
                       }
                     },
                     {
@@ -4828,7 +4877,7 @@
                         "height": 27,
                         "width": 24,
                         "x": 0,
-                        "y": 39
+                        "y": 41
                       }
                     }
                   ]
@@ -4852,9 +4901,35 @@
                           "name": "panel-10"
                         },
                         "height": 2,
-                        "width": 8,
+                        "width": 24,
                         "x": 0,
                         "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-12"
+                        },
+                        "height": 10,
+                        "width": 16,
+                        "x": 0,
+                        "y": 2
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-16"
+                        },
+                        "height": 10,
+                        "width": 8,
+                        "x": 16,
+                        "y": 2
                       }
                     },
                     {
@@ -4867,7 +4942,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 2
+                        "y": 12
                       }
                     },
                     {
@@ -4880,20 +4955,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 8
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-12"
-                        },
-                        "height": 10,
-                        "width": 12,
-                        "x": 0,
-                        "y": 14
+                        "y": 18
                       }
                     },
                     {
@@ -4904,9 +4966,22 @@
                           "name": "panel-9"
                         },
                         "height": 10,
-                        "width": 12,
-                        "x": 12,
-                        "y": 14
+                        "width": 24,
+                        "x": 0,
+                        "y": 24
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-15"
+                        },
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 34
                       }
                     },
                     {
@@ -4919,7 +4994,7 @@
                         "height": 10,
                         "width": 12,
                         "x": 0,
-                        "y": 24
+                        "y": 43
                       }
                     },
                     {
@@ -4932,45 +5007,6 @@
                         "height": 10,
                         "width": 12,
                         "x": 12,
-                        "y": 24
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-15"
-                        },
-                        "height": 9,
-                        "width": 17,
-                        "x": 0,
-                        "y": 34
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-16"
-                        },
-                        "height": 9,
-                        "width": 7,
-                        "x": 17,
-                        "y": 34
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-17"
-                        },
-                        "height": 14,
-                        "width": 12,
-                        "x": 0,
                         "y": 43
                       }
                     },
@@ -4981,10 +5017,23 @@
                           "kind": "ElementReference",
                           "name": "panel-18"
                         },
-                        "height": 14,
-                        "width": 12,
-                        "x": 12,
-                        "y": 43
+                        "height": 9,
+                        "width": 24,
+                        "x": 0,
+                        "y": 53
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-17"
+                        },
+                        "height": 10,
+                        "width": 24,
+                        "x": 0,
+                        "y": 62
                       }
                     },
                     {
@@ -4995,139 +5044,9 @@
                           "name": "panel-11"
                         },
                         "height": 2,
-                        "width": 6,
-                        "x": 0,
-                        "y": 57
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-19"
-                        },
-                        "height": 10,
                         "width": 24,
                         "x": 0,
-                        "y": 59
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-20"
-                        },
-                        "height": 10,
-                        "width": 24,
-                        "x": 0,
-                        "y": 69
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-21"
-                        },
-                        "height": 10,
-                        "width": 24,
-                        "x": 0,
-                        "y": 79
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-22"
-                        },
-                        "height": 12,
-                        "width": 12,
-                        "x": 0,
-                        "y": 89
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-23"
-                        },
-                        "height": 12,
-                        "width": 12,
-                        "x": 12,
-                        "y": 89
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-24"
-                        },
-                        "height": 12,
-                        "width": 12,
-                        "x": 0,
-                        "y": 101
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-25"
-                        },
-                        "height": 12,
-                        "width": 12,
-                        "x": 12,
-                        "y": 101
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-26"
-                        },
-                        "height": 10,
-                        "width": 24,
-                        "x": 0,
-                        "y": 113
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-27"
-                        },
-                        "height": 10,
-                        "width": 12,
-                        "x": 0,
-                        "y": 123
-                      }
-                    },
-                    {
-                      "kind": "GridLayoutItem",
-                      "spec": {
-                        "element": {
-                          "kind": "ElementReference",
-                          "name": "panel-28"
-                        },
-                        "height": 10,
-                        "width": 12,
-                        "x": 12,
-                        "y": 123
+                        "y": 72
                       }
                     },
                     {
@@ -5140,7 +5059,7 @@
                         "height": 10,
                         "width": 12,
                         "x": 0,
-                        "y": 133
+                        "y": 74
                       }
                     },
                     {
@@ -5153,7 +5072,137 @@
                         "height": 10,
                         "width": 12,
                         "x": 12,
-                        "y": 133
+                        "y": 74
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-24"
+                        },
+                        "height": 12,
+                        "width": 12,
+                        "x": 0,
+                        "y": 84
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-25"
+                        },
+                        "height": 12,
+                        "width": 12,
+                        "x": 12,
+                        "y": 84
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-26"
+                        },
+                        "height": 11,
+                        "width": 12,
+                        "x": 0,
+                        "y": 96
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-21"
+                        },
+                        "height": 11,
+                        "width": 12,
+                        "x": 12,
+                        "y": 96
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-27"
+                        },
+                        "height": 11,
+                        "width": 12,
+                        "x": 0,
+                        "y": 107
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-22"
+                        },
+                        "height": 11,
+                        "width": 12,
+                        "x": 12,
+                        "y": 107
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-28"
+                        },
+                        "height": 12,
+                        "width": 12,
+                        "x": 0,
+                        "y": 118
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-23"
+                        },
+                        "height": 12,
+                        "width": 12,
+                        "x": 12,
+                        "y": 118
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-19"
+                        },
+                        "height": 10,
+                        "width": 24,
+                        "x": 0,
+                        "y": 130
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-20"
+                        },
+                        "height": 10,
+                        "width": 24,
+                        "x": 0,
+                        "y": 140
                       }
                     }
                   ]
@@ -5222,7 +5271,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-6h",
+      "from": "now-24h",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
