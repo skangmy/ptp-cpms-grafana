@@ -2608,11 +2608,29 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"requiredChillers\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: true, timeSrc: \"_start\")\n  |\u003e rename(columns: {_value: \"Chiller Needed\"})\n  |\u003e keep(columns: [\"_time\", \"Chiller Needed\"])"
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"requiredChillers\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: true, timeSrc: \"_start\")\n  |\u003e rename(columns: {_value: \"Chiller Needed\"})\n  |\u003e keep(columns: [\"_time\", \"Chiller Needed\"])"
                       },
                       "version": "v0"
                     },
                     "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"state\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: true)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: if r._value == 2 then 1.0 else 0.0 }))\n  |\u003e group()\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: true, timeSrc: \"_start\")\n  |\u003e rename(columns: {_value: \"Active Chiller\"})\n  |\u003e keep(columns: [\"_time\", \"Active Chiller\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
                   }
                 }
               ],
@@ -2664,7 +2682,7 @@
                     "spanNulls": false,
                     "stacking": {
                       "group": "A",
-                      "mode": "normal"
+                      "mode": "none"
                     },
                     "thresholdsStyle": {
                       "mode": "off"
@@ -2702,7 +2720,8 @@
                         "value": "stepAfter"
                       },
                       {
-                        "id": "unit"
+                        "id": "unit",
+                        "value": "short"
                       },
                       {
                         "id": "custom.spanNulls",
@@ -2722,6 +2741,56 @@
                       {
                         "id": "custom.lineWidth",
                         "value": 3
+                      },
+                      {
+                        "id": "custom.gradientMode",
+                        "value": "none"
+                      },
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "dash": [
+                            50,
+                            10
+                          ],
+                          "fill": "dash"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Active Chiller",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.lineInterpolation",
+                        "value": "stepAfter"
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 3
+                      },
+                      {
+                        "id": "custom.drawStyle",
+                        "value": "line"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "short"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
                       },
                       {
                         "id": "custom.gradientMode",
@@ -3335,11 +3404,29 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"requiredCoolingTowers\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: true, timeSrc: \"_start\")\n  |\u003e rename(columns: {_value: \"CT Needed\"})\n  |\u003e keep(columns: [\"_time\", \"CT Needed\"])"
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"requiredCoolingTowers\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: true, )\n  |\u003e rename(columns: {_value: \"CT Needed\"})\n  |\u003e keep(columns: [\"_time\", \"CT Needed\"])"
                       },
                       "version": "v0"
                     },
                     "refId": "B"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"state\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /ct\\d/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: true)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: if r._value == 2 then 1.0 else 0.0 }))\n  |\u003e group()\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: true, timeSrc: \"_start\")\n  |\u003e rename(columns: {_value: \"Active CT\"})\n  |\u003e keep(columns: [\"_time\", \"Active CT\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "C"
                   }
                 }
               ],
@@ -3391,7 +3478,7 @@
                     "spanNulls": false,
                     "stacking": {
                       "group": "A",
-                      "mode": "normal"
+                      "mode": "none"
                     },
                     "thresholdsStyle": {
                       "mode": "off"
@@ -3429,7 +3516,8 @@
                         "value": "stepAfter"
                       },
                       {
-                        "id": "unit"
+                        "id": "unit",
+                        "value": "short"
                       },
                       {
                         "id": "custom.spanNulls",
@@ -3453,6 +3541,56 @@
                       {
                         "id": "custom.gradientMode",
                         "value": "none"
+                      },
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "dash": [
+                            50,
+                            10
+                          ],
+                          "fill": "dash"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Active CT",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.drawStyle",
+                        "value": "line"
+                      },
+                      {
+                        "id": "unit",
+                        "value": "short"
+                      },
+                      {
+                        "id": "custom.lineInterpolation",
+                        "value": "stepAfter"
+                      },
+                      {
+                        "id": "custom.fillOpacity",
+                        "value": 0
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 3
+                      },
+                      {
+                        "id": "custom.gradientMode",
+                        "value": "none"
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "green",
+                          "mode": "fixed"
+                        }
                       }
                     ]
                   }
@@ -5674,8 +5812,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "4.507897777777777",
-            "value": "4.507897777777777"
+            "text": "8.575487222222225",
+            "value": "8.575487222222225"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
