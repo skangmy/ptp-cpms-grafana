@@ -3276,7 +3276,7 @@
                   "spec": {
                     "options": {
                       "regex": "ct(.*)",
-                      "renamePattern": "CT $1"
+                      "renamePattern": "CT$1"
                     }
                   }
                 }
@@ -4150,7 +4150,7 @@
                   "spec": {
                     "options": {
                       "regex": "ct(.*)",
-                      "renamePattern": "CT $1"
+                      "renamePattern": "CT$1"
                     }
                   }
                 }
@@ -4352,6 +4352,262 @@
                 "tooltip": {
                   "hideZeros": false,
                   "mode": "multi",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-35": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"priority\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct/)\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |\u003e keep(columns:[\"deviceId\", \"_time\", \"_value\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "ct(.*)",
+                      "renamePattern": "CT$1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 35,
+          "links": [],
+          "title": "",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#8e8e8e",
+                          "index": 0,
+                          "text": "STANDBY"
+                        },
+                        "1": {
+                          "color": "light-blue",
+                          "index": 1,
+                          "text": "LAG"
+                        },
+                        "2": {
+                          "color": "green",
+                          "index": 2,
+                          "text": "LEAD"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "center",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.85,
+                "showValue": "auto",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
+                  "sort": "none"
+                }
+              }
+            },
+            "version": "13.1.0"
+          }
+        }
+      },
+      "panel-36": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"packageStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"priority\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller/)\n  |\u003e aggregateWindow(every: v.windowPeriod, fn: max, createEmpty: false)\n  |\u003e keep(columns:[\"deviceId\", \"_time\", \"_value\"])"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {
+                "interval": "5m"
+              },
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "chiller(.*)",
+                      "renamePattern": "Chiller $1"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "description": "",
+          "id": 36,
+          "links": [],
+          "title": "",
+          "vizConfig": {
+            "group": "state-timeline",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "fixed"
+                  },
+                  "custom": {
+                    "axisPlacement": "auto",
+                    "fillOpacity": 70,
+                    "hideFrom": {
+                      "legend": false,
+                      "tooltip": false,
+                      "viz": false
+                    },
+                    "insertNulls": false,
+                    "lineWidth": 0,
+                    "spanNulls": false
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "0": {
+                          "color": "#8e8e8e",
+                          "index": 0,
+                          "text": "STANDBY"
+                        },
+                        "1": {
+                          "color": "light-blue",
+                          "index": 1,
+                          "text": "LAG"
+                        },
+                        "2": {
+                          "color": "green",
+                          "index": 2,
+                          "text": "LEAD"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alignValue": "center",
+                "annotations": {
+                  "clustering": -1,
+                  "multiLane": false
+                },
+                "legend": {
+                  "displayMode": "list",
+                  "overflow": "ellipsis",
+                  "placement": "bottom",
+                  "showLegend": true
+                },
+                "mergeValues": true,
+                "rowHeight": 0.85,
+                "showValue": "auto",
+                "tooltip": {
+                  "hideZeros": false,
+                  "mode": "single",
                   "sort": "none"
                 }
               }
@@ -5820,12 +6076,25 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-36"
+                        },
+                        "height": 6,
+                        "width": 24,
+                        "x": 0,
+                        "y": 117
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-28"
                         },
                         "height": 12,
                         "width": 24,
                         "x": 0,
-                        "y": 117
+                        "y": 123
                       }
                     },
                     {
@@ -5838,7 +6107,7 @@
                         "height": 5,
                         "width": 24,
                         "x": 0,
-                        "y": 129
+                        "y": 135
                       }
                     },
                     {
@@ -5851,7 +6120,7 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 134
+                        "y": 140
                       }
                     },
                     {
@@ -5864,7 +6133,20 @@
                         "height": 6,
                         "width": 24,
                         "x": 0,
-                        "y": 140
+                        "y": 146
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-35"
+                        },
+                        "height": 6,
+                        "width": 24,
+                        "x": 0,
+                        "y": 152
                       }
                     },
                     {
@@ -5877,7 +6159,7 @@
                         "height": 10,
                         "width": 24,
                         "x": 0,
-                        "y": 146
+                        "y": 158
                       }
                     }
                   ]
@@ -6084,8 +6366,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "9.292356666666667",
-            "value": "9.292356666666667"
+            "text": "9.427870555555556",
+            "value": "9.427870555555556"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
