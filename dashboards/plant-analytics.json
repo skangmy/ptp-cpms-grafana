@@ -687,6 +687,10 @@
                           "fixedColor": "purple",
                           "mode": "fixed"
                         }
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
                       }
                     ]
                   }
@@ -734,7 +738,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cws\" or r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"deltaT\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with _field: if r._field != \"deltaT\" then strings.toUpper(v: r._field) else \"ΔT\"}))"
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"cwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cws\" or r[\"_field\"] == \"cwr\" or r[\"_field\"] == \"deltaT\" or r._field == \"flowRate\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  |\u003e map(fn: (r) =\u003e ({ r with _field: if r._field != \"deltaT\" then strings.toUpper(v: r._field) else \"ΔT\"}))"
                       },
                       "version": "v0"
                     },
@@ -744,7 +748,7 @@
                 {
                   "kind": "PanelQuery",
                   "spec": {
-                    "hidden": true,
+                    "hidden": false,
                     "query": {
                       "datasource": {
                         "name": "cpms-influxdb"
@@ -752,7 +756,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * ${GJ_TO_RT}})) // convert to RT\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
+                        "query": "import \"strings\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e set(key: \"_field\", value: \"Setpoint\")\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n"
                       },
                       "version": "v0"
                     },
@@ -767,8 +771,8 @@
                   "kind": "Transformation",
                   "spec": {
                     "options": {
-                      "regex": "energyFlowRate",
-                      "renamePattern": "Cooling Load"
+                      "regex": "FLOWRATE",
+                      "renamePattern": "Flow Rate"
                     }
                   }
                 }
@@ -848,6 +852,53 @@
                       {
                         "id": "unit",
                         "value": "RT"
+                      },
+                      {
+                        "id": "custom.axisPlacement",
+                        "value": "left"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Setpoint",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.lineStyle",
+                        "value": {
+                          "dash": [
+                            10,
+                            10
+                          ],
+                          "fill": "dash"
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "dark-purple",
+                          "mode": "fixed"
+                        }
+                      },
+                      {
+                        "id": "custom.lineWidth",
+                        "value": 2
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "FLOWRATE",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "unit",
+                        "value": "m3/h"
                       },
                       {
                         "id": "custom.axisPlacement",
@@ -5600,8 +5651,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "4.446809444444444",
-            "value": "4.446809444444444"
+            "text": "4.507897777777777",
+            "value": "4.507897777777777"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
