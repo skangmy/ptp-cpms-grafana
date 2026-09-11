@@ -4699,6 +4699,13 @@
                           "tooltip": false,
                           "viz": true
                         }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "transparent",
+                          "mode": "fixed"
+                        }
                       }
                     ]
                   }
