@@ -5436,7 +5436,7 @@
         "1d"
       ],
       "fiscalYearStartMonth": 0,
-      "from": "now-24h",
+      "from": "now/d",
       "hideTimepicker": false,
       "timezone": "browser",
       "to": "now"
@@ -5574,8 +5574,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "59.90237055555554",
-            "value": "59.90237055555554"
+            "text": "4.138064999999998",
+            "value": "4.138064999999998"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
