@@ -339,7 +339,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"packageStatus\")\n    |\u003e filter(fn: (r) =\u003e r.kind == \"chiller_package\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"coolingLoad\")\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n        r with\n        _field: r.deviceId\n    }))\n    |\u003e keep(columns: [\"_field\", \"_time\", \"_value\"])\n"
+                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nraw = from(bucket: \"cpms\")\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId =~ /chiller\\dChw/)\n    |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n    \n    \nchrs = raw\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n        r with\n        _field: r.deviceId,\n        _value: r._value * ${GJ_TO_RT}\n    }))\n    |\u003e keep(columns: [\"_field\", \"_time\", \"_value\"])\n\ntotal = raw \n    |\u003e group(columns: [\"_field\"])\n    |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n    |\u003e map(fn: (r) =\u003e ({\n        r with\n        _field: \"Total\",\n        _value: r._value * ${GJ_TO_RT}\n    }))\n    |\u003e keep(columns: [\"_field\", \"_time\", \"_value\"])\n\nunion(tables: [total, chrs])"
                       },
                       "version": "v0"
                     },
@@ -356,7 +356,7 @@
                   "kind": "Transformation",
                   "spec": {
                     "options": {
-                      "regex": "chiller(.*)",
+                      "regex": "chiller(.*)Chw",
                       "renamePattern": "Chiller $1"
                     }
                   }
@@ -430,7 +430,8 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "chiller1"
+                      "options": "chiller1Chw",
+                      "scope": "series"
                     },
                     "properties": [
                       {
@@ -445,7 +446,8 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "chiller2"
+                      "options": "chiller2Chw",
+                      "scope": "series"
                     },
                     "properties": [
                       {
@@ -460,13 +462,38 @@
                   {
                     "matcher": {
                       "id": "byName",
-                      "options": "chiller3"
+                      "options": "chiller3Chw",
+                      "scope": "series"
                     },
                     "properties": [
                       {
                         "id": "color",
                         "value": {
                           "fixedColor": "super-light-blue",
+                          "mode": "fixed"
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "Total",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.hideFrom",
+                        "value": {
+                          "legend": true,
+                          "tooltip": false,
+                          "viz": true
+                        }
+                      },
+                      {
+                        "id": "color",
+                        "value": {
+                          "fixedColor": "transparent",
                           "mode": "fixed"
                         }
                       }
@@ -5547,8 +5574,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "70.62492333333344",
-            "value": "70.62492333333344"
+            "text": "59.90237055555554",
+            "value": "59.90237055555554"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
