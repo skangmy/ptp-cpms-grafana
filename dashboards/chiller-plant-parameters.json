@@ -152,7 +152,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "select key, value from control_params where key = 'chiller.staging_load_source' and scope = 'GLOBAL' and equipment_kind = 'PLANT'",
+                        "rawSql": "select key, value, scope, equipment_id, equipment_kind from control_params where key = 'chiller.staging_load_source' and scope = 'GLOBAL' and equipment_kind = 'PLANT'",
                         "sql": {
                           "columns": [
                             {
