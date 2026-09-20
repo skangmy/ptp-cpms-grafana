@@ -693,6 +693,115 @@
                         "value": 2
                       }
                     ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CHWS",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#C00000",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 3
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 20.000001
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CHWR",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#548235",
+                              "value": null
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 30.000001
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ΔT",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#C00000",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 3
+                            },
+                            {
+                              "color": "#548235",
+                              "value": 4
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 7.000001
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 9.000001
+                            }
+                          ]
+                        }
+                      }
+                    ]
                   }
                 ]
               },
@@ -903,6 +1012,115 @@
                       {
                         "id": "custom.axisPlacement",
                         "value": "left"
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CWS",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#548235",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 28.9
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "CWR",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#548235",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 40
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 45.000001
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "ΔT",
+                      "scope": "series"
+                    },
+                    "properties": [
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#C00000",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 3
+                            },
+                            {
+                              "color": "#548235",
+                              "value": 4
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 7.000001
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 9.000001
+                            }
+                          ]
+                        }
                       }
                     ]
                   }
