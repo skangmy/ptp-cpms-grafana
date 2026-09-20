@@ -1381,7 +1381,7 @@
               "transformations": []
             }
           },
-          "description": "",
+          "description": "Approved cooling-water operating thresholds for CWS, CWR, and CW delta T.",
           "id": 6,
           "links": [],
           "title": "CW and Setpoint",
@@ -1461,6 +1461,32 @@
                           "fixedColor": "super-light-red",
                           "mode": "fixed"
                         }
+                      },
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#548235",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 40
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 45.000001
+                            }
+                          ]
+                        }
                       }
                     ]
                   },
@@ -1495,6 +1521,28 @@
                       {
                         "id": "displayName",
                         "value": "CWS"
+                      },
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#548235",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 28.9
+                            }
+                          ]
+                        }
                       }
                     ]
                   },
@@ -1514,6 +1562,40 @@
                       {
                         "id": "displayName",
                         "value": "CW ΔT"
+                      },
+                      {
+                        "id": "custom.thresholdsStyle",
+                        "value": {
+                          "mode": "dashed"
+                        }
+                      },
+                      {
+                        "id": "thresholds",
+                        "value": {
+                          "mode": "absolute",
+                          "steps": [
+                            {
+                              "color": "#C00000",
+                              "value": null
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 3
+                            },
+                            {
+                              "color": "#548235",
+                              "value": 4
+                            },
+                            {
+                              "color": "#EAB839",
+                              "value": 7.000001
+                            },
+                            {
+                              "color": "#C00000",
+                              "value": 9.000001
+                            }
+                          ]
+                        }
                       }
                     ]
                   },
