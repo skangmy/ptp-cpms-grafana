@@ -246,94 +246,16 @@
                     },
                     "refId": "A"
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-postgres"
-                      },
-                      "group": "grafana-postgresql-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "dataset": "chiller",
-                        "editorMode": "code",
-                        "format": "table",
-                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n",
-                        "rawQuery": true,
-                        "rawSql": "with data as (\n  select (value-\u003e\u003e'target')::float as target, (value-\u003e\u003e'deadband')::float as deadband from control_params cp where key = 'chwp.delta_t_controller'\n)\nselect target, target - deadband as low, target + deadband as high from data\n",
-                        "sql": {
-                          "columns": [
-                            {
-                              "parameters": [],
-                              "type": "function"
-                            }
-                          ],
-                          "groupBy": [
-                            {
-                              "property": {
-                                "type": "string"
-                              },
-                              "type": "groupBy"
-                            }
-                          ],
-                          "limit": 50
-                        }
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "target"
-                  }
                 }
               ],
               "queryOptions": {},
-              "transformations": [
-                {
-                  "group": "configFromData",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "applyTo": {
-                        "id": "byName",
-                        "options": "deltaT"
-                      },
-                      "configRefId": "target",
-                      "mappings": [
-                        {
-                          "fieldName": "target",
-                          "handlerArguments": {
-                            "threshold": {
-                              "color": "purple"
-                            }
-                          },
-                          "handlerKey": "threshold1"
-                        },
-                        {
-                          "fieldName": "low",
-                          "handlerArguments": {
-                            "threshold": {
-                              "color": "blue"
-                            }
-                          },
-                          "handlerKey": "threshold1"
-                        },
-                        {
-                          "fieldName": "high",
-                          "handlerKey": "threshold1"
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
+              "transformations": []
             }
           },
-          "description": "Setpoint = purple dashed line ",
+          "description": "Approved CHW delta-T operating bands: red below 3 °C or above 9 °C, yellow from 3-4 °C and above 7-9 °C, green from 4-7 °C.",
           "id": 11,
           "links": [],
-          "title": "CHW ΔT vs Target and Deadband 🌡️",
+          "title": "CHW ΔT Operating Bands 🌡️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -378,7 +300,7 @@
                       "mode": "none"
                     },
                     "thresholdsStyle": {
-                      "mode": "line"
+                      "mode": "dashed+area"
                     }
                   },
                   "displayName": "CHW ΔT",
@@ -386,12 +308,24 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
-                        "value": 0
+                        "color": "#C00000",
+                        "value": null
                       },
                       {
-                        "color": "red",
-                        "value": 80
+                        "color": "#EAB839",
+                        "value": 3
+                      },
+                      {
+                        "color": "#548235",
+                        "value": 4
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 7.000001
+                      },
+                      {
+                        "color": "#C00000",
+                        "value": 9.000001
                       }
                     ]
                   },
@@ -447,94 +381,16 @@
                     },
                     "refId": "A"
                   }
-                },
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-postgres"
-                      },
-                      "group": "grafana-postgresql-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "dataset": "chiller",
-                        "editorMode": "code",
-                        "format": "table",
-                        "query": "import \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"cwsSetpoint\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\n",
-                        "rawQuery": true,
-                        "rawSql": "with data as (\n  select (value-\u003e\u003e'target')::float as target, (value-\u003e\u003e'deadband')::float as deadband from control_params cp where key = 'cwp.delta_t_controller'\n)\nselect target, target - deadband as low, target + deadband as high from data\n",
-                        "sql": {
-                          "columns": [
-                            {
-                              "parameters": [],
-                              "type": "function"
-                            }
-                          ],
-                          "groupBy": [
-                            {
-                              "property": {
-                                "type": "string"
-                              },
-                              "type": "groupBy"
-                            }
-                          ],
-                          "limit": 50
-                        }
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "target"
-                  }
                 }
               ],
               "queryOptions": {},
-              "transformations": [
-                {
-                  "group": "configFromData",
-                  "kind": "Transformation",
-                  "spec": {
-                    "options": {
-                      "applyTo": {
-                        "id": "byName",
-                        "options": "deltaT"
-                      },
-                      "configRefId": "target",
-                      "mappings": [
-                        {
-                          "fieldName": "target",
-                          "handlerArguments": {
-                            "threshold": {
-                              "color": "purple"
-                            }
-                          },
-                          "handlerKey": "threshold1"
-                        },
-                        {
-                          "fieldName": "low",
-                          "handlerArguments": {
-                            "threshold": {
-                              "color": "blue"
-                            }
-                          },
-                          "handlerKey": "threshold1"
-                        },
-                        {
-                          "fieldName": "high",
-                          "handlerKey": "threshold1"
-                        }
-                      ]
-                    }
-                  }
-                }
-              ]
+              "transformations": []
             }
           },
-          "description": "",
+          "description": "Approved CW delta-T operating bands: red below 3 °C or above 9 °C, yellow from 3-4 °C and above 7-9 °C, green from 4-7 °C.",
           "id": 12,
           "links": [],
-          "title": "CW ΔT vs Target and Deadband 🌡️",
+          "title": "CW ΔT Operating Bands 🌡️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -579,7 +435,7 @@
                       "mode": "none"
                     },
                     "thresholdsStyle": {
-                      "mode": "line"
+                      "mode": "dashed+area"
                     }
                   },
                   "displayName": "CW ΔT",
@@ -587,12 +443,24 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green",
-                        "value": 0
+                        "color": "#C00000",
+                        "value": null
                       },
                       {
-                        "color": "red",
-                        "value": 80
+                        "color": "#EAB839",
+                        "value": 3
+                      },
+                      {
+                        "color": "#548235",
+                        "value": 4
+                      },
+                      {
+                        "color": "#EAB839",
+                        "value": 7.000001
+                      },
+                      {
+                        "color": "#C00000",
+                        "value": 9.000001
                       }
                     ]
                   },
