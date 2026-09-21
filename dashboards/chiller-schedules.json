@@ -789,7 +789,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "with data as (select id, holiday_date, name, mode, enabled, true as can_edit from holiday_schedule\norder by holiday_date)\nselect 'p_' || id as selected, * from data\nunion all\nselect 'p_-1' as selected, -1, '1900-01-01' as holiday_date, null as name, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
+                        "rawSql": "with data as (select id, holiday_date, name, mode, enabled, true as can_edit from holiday_schedule\nwhere holiday_date \u003c= $__timeTo() and holiday_date \u003e $__timeFrom() \norder by holiday_date)\nselect 'p_' || id as selected, * from data\nunion all\nselect 'p_-1' as selected, -1, '1900-01-01' as holiday_date, null as name, null as mode, null as enabled, false as can_edit\nwhere not exists(select 1 from data)",
                         "sql": {
                           "columns": [
                             {
@@ -873,7 +873,7 @@
           "description": "",
           "id": 2,
           "links": [],
-          "title": "Public Holiday",
+          "title": "Public Holiday 🏖️",
           "vizConfig": {
             "group": "volkovlabs-table-panel",
             "kind": "VizConfig",
@@ -1888,7 +1888,7 @@
           "description": "",
           "id": 5,
           "links": [],
-          "title": "Schedule Events",
+          "title": "Schedule Events 🗓️",
           "vizConfig": {
             "group": "volkovlabs-table-panel",
             "kind": "VizConfig",
@@ -2689,6 +2689,193 @@
             "version": "3.6.5"
           }
         }
+      },
+      "panel-6": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select start_time, end_time, '🗓️ ' || mode || ' - ' || description as name, enabled from schedule_event \nwhere start_time \u003c= $__timeTo() and end_time \u003e $__timeFrom() and enabled = true\norder by start_time, end_time\n",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "chiller",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select \n  (holiday_date + TIME '00:00:00') AT TIME ZONE 'Asia/Kuala_Lumpur' as start_time, \n  ((holiday_date + TIME '00:00:00') + interval '1 day') AT TIME ZONE 'Asia/Kuala_Lumpur' as end_time, \n  '🏖️ ' || mode || ' - ' || name as name, enabled from holiday_schedule\nwhere enabled = true\norder by holiday_date",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "B"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 6,
+          "links": [],
+          "title": "Calendar",
+          "vizConfig": {
+            "group": "marcusolsson-calendar-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "color": {
+                    "mode": "thresholds"
+                  },
+                  "mappings": [
+                    {
+                      "options": {
+                        "[PH] .*": {
+                          "color": "orange",
+                          "index": 0
+                        }
+                      },
+                      "type": "value"
+                    },
+                    {
+                      "options": {
+                        "pattern": "[Event] .*",
+                        "result": {
+                          "color": "blue",
+                          "index": 1
+                        }
+                      },
+                      "type": "regex"
+                    }
+                  ],
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": ""
+                    },
+                    "properties": []
+                  }
+                ]
+              },
+              "options": {
+                "annotations": false,
+                "annotationsLimit": 100,
+                "annotationsType": "",
+                "colors": "frame",
+                "dateFormat": "inherit",
+                "defaultView": "month",
+                "descriptionField": [
+                  "name"
+                ],
+                "displayFields": [
+                  "description",
+                  "labels",
+                  "links",
+                  "location",
+                  "text",
+                  "time"
+                ],
+                "endTimeField": "end_time",
+                "labelFields": [],
+                "locationLabel": "",
+                "preformattedDescription": false,
+                "quickLinks": false,
+                "scrollToTime": {
+                  "hours": 0,
+                  "minutes": 0
+                },
+                "showEventTooltip": false,
+                "showMonthTime": true,
+                "textField": "name",
+                "timeField": "start_time",
+                "timeRangeType": "default",
+                "views": [
+                  "day",
+                  "week",
+                  "month"
+                ]
+              }
+            },
+            "version": "4.2.4"
+          }
+        }
       }
     },
     "layout": {
@@ -2713,12 +2900,25 @@
             "spec": {
               "element": {
                 "kind": "ElementReference",
+                "name": "panel-6"
+              },
+              "height": 16,
+              "width": 24,
+              "x": 0,
+              "y": 10
+            }
+          },
+          {
+            "kind": "GridLayoutItem",
+            "spec": {
+              "element": {
+                "kind": "ElementReference",
                 "name": "panel-2"
               },
               "height": 13,
               "width": 16,
               "x": 0,
-              "y": 10
+              "y": 26
             }
           },
           {
@@ -2731,7 +2931,7 @@
               "height": 7,
               "width": 8,
               "x": 16,
-              "y": 10
+              "y": 26
             }
           },
           {
@@ -2744,7 +2944,7 @@
               "height": 6,
               "width": 8,
               "x": 16,
-              "y": 17
+              "y": 33
             }
           },
           {
@@ -2757,7 +2957,7 @@
               "height": 15,
               "width": 24,
               "x": 0,
-              "y": 23
+              "y": 39
             }
           }
         ]
@@ -2823,8 +3023,8 @@
         "spec": {
           "allowCustomValue": true,
           "current": {
-            "text": "w_3",
-            "value": "w_3"
+            "text": "s_6",
+            "value": "s_6"
           },
           "definition": "with a_schedule as (\n  select 0 as o, 's_' || id as row from schedule_event where start_time \u003c= current_timestamp and end_time \u003e current_timestamp and enabled = true\n),\na_ph as (\n  select 1 as o, 'p_' || id as row from holiday_schedule where holiday_date = current_date and enabled = true\n),\na_week as (\n  select 2 as o, 'w_' || id as row from weekly_schedule ws  where ws.day_of_week = extract(dow from current_timestamp) and enabled = true\n)\nselect * from a_schedule\nunion\nselect * from a_ph\nunion\nselect * from a_week\norder by o limit 1",
           "hide": "hideVariable",
