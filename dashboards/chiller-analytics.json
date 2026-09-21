@@ -450,6 +450,23 @@
                       "renamePattern": "Chiller$1"
                     }
                   }
+                },
+                {
+                  "group": "organize",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "excludeByName": {},
+                      "includeByName": {},
+                      "indexByName": {
+                        "Chiller1": 1,
+                        "Chiller2": 2,
+                        "Chiller3": 3,
+                        "loadRt": 0
+                      },
+                      "renameByName": {}
+                    }
+                  }
                 }
               ]
             }
@@ -538,36 +555,6 @@
                       {
                         "id": "unit",
                         "value": "kW/RT"
-                      },
-                      {
-                        "id": "color",
-                        "value": {
-                          "mode": "thresholds"
-                        }
-                      },
-                      {
-                        "id": "thresholds",
-                        "value": {
-                          "mode": "absolute",
-                          "steps": [
-                            {
-                              "color": "#94A3B8",
-                              "value": null
-                            },
-                            {
-                              "color": "#548235",
-                              "value": 0.000001
-                            },
-                            {
-                              "color": "#EAB839",
-                              "value": 0.715
-                            },
-                            {
-                              "color": "#C00000",
-                              "value": 0.78
-                            }
-                          ]
-                        }
                       }
                     ]
                   }
@@ -1332,7 +1319,7 @@
                           "steps": [
                             {
                               "color": "#94A3B8",
-                              "value": null
+                              "value": 0
                             },
                             {
                               "color": "#548235",
@@ -1796,7 +1783,7 @@
                     "steps": [
                       {
                         "color": "#94A3B8",
-                        "value": null
+                        "value": 0
                       },
                       {
                         "color": "#548235",
@@ -2282,7 +2269,7 @@
                           "steps": [
                             {
                               "color": "#C00000",
-                              "value": null
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -2317,7 +2304,7 @@
                           "steps": [
                             {
                               "color": "#548235",
-                              "value": null
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -2512,7 +2499,7 @@
                           "steps": [
                             {
                               "color": "#C00000",
-                              "value": null
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -2703,7 +2690,7 @@
                           "steps": [
                             {
                               "color": "#548235",
-                              "value": null
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -2738,7 +2725,7 @@
                           "steps": [
                             {
                               "color": "#548235",
-                              "value": null
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -2884,7 +2871,7 @@
                     "steps": [
                       {
                         "color": "#2563EB",
-                        "value": null
+                        "value": 0
                       },
                       {
                         "color": "#548235",
@@ -3071,7 +3058,7 @@
                     "steps": [
                       {
                         "color": "#2563EB",
-                        "value": null
+                        "value": 0
                       },
                       {
                         "color": "#548235",
