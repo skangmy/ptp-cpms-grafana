@@ -204,7 +204,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwHeader\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n    |\u003e sum()\n    |\u003e map(fn: (r) =\u003e ({\n        r with coolingLoad: r._value * ${GJ_TO_RT},\n        coolingCapacity: r._value * ${RT_TO_KW} * ${GJ_TO_RT}\n    }))\n"
+                        "query": "import \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n    |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n    |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n    |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n    |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n    |\u003e sum()\n    |\u003e map(fn: (r) =\u003e ({\n        r with coolingLoad: r._value,\n        coolingCapacity: r._value * ${RT_TO_KW}\n    }))\n"
                       },
                       "version": "v0"
                     },
@@ -222,7 +222,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\n\nrt =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"flow\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"chwHeader\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"energyFlowRate\")\n        |\u003e aggregateWindow(every: 5m, fn: mean, createEmpty: false)\n        |\u003e map(fn: (r) =\u003e ({\n            _time: r._time,\n            _value: r._value * ${GJ_TO_RT}\n        }))\n\nplantState =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n        |\u003e aggregateWindow(every: 5m, fn: last, createEmpty: true)\n        |\u003e fill(usePrevious: true)\n        |\u003e filter(fn: (r) =\u003e r._value == 2)\n        |\u003e map(fn: (r) =\u003e ({\n            _time: r._time,\n            plantState: r._value\n        }))\n\ndata = join.inner(left: rt, right: plantState,\n    on: (l, r) =\u003e l._time == r._time,\n    as: (l, r) =\u003e l\n)\n\navg = data \n    |\u003e mean()\n    |\u003e set(key: \"_field\", value: \"avg\")\n\npeak = data \n    |\u003e max()\n    |\u003e set(key: \"_field\", value: \"peak\")\n\nunion(tables: [avg, peak])\n    |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
+                        "query": "import \"join\"\n\nrt =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"estimatedLoadRt\")\n        |\u003e aggregateWindow(every: 5m, fn: mean, createEmpty: false)\n        |\u003e keep(columns: [\"_time\", \"_value\"])\n\nplantState =\n    from(bucket: \"cpms\")\n        |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n        |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n        |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n        |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n        |\u003e aggregateWindow(every: 5m, fn: last, createEmpty: true)\n        |\u003e fill(usePrevious: true)\n        |\u003e filter(fn: (r) =\u003e r._value == 2)\n        |\u003e map(fn: (r) =\u003e ({\n            _time: r._time,\n            plantState: r._value\n        }))\n\ndata = join.inner(left: rt, right: plantState,\n    on: (l, r) =\u003e l._time == r._time,\n    as: (l, r) =\u003e l\n)\n\navg = data \n    |\u003e mean()\n    |\u003e set(key: \"_field\", value: \"avg\")\n\npeak = data \n    |\u003e max()\n    |\u003e set(key: \"_field\", value: \"peak\")\n\nunion(tables: [avg, peak])\n    |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n"
                       },
                       "version": "v0"
                     },
@@ -713,7 +713,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#C00000"
+                              "color": "#C00000",
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -747,7 +748,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#548235"
+                              "color": "#548235",
+                              "value": 0
                             },
                             {
                               "color": "#C00000",
@@ -777,7 +779,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#C00000"
+                              "color": "#C00000",
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -1031,7 +1034,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#548235"
+                              "color": "#548235",
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -1061,7 +1065,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#548235"
+                              "color": "#548235",
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -1095,7 +1100,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#C00000"
+                              "color": "#C00000",
+                              "value": 0
                             },
                             {
                               "color": "#EAB839",
@@ -2274,7 +2280,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e sum()\n  |\u003e group()\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * ${GJ_TO_RT}}))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"energyUsage\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    efficiency: if r.coolingLoad \u003e 0.0 then r.energyUsage / r.coolingLoad else 0.0,\n  }))"
+                        "query": "import \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e sum()\n  |\u003e group()\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"loadUsage\")\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\" }))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"energyUsage\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    efficiency: if r.coolingLoad \u003e 0.0 then r.energyUsage / r.coolingLoad else 0.0,\n  }))"
                       },
                       "version": "v0"
                     },
@@ -7134,8 +7140,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "3.169345555555555",
-            "value": "3.169345555555555"
+            "text": "5.328543888888889",
+            "value": "5.328543888888889"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
