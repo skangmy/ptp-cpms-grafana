@@ -713,8 +713,7 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#C00000",
-                              "value": null
+                              "color": "#C00000"
                             },
                             {
                               "color": "#EAB839",
@@ -748,8 +747,7 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#548235",
-                              "value": null
+                              "color": "#548235"
                             },
                             {
                               "color": "#C00000",
@@ -779,8 +777,7 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#C00000",
-                              "value": null
+                              "color": "#C00000"
                             },
                             {
                               "color": "#EAB839",
@@ -1034,8 +1031,7 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#548235",
-                              "value": null
+                              "color": "#548235"
                             },
                             {
                               "color": "#EAB839",
@@ -1065,8 +1061,7 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#548235",
-                              "value": null
+                              "color": "#548235"
                             },
                             {
                               "color": "#EAB839",
@@ -1100,8 +1095,7 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "#C00000",
-                              "value": null
+                              "color": "#C00000"
                             },
                             {
                               "color": "#EAB839",
@@ -4242,7 +4236,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e mean()\n  |\u003e group()\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e mean()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\", _value: r._value * ${GJ_TO_RT}}))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"totalPower\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    efficiency: if r.coolingLoad \u003e 0.0 then r.totalPower / r.coolingLoad else 0.0,\n  }))"
+                        "query": "import \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e mean()\n  |\u003e group()\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"estimatedLoadRt\")\n  |\u003e mean()\n  |\u003e map(fn: (r) =\u003e ({ r with _field: \"coolingLoad\" }))\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoad\", \"totalPower\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    efficiency: if r.coolingLoad \u003e 0.0 then r.totalPower / r.coolingLoad else 0.0,\n  }))"
                       },
                       "version": "v0"
                     },
@@ -4270,7 +4264,7 @@
               ],
               "queryOptions": {
                 "hideTimeOverride": true,
-                "timeFrom": "15m"
+                "timeFrom": "5m"
               },
               "transformations": []
             }
@@ -5603,7 +5597,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"array\"\nimport \"join\"\nimport \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = today()\nstop = now()\n\n// durationInHours = float(v:(uint(v: stop) - uint(v: start))) / 3600000000000.0\n\ngetFieldValue = (tables=\u003c-, field) =\u003e {\n    extract = tables\n        |\u003e findColumn(fn: (key) =\u003e key._field == field, column: \"_value\")\n\n    return extract[0]\n}\n\ndurationInHours = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n  |\u003e getFieldValue(field: \"state\")\n  \n\ncoolingLoad = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")  \n  |\u003e sum()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with avgRT: r.loadUsage * ${GJ_TO_RT} / durationInHours,\n      coolingCapacity: r.loadUsage * ${GJ_TO_RT} / durationInHours * ${RT_TO_KW},\n      key: \"1\",\n      order: 0,\n  }))\n  |\u003e group()\n\ndefCoolingLoad = union(tables: [coolingLoad, array.from(rows: [{ avgRT: 0.0, loadUsage: 0.0, coolingCapacity: 0.0, key: \"1\", order: 1}])])\n  |\u003e sort(columns: [\"order\"])\n  |\u003e limit(n: 1)\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")  \n  |\u003e filter(fn: (r) =\u003e \n    r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/ or r[\"deviceId\"] =~ /chiller\\d/\n  )\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with avgKw: r.energyUsage / durationInHours,    \n    key: \"1\"\n  }))\n  |\u003e group()\n\njoin.inner(left: defCoolingLoad, right: power, on: (l, r) =\u003e l.key == r.key, \n  as: (l, r) =\u003e ({\n    l with avgPower: r.avgKw,\n    energyUsage: r.energyUsage,\n    efficiency: if l.avgRT \u003e 0.0 then r.avgKw / l.avgRT else 0.0,\n    cop: if r.avgKw \u003e 0.0 then l.coolingCapacity / r.avgKw else 0.0,\n    durationInHours: durationInHours\n  })\n)"
+                        "query": "import \"array\"\nimport \"join\"\nimport \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = today()\nstop = now()\n\n// durationInHours = float(v:(uint(v: stop) - uint(v: start))) / 3600000000000.0\n\ngetFieldValue = (tables=\u003c-, field) =\u003e {\n    extract = tables\n        |\u003e findColumn(fn: (key) =\u003e key._field == field, column: \"_value\")\n\n    return extract[0]\n}\n\ndurationInHours = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n  |\u003e getFieldValue(field: \"state\")\n  \n\ncoolingLoad = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e sum()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with avgRT: r.loadUsage / durationInHours,\n      coolingCapacity: r.loadUsage / durationInHours * ${RT_TO_KW},\n      key: \"1\",\n      order: 0,\n  }))\n  |\u003e group()\n\ndefCoolingLoad = union(tables: [coolingLoad, array.from(rows: [{ avgRT: 0.0, loadUsage: 0.0, coolingCapacity: 0.0, key: \"1\", order: 1}])])\n  |\u003e sort(columns: [\"order\"])\n  |\u003e limit(n: 1)\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")  \n  |\u003e filter(fn: (r) =\u003e \n    r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/ or r[\"deviceId\"] =~ /chiller\\d/\n  )\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  |\u003e keep(columns: [\"_field\", \"_value\"])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with avgKw: r.energyUsage / durationInHours,    \n    key: \"1\"\n  }))\n  |\u003e group()\n\njoin.inner(left: defCoolingLoad, right: power, on: (l, r) =\u003e l.key == r.key, \n  as: (l, r) =\u003e ({\n    l with avgPower: r.avgKw,\n    energyUsage: r.energyUsage,\n    efficiency: if l.avgRT \u003e 0.0 then r.avgKw / l.avgRT else 0.0,\n    cop: if r.avgKw \u003e 0.0 then l.coolingCapacity / r.avgKw else 0.0,\n    durationInHours: durationInHours\n  })\n)"
                       },
                       "version": "v0"
                     },
@@ -5621,7 +5615,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\nimport \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(d: 5m, from: now())\nstop = now()\n\ncoolingLoad = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")  \n  |\u003e mean()\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")  \n  |\u003e filter(fn: (r) =\u003e \n    r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/ or r[\"deviceId\"] =~ /chiller\\d/\n  )\n  |\u003e mean()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  \n  \nunion(tables: [coolingLoad, power])\n  |\u003e group()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.energyFlowRate \u003e 0 then r.totalPower / (r.energyFlowRate * ${GJ_TO_RT}) else 0.0,\n    coolingLoad: r.energyFlowRate * ${GJ_TO_RT}\n  }))\n  |\u003e map(fn: (r) =\u003e ({\n    r with cop: if r.totalPower \u003e 0 then r.coolingLoad * ${RT_TO_KW} / r.totalPower else 0.0\n  }))\n"
+                        "query": "import \"join\"\nimport \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(d: 5m, from: now())\nstop = now()\n\ncoolingLoad = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"estimatedLoadRt\")\n  |\u003e mean()\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")  \n  |\u003e filter(fn: (r) =\u003e \n    r[\"deviceId\"] =~ /chwp\\d/ or r[\"deviceId\"] =~ /cwp\\d/ or r[\"deviceId\"] =~ /ct\\dFan\\d/ or r[\"deviceId\"] =~ /chiller\\d/\n  )\n  |\u003e mean()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  \n  \nunion(tables: [coolingLoad, power])\n  |\u003e group()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.estimatedLoadRt \u003e 0 then r.totalPower / r.estimatedLoadRt else 0.0,\n    coolingLoad: r.estimatedLoadRt\n  }))\n  |\u003e map(fn: (r) =\u003e ({\n    r with cop: if r.totalPower \u003e 0 then r.coolingLoad * ${RT_TO_KW} / r.totalPower else 0.0\n  }))\n"
                       },
                       "version": "v0"
                     },
@@ -7140,8 +7134,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "3.5707433333333323",
-            "value": "3.5707433333333323"
+            "text": "1.850896666666667",
+            "value": "1.850896666666667"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
