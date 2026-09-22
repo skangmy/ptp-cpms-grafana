@@ -123,7 +123,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\nimport \"date\"\nimport \"array\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(from: date.truncate(t: now(), unit: 1d), d: 1d)\nstop = date.sub(from: now(), d: 1d)\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: date.truncate(t: now(), unit: 1d))\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"chwHeader\")\n  |\u003e sum()\n"
+                        "query": "import \"timezone\"\nimport \"date\"\nimport \"array\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: date.truncate(t: now(), unit: 1d))\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"loadUsage\")\n  |\u003e sum()\n"
                       },
                       "version": "v0"
                     },
