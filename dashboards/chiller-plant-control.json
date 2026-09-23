@@ -1207,6 +1207,11 @@
                             "selector": "lockout",
                             "text": "",
                             "type": "boolean"
+                          },
+                          {
+                            "selector": "requestOn",
+                            "text": "",
+                            "type": "boolean"
                           }
                         ],
                         "filters": [],
