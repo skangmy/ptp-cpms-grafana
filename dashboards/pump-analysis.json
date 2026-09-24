@@ -2097,7 +2097,7 @@
           "description": "",
           "id": 23,
           "links": [],
-          "title": "CHW Pump Pressures",
+          "title": "CHW Pump Pressures ⏲️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
@@ -2216,7 +2216,7 @@
           "description": "",
           "id": 24,
           "links": [],
-          "title": "CW Pump Pressures",
+          "title": "CW Pump Pressures ⏲️",
           "vizConfig": {
             "group": "timeseries",
             "kind": "VizConfig",
