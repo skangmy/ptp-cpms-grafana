@@ -87,7 +87,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/telemetry/state",
+                        "url": "/cpms/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -986,7 +986,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/telemetry/state",
+                        "url": "/cpms/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -1221,7 +1221,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/telemetry/state",
+                        "url": "/cpms/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
