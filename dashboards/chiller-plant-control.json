@@ -87,7 +87,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -188,7 +188,7 @@
                         "root_selector": "$.coolingTowers.${coolingTower}",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -317,7 +317,7 @@
                         "root_selector": "$.chwPumps.${chwp}\n",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -426,7 +426,7 @@
                         "root_selector": "$.cwPumps.${cwp}\n",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -535,7 +535,7 @@
                         "root_selector": "$.coolingTowers.${ctFan.ct}.fans[deviceId='${ctFan}']\n",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -644,7 +644,7 @@
                         "root_selector": "$.coolingTowers.${ctValve.ct}.valves[deviceId='${ctValve}']\n",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -791,7 +791,7 @@
                         "root_selector": "$.chillers.${chiller}.chiller\n",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -986,7 +986,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -1221,7 +1221,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -1361,7 +1361,7 @@
                         "root_selector": "$.chillers.${chiller}",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -1487,7 +1487,7 @@
                         "root_selector": "$.bypassValve",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
