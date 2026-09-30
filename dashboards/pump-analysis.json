@@ -173,7 +173,22 @@
           },
           "description": "",
           "id": 1,
-          "links": [],
+          "links": [
+            {
+              "asDropdown": true,
+              "icon": "external link",
+              "includeVars": false,
+              "keepTime": false,
+              "tags": [
+                "cpms"
+              ],
+              "targetBlank": false,
+              "title": "Chiller Plant",
+              "tooltip": "",
+              "type": "dashboards",
+              "url": ""
+            }
+          ],
           "title": "Live Status",
           "transparent": true,
           "vizConfig": {
