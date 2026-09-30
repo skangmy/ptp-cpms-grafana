@@ -27,7 +27,6 @@
       }
     ],
     "cursorSync": "Tooltip",
-    "description": "",
     "editable": true,
     "elements": {
       "panel-1": {
@@ -173,22 +172,7 @@
           },
           "description": "",
           "id": 1,
-          "links": [
-            {
-              "asDropdown": true,
-              "icon": "external link",
-              "includeVars": false,
-              "keepTime": false,
-              "tags": [
-                "cpms"
-              ],
-              "targetBlank": false,
-              "title": "Chiller Plant",
-              "tooltip": "",
-              "type": "dashboards",
-              "url": ""
-            }
-          ],
+          "links": [],
           "title": "Live Status",
           "transparent": true,
           "vizConfig": {
@@ -3675,6 +3659,20 @@
         "tooltip": "View source file in repository",
         "type": "link",
         "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/pump-analysis.json"
+      },
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "cpms"
+        ],
+        "targetBlank": false,
+        "title": "Chiller Plant",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
       }
     ],
     "liveNow": false,
