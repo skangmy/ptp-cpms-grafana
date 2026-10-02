@@ -5974,7 +5974,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"join\"\nimport \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(d: 5m, from: now())\nstop = now()\n\ncoolingLoad = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"estimatedLoadRt\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"plant1\")    \n  |\u003e mean()\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")  \n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}Fan1\" or r[\"deviceId\"] == \"${coolingTower}Fan2\")\n  |\u003e mean()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  \nunion(tables: [coolingLoad, power])\n  |\u003e group()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.estimatedLoadRt \u003e 0 then r.totalPower / r.estimatedLoadRt else 0.0\n  }))"
+                        "query": "import \"join\"\nimport \"date\"\nimport \"timezone\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nstart = date.sub(d: 5m, from: now())\nstop = now()\n\ncoolingLoad = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"estimatedLoadRt\")\n  |\u003e mean()\n  |\u003e group()\n  |\u003e sum()  \n  |\u003e set(key: \"_field\", value: \"estimatedLoadRt\")\n  |\u003e group()\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: start, stop: stop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")  \n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"${coolingTower}Fan1\" or r[\"deviceId\"] == \"${coolingTower}Fan2\")\n  |\u003e mean()\n  |\u003e group(columns: [\"_field\"])\n  |\u003e sum()\n  \nunion(tables: [coolingLoad, power])\n  |\u003e group()\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.estimatedLoadRt \u003e 0 then r.totalPower / r.estimatedLoadRt else 0.0\n  }))"
                       },
                       "version": "v0"
                     },
@@ -7151,8 +7151,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "12.658729999999995",
-            "value": "12.658729999999995"
+            "text": "12.719915555555552",
+            "value": "12.719915555555552"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
