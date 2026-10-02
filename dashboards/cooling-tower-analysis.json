@@ -1059,7 +1059,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"auto\" or r._field == \"control\" or r._field == \"opened\" or r._field == \"closed\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct\\dValve.*/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: false)"
+                        "query": "// -2 = INVALID, -1 = UNKNOWN, 0 = CLOSED, 1 = OPENED, 2 = CLOSING, 3 = OPENING\nfrom(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"status\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"auto\" or r._field == \"control\" or r._field == \"opened\" or r._field == \"closed\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId =~ /ct\\dValve.*/)\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: last, createEmpty: false)\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({ r with state: \n      if r.opened == 1 and r.closed == 1 then -2.0 \n      else if r.opened == 1 then 1.0\n      else if r.closed == 1 then 0.0\n      else if r.auto == 0 then -1.0\n      else if r.control == 1 then 3.0 else 2.0\n   }))\n   |\u003e keep(columns: [\"_time\", \"deviceId\", \"state\"])"
                       },
                       "version": "v0"
                     },
@@ -1068,7 +1068,18 @@
                 }
               ],
               "queryOptions": {},
-              "transformations": []
+              "transformations": [
+                {
+                  "group": "renameByRegex",
+                  "kind": "Transformation",
+                  "spec": {
+                    "options": {
+                      "regex": "state ct(.*)Valve(.*)",
+                      "renamePattern": "CT $1 Valve $2"
+                    }
+                  }
+                }
+              ]
             }
           },
           "description": "",
@@ -1096,6 +1107,43 @@
                     "lineWidth": 0,
                     "spanNulls": false
                   },
+                  "mappings": [
+                    {
+                      "options": {
+                        "-1": {
+                          "color": "text",
+                          "index": 1,
+                          "text": "UNKNOWN"
+                        },
+                        "-2": {
+                          "color": "super-light-red",
+                          "index": 0,
+                          "text": "INVALID"
+                        },
+                        "0": {
+                          "color": "orange",
+                          "index": 2,
+                          "text": "CLOSED"
+                        },
+                        "1": {
+                          "color": "green",
+                          "index": 3,
+                          "text": "OPENED"
+                        },
+                        "2": {
+                          "color": "super-light-orange",
+                          "index": 4,
+                          "text": "CLOSING"
+                        },
+                        "3": {
+                          "color": "super-light-green",
+                          "index": 5,
+                          "text": "OPENING"
+                        }
+                      },
+                      "type": "value"
+                    }
+                  ],
                   "thresholds": {
                     "mode": "absolute",
                     "steps": [
@@ -2077,7 +2125,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"ct1Fan1\" or r.deviceId == \"ct1Fan2\" or r.deviceId == \"ct2Fan1\" or r.deviceId == \"ct2Fan2\" or r.deviceId == \"ct3Fan1\" or r.deviceId == \"ct3Fan2\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  \nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"flow\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyFlowRate\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"cwHeader\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e map(fn: (r) =\u003e ({ r with _value: r._value * 78.986}))\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.energyFlowRate \u003e 0 then r.totalPower / r.energyFlowRate else 0.0\n  }))\n  |\u003e sort(columns: [\"_time\"])"
+                        "query": "import \"timezone\"\nimport \"join\"\n\n// Set the global location context\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"ct1Fan1\" or r.deviceId == \"ct1Fan2\" or r.deviceId == \"ct2Fan1\" or r.deviceId == \"ct2Fan2\" or r.deviceId == \"ct3Fan1\" or r.deviceId == \"ct3Fan2\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e group(columns: [\"_field\"])\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: sum, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n  \nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"estimatedLoadRt\")\n  |\u003e aggregateWindow(every: ${chartInterval}, fn: mean, createEmpty: false)\n  |\u003e keep(columns: [\"_time\", \"_field\", \"_value\"])\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [\"_time\"], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({\n    r with efficiency: if r.estimatedLoadRt \u003e 0 then r.totalPower / r.estimatedLoadRt else 0.0\n  }))\n  |\u003e sort(columns: [\"_time\"])"
                       },
                       "version": "v0"
                     },
@@ -2114,6 +2162,7 @@
                     "options": {
                       "excludeByName": {
                         "energyFlowRate": true,
+                        "estimatedLoadRt": true,
                         "totalPower": true
                       },
                       "includeByName": {},
@@ -2359,8 +2408,8 @@
                           "kind": "ElementReference",
                           "name": "panel-14"
                         },
-                        "height": 8,
-                        "width": 12,
+                        "height": 9,
+                        "width": 24,
                         "x": 0,
                         "y": 42
                       }
