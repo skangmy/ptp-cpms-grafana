@@ -56,7 +56,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/telemetry/state",
+                        "url": "/cpms-api/telemetry/state",
                         "url_options": {
                           "data": "",
                           "method": "GET"
@@ -204,6 +204,18 @@
       }
     },
     "links": [
+      {
+        "asDropdown": false,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [],
+        "targetBlank": true,
+        "title": "Source (GitHub)",
+        "tooltip": "View source file in repository",
+        "type": "link",
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-equipment-health.json"
+      },
       {
         "asDropdown": true,
         "icon": "external link",
