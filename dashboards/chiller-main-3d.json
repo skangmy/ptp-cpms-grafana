@@ -205,6 +205,19 @@
           "query": "/d/dag0hl0l10s8w0b/chiller-main-2d",
           "skipUrlSync": true
         }
+      },
+      {
+        "kind": "ConstantVariable",
+        "spec": {
+          "current": {
+            "text": "/custom/three.min.js",
+            "value": "/custom/three.min.js"
+          },
+          "hide": "hideVariable",
+          "name": "cpms_three_url",
+          "query": "/custom/three.min.js",
+          "skipUrlSync": true
+        }
       }
     ]
   }
