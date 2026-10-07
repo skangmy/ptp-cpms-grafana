@@ -1680,7 +1680,7 @@
     "liveNow": false,
     "preload": true,
     "tags": [
-      "cpms"
+      "cpms", "cpms-controls-settings"
     ],
     "timeSettings": {
       "autoRefresh": "",

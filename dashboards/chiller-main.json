@@ -1039,7 +1039,7 @@
     "liveNow": false,
     "preload": true,
     "tags": [
-      "cpms"
+      "cpms", "cpms-main"
     ],
     "timeSettings": {
       "autoRefresh": "10s",

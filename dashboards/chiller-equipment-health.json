@@ -234,7 +234,7 @@
     "liveNow": false,
     "preload": false,
     "tags": [
-      "cpms"
+      "cpms", "cpms-controls-settings"
     ],
     "timeSettings": {
       "autoRefresh": "",
