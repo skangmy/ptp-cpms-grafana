@@ -328,7 +328,9 @@
     ],
     "liveNow": false,
     "preload": true,
-    "tags": [],
+    "tags": [
+      "cpms-main"
+    ],
     "timeSettings": {
       "autoRefresh": "10s",
       "autoRefreshIntervals": [
