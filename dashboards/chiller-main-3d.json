@@ -309,7 +309,7 @@
         "title": "Source (GitHub)",
         "tooltip": "View source file in repository",
         "type": "link",
-        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-main.json"
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-main-3d.json"
       },
       {
         "asDropdown": true,
@@ -347,7 +347,7 @@
       "timezone": "browser",
       "to": "now"
     },
-    "title": "Chiller - Main 3D Copy",
+    "title": "Chiller - Main 3D",
     "variables": [
       {
         "kind": "ConstantVariable",
