@@ -309,7 +309,7 @@
         "title": "Source (GitHub)",
         "tooltip": "View source file in repository",
         "type": "link",
-        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-main.json"
+        "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-main-2d.json"
       },
       {
         "asDropdown": true,
@@ -380,12 +380,12 @@
         "kind": "ConstantVariable",
         "spec": {
           "current": {
-            "text": "/3d",
-            "value": "/3d"
+            "text": "/d/dfg0hl50gxgl4wa/chiller-main-3d",
+            "value": "/d/dfg0hl50gxgl4wa/chiller-main-3d"
           },
           "hide": "hideVariable",
           "name": "cpms_3d_dashboard_url",
-          "query": "/3d",
+          "query": "/d/dfg0hl50gxgl4wa/chiller-main-3d",
           "skipUrlSync": true
         }
       }
