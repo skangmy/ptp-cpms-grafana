@@ -380,12 +380,12 @@
         "kind": "ConstantVariable",
         "spec": {
           "current": {
-            "text": "/2d",
-            "value": "/2d"
+            "text": "/d/dag0hl0l10s8w0b/chiller-main-2d",
+            "value": "/d/dag0hl0l10s8w0b/chiller-main-2d"
           },
           "hide": "hideVariable",
           "name": "cpms_2d_dashboard_url",
-          "query": "/2d",
+          "query": "/d/dag0hl0l10s8w0b/chiller-main-2d",
           "skipUrlSync": true
         }
       }
