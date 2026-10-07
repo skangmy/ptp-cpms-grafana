@@ -692,7 +692,8 @@
     "liveNow": false,
     "preload": false,
     "tags": [
-      "cpms"
+      "cpms",
+      "cpms-main"
     ],
     "timeSettings": {
       "autoRefresh": "",
