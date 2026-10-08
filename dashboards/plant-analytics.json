@@ -5580,6 +5580,115 @@
           }
         }
       },
+      "panel-40": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\npower = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e sum()\n  |\u003e group()\n  |\u003e set(key: \"_field\", value: \"plantPowerKw\")\n\nload = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"estimatedLoadRt\")\n  |\u003e integral(unit: 1h)\n  |\u003e group()\n  |\u003e sum()  \n  |\u003e set(key: \"_field\", value: \"coolingLoadRt\")\n  |\u003e group()\n\nunion(tables: [power, load])\n  |\u003e pivot(rowKey: [], columnKey: [\"_field\"], valueColumn: \"_value\")\n  |\u003e keep(columns: [\"coolingLoadRt\", \"plantPowerKw\"])\n  |\u003e map(fn: (r) =\u003e ({ r with \n    efficiency: if r.coolingLoadRt \u003e 0.0 then r.plantPowerKw / r.coolingLoadRt else 0.0,\n  }))"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                },
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-influxdb"
+                      },
+                      "group": "influxdb",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "query": "import \"strings\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nchr = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chiller\\d/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e rename(columns: {_value: \"power\"})\n  |\u003e keep(columns: [\"deviceId\", \"power\"])  \n  |\u003e group()\n  |\u003e set(key: \"type\", value: \"Chiller\")\n  |\u003e map(fn: (r) =\u003e ({ r with sortOrder: 1}))\n  \n\nchwp = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /chwp\\d/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e rename(columns: {_value: \"power\"})\n  |\u003e keep(columns: [\"deviceId\", \"power\"])\n  |\u003e group()\n  |\u003e set(key: \"type\", value: \"CHWP\")\n  |\u003e map(fn: (r) =\u003e ({ r with sortOrder: 3}))\n\ncwp = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /cwp\\d/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e rename(columns: {_value: \"power\"})\n  |\u003e keep(columns: [\"deviceId\", \"power\"])\n  |\u003e group()\n  |\u003e set(key: \"type\", value: \"CWP\")\n  |\u003e map(fn: (r) =\u003e ({ r with sortOrder: 4}))\n\nct = from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"category\"] == \"chiller\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] =~ /ct\\dFan\\d/)\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e map(fn: (r) =\u003e ({ r with deviceId: strings.substring(v: r.deviceId, start: 0, end: 3)}))\n  |\u003e group(columns: [\"deviceId\"])\n  |\u003e sum()\n  |\u003e rename(columns: {_value: \"power\"})\n  |\u003e keep(columns: [\"deviceId\", \"power\"])\n  |\u003e group()\n  |\u003e set(key: \"type\", value: \"Cooling tower\")\n  |\u003e map(fn: (r) =\u003e ({ r with sortOrder: 2}))\n\nunion(tables: [chr, chwp, cwp, ct])\n  |\u003e sort(columns: [\"sortOrder\", \"deviceId\"])\n"
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "chillers"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 40,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": [
+                  {
+                    "matcher": {
+                      "id": "byName",
+                      "options": "1",
+                      "scope": "series"
+                    },
+                    "properties": []
+                  }
+                ]
+              },
+              "options": {
+                "afterRender": "(() =\u003e {\n  const root = document.getElementById('plant-efficiency-kwh-breakdown');\n  if (!root) return;\n  const body = root.querySelector('tbody');\n  const foot = root.querySelector('.plant-efficiency-breakdown-foot');\n  const chartBar = root.querySelector('.plant-efficiency-breakdown-chart-bar');\n  const chartLegend = root.querySelector('.plant-efficiency-breakdown-chart-legend');\n  const chartNote = root.querySelector('.plant-efficiency-breakdown-chart-note');\n  const source = typeof context !== 'undefined' \u0026\u0026 Array.isArray(context.data) ? context.data : [];\n  const number = (value) =\u003e {\n    if (value === null || value === undefined || value === '') return null;\n    const parsed = Number(value);\n    return Number.isFinite(parsed) ? parsed : null;\n  };\n  const equipmentRows = Array.isArray(source[1]) ? source[1] : [];\n  const devices = equipmentRows\n    .filter((row) =\u003e row?.deviceId \u0026\u0026 row?.type \u0026\u0026 number(row?.energyKwh ?? row?.power) !== null)\n    .map((row) =\u003e ({\n      deviceId: String(row.deviceId),\n      energyKwh: number(row.energyKwh ?? row.power),\n      type: String(row.type),\n      sortOrder: number(row.sortOrder) ?? 999,\n    }));\n\n  if (!devices.length) {\n    const row = document.createElement('tr');\n    const cell = document.createElement('td');\n    row.className = 'plant-efficiency-breakdown-empty';\n    cell.colSpan = 4;\n    cell.textContent = 'No equipment energy data available.';\n    row.append(cell);\n    body.replaceChildren(row);\n    chartNote.textContent = 'No energy data';\n    chartBar.replaceChildren();\n    chartLegend.replaceChildren();\n    return;\n  }\n\n  const metadata = Array.isArray(source[0]) ? source[0][0] || {} : {};\n  const plantEnergyKwh = number(metadata.plantEnergyKwh ?? metadata.plantPowerKw);\n  const validPlantEnergy = plantEnergyKwh !== null \u0026\u0026 plantEnergyKwh \u003e 0;\n  const submeterEnergyKwh = devices.reduce((total, device) =\u003e total + device.energyKwh, 0);\n  const typeNames = {\n    chiller: 'Chillers',\n    'cooling tower': 'Cooling Towers',\n    chwp: 'Chilled-Water Pumps',\n    cwp: 'Condenser-Water Pumps',\n  };\n  const typeColors = {\n    chiller: '#4f9fe6',\n    'cooling tower': '#9b7fea',\n    chwp: '#2ec4b6',\n    cwp: '#7088e8',\n  };\n  const fallbackColors = ['#4f9fe6', '#9b7fea', '#2ec4b6', '#7088e8', '#e59f3a'];\n  const displayName = (deviceId) =\u003e {\n    const match = deviceId.match(/^(chiller|ct|chwp|cwp)[-_ ]?(\\d+)$/i);\n    if (!match) return deviceId.toUpperCase();\n    const prefix = match[1].toLowerCase() === 'chiller' ? 'CH' : match[1].toUpperCase();\n    return `${prefix}-${match[2].padStart(2, '0')}`;\n  };\n  const groupKey = (type) =\u003e type.toLowerCase().replace(/[^a-z0-9]+/g, '-');\n  const cell = (text, className) =\u003e {\n    const node = document.createElement('td');\n    if (className) node.className = className;\n    node.textContent = text;\n    return node;\n  };\n  const measurementCell = (value, digits, unit) =\u003e {\n    if (value === null || !Number.isFinite(value)) return cell('—');\n    const node = document.createElement('td');\n    const reading = document.createElement('span');\n    const suffix = document.createElement('span');\n    reading.className = 'plant-efficiency-breakdown-value';\n    suffix.className = 'plant-efficiency-breakdown-unit';\n    reading.textContent = value.toFixed(digits);\n    suffix.textContent = unit;\n    node.append(reading, suffix);\n    return node;\n  };\n  const groups = [...devices.reduce((map, device) =\u003e {\n    const key = groupKey(device.type);\n    const group = map.get(key) || {\n      key,\n      type: device.type,\n      label: typeNames[device.type.toLowerCase()] || device.type,\n      sortOrder: device.sortOrder,\n      devices: [],\n    };\n    group.sortOrder = Math.min(group.sortOrder, device.sortOrder);\n    group.devices.push(device);\n    map.set(key, group);\n    return map;\n  }, new Map()).values()].sort((a, b) =\u003e a.sortOrder - b.sortOrder || a.label.localeCompare(b.label));\n  groups.forEach((group, index) =\u003e {\n    group.subtotal = group.devices.reduce((total, device) =\u003e total + device.energyKwh, 0);\n    group.color = typeColors[group.type.toLowerCase()] || fallbackColors[index % fallbackColors.length];\n  });\n\n  const chartUsesMainMeter = validPlantEnergy \u0026\u0026 plantEnergyKwh \u003e= submeterEnergyKwh;\n  const chartTotal = chartUsesMainMeter ? plantEnergyKwh : submeterEnergyKwh;\n  const chartItems = groups.map((group) =\u003e ({\n    label: group.label,\n    energyKwh: group.subtotal,\n    color: group.color,\n  }));\n  if (chartUsesMainMeter \u0026\u0026 plantEnergyKwh \u003e submeterEnergyKwh) {\n    chartItems.push({\n      label: 'Unallocated / Estimated Auxiliary',\n      energyKwh: plantEnergyKwh - submeterEnergyKwh,\n      color: '#b565a7',\n    });\n  }\n  const chartDescription = chartItems\n    .filter((item) =\u003e item.energyKwh \u003e 0)\n    .map((item) =\u003e `${item.label} ${(item.energyKwh / chartTotal * 100).toFixed(1)}%`)\n    .join(', ');\n  const chartSegments = document.createDocumentFragment();\n  const legendItems = document.createDocumentFragment();\n  chartItems.forEach((item) =\u003e {\n    const share = chartTotal \u003e 0 ? item.energyKwh / chartTotal * 100 : 0;\n    if (item.energyKwh \u003e 0) {\n      const segment = document.createElement('span');\n      segment.className = 'plant-efficiency-breakdown-chart-segment';\n      segment.style.width = `${share}%`;\n      segment.style.backgroundColor = item.color;\n      segment.title = `${item.label}: ${item.energyKwh.toFixed(1)} kWh (${share.toFixed(1)}%)`;\n      chartSegments.append(segment);\n    }\n    const legendItem = document.createElement('span');\n    const swatch = document.createElement('span');\n    const label = document.createElement('span');\n    legendItem.className = 'plant-efficiency-breakdown-chart-legend-item';\n    swatch.className = 'plant-efficiency-breakdown-chart-swatch';\n    swatch.style.backgroundColor = item.color;\n    label.textContent = `${item.label} · ${item.energyKwh.toFixed(1)} kWh · ${share.toFixed(1)}%`;\n    legendItem.append(swatch, label);\n    legendItems.append(legendItem);\n  });\n  chartBar.replaceChildren(chartSegments);\n  chartBar.setAttribute('aria-label', `Energy usage breakdown: ${chartDescription}`);\n  chartLegend.replaceChildren(legendItems);\n  chartNote.textContent = chartUsesMainMeter\n    ? 'Share of main plant energy'\n    : 'Share of submetered energy';\n\n  const fragment = document.createDocumentFragment();\n  groups.forEach((group) =\u003e {\n    group.devices.sort((a, b) =\u003e a.deviceId.localeCompare(b.deviceId, undefined, { numeric: true }));\n    const heading = document.createElement('tr');\n    const labelCell = document.createElement('td');\n    const toggle = document.createElement('button');\n    heading.className = 'plant-efficiency-breakdown-group';\n    labelCell.colSpan = 2;\n    toggle.className = 'plant-efficiency-breakdown-toggle';\n    toggle.type = 'button';\n    toggle.dataset.groupToggle = group.key;\n    toggle.setAttribute('aria-expanded', 'true');\n    toggle.textContent = group.label;\n    labelCell.append(toggle);\n    heading.append(\n      labelCell,\n      measurementCell(group.subtotal, 1, ' kWh'),\n      measurementCell(validPlantEnergy ? group.subtotal / plantEnergyKwh * 100 : null, 1, '%'),\n    );\n    fragment.append(heading);\n\n    group.devices.forEach((device) =\u003e {\n      const row = document.createElement('tr');\n      row.dataset.groupRow = group.key;\n      row.append(\n        cell(displayName(device.deviceId), 'plant-efficiency-breakdown-equipment'),\n        cell(device.type),\n        measurementCell(device.energyKwh, 1, ' kWh'),\n        measurementCell(validPlantEnergy ? device.energyKwh / plantEnergyKwh * 100 : null, 1, '%'),\n      );\n      fragment.append(row);\n    });\n  });\n\n  const subtotalRow = document.createElement('tr');\n  const subtotalLabel = cell('Submetered Equipment Subtotal');\n  subtotalLabel.colSpan = 2;\n  subtotalRow.className = 'plant-efficiency-breakdown-subtotal';\n  subtotalRow.append(\n    subtotalLabel,\n    measurementCell(submeterEnergyKwh, 1, ' kWh'),\n    measurementCell(validPlantEnergy ? submeterEnergyKwh / plantEnergyKwh * 100 : null, 1, '%'),\n  );\n  fragment.append(subtotalRow);\n\n  if (validPlantEnergy) {\n    const unallocatedEnergyKwh = plantEnergyKwh - submeterEnergyKwh;\n    const unallocatedRow = document.createElement('tr');\n    unallocatedRow.className = 'plant-efficiency-breakdown-unallocated';\n    unallocatedRow.append(\n      cell('Unallocated / Estimated Auxiliary', 'plant-efficiency-breakdown-equipment'),\n      cell('Main meter − submeters'),\n      measurementCell(unallocatedEnergyKwh, 1, ' kWh'),\n      measurementCell(unallocatedEnergyKwh / plantEnergyKwh * 100, 1, '%'),\n    );\n    fragment.append(unallocatedRow);\n\n    const totalRow = document.createElement('tr');\n    const totalLabel = cell('Plant Total · Main Energy Meter');\n    totalLabel.colSpan = 2;\n    totalRow.className = 'plant-efficiency-breakdown-total';\n    totalRow.append(\n      totalLabel,\n      measurementCell(plantEnergyKwh, 1, ' kWh'),\n      measurementCell(100, 1, '%'),\n    );\n    fragment.append(totalRow);\n  }\n\n  body.replaceChildren(fragment);\n  foot.textContent = validPlantEnergy\n    ? 'Energy reconciliation uses aligned main-meter and equipment-submeter usage over the selected time range. Unallocated energy may include auxiliary loads, distribution losses, and meter variance.'\n    : 'Equipment energy is available. Add plantEnergyKwh to the query result to calculate main-meter share and unallocated auxiliary energy.';\n\n  if (root.dataset.collapseBound !== 'true') {\n    root.dataset.collapseBound = 'true';\n    root.addEventListener('click', (event) =\u003e {\n      const toggle = event.target.closest('[data-group-toggle]');\n      if (!toggle || !root.contains(toggle)) return;\n      const expanded = toggle.getAttribute('aria-expanded') === 'true';\n      toggle.setAttribute('aria-expanded', String(!expanded));\n      root.querySelectorAll(`[data-group-row=\"${toggle.dataset.groupToggle}\"]`).forEach((row) =\u003e {\n        row.hidden = expanded;\n      });\n    });\n  }\n})();",
+                "content": "\u003csection id=\"plant-efficiency-kwh-breakdown\" class=\"plant-efficiency-breakdown-card\" aria-label=\"Plant energy usage and meter reconciliation\"\u003e\n  \u003cdiv class=\"plant-efficiency-breakdown-head\"\u003e\n    \u003cdiv class=\"plant-efficiency-breakdown-title\"\u003ePlant Energy Breakdown\u003c/div\u003e\n    \u003cdiv class=\"plant-efficiency-breakdown-note\"\u003eSelected time range\u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003cdiv class=\"plant-efficiency-breakdown-chart\"\u003e\n    \u003cdiv class=\"plant-efficiency-breakdown-chart-head\"\u003e\n      \u003cdiv class=\"plant-efficiency-breakdown-chart-title\"\u003eEnergy Usage Breakdown\u003c/div\u003e\n      \u003cdiv class=\"plant-efficiency-breakdown-chart-note\"\u003eAwaiting equipment data\u003c/div\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"plant-efficiency-breakdown-chart-bar\" role=\"img\" aria-label=\"Equipment energy usage breakdown\"\u003e\u003c/div\u003e\n    \u003cdiv class=\"plant-efficiency-breakdown-chart-legend\"\u003e\u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003ctable class=\"plant-efficiency-breakdown-table\"\u003e\n    \u003cthead\u003e\n      \u003ctr\u003e\n        \u003cth\u003eEquipment\u003c/th\u003e\n        \u003cth\u003eType\u003c/th\u003e\n        \u003cth\u003eEnergy Usage\u003c/th\u003e\n        \u003cth title=\"Equipment energy usage as a percentage of the main plant energy meter.\"\u003ePlant Energy\u003c/th\u003e\n      \u003c/tr\u003e\n    \u003c/thead\u003e\n    \u003ctbody\u003e\n      \u003ctr class=\"plant-efficiency-breakdown-empty\"\u003e\n        \u003ctd colspan=\"4\"\u003eAwaiting equipment energy data.\u003c/td\u003e\n      \u003c/tr\u003e\n    \u003c/tbody\u003e\n  \u003c/table\u003e\n  \u003cdiv class=\"plant-efficiency-breakdown-foot\"\u003e\n    Energy reconciliation compares aligned main-meter and equipment-submeter usage over the selected time range.\n  \u003c/div\u003e\n\u003c/section\u003e",
+                "contentPartials": [],
+                "defaultContent": "The query didn't return any results.",
+                "editor": {
+                  "format": "auto",
+                  "language": "markdown"
+                },
+                "editors": [
+                  "styles",
+                  "helpers",
+                  "afterRender"
+                ],
+                "externalStyles": [],
+                "helpers": "context.handlebars.registerHelper('deviceName', (deviceId) =\u003e {\n  if (deviceId.startsWith('chiller')) return deviceId.replace('chiller', 'Chiller ');\n  return deviceId.toUpperCase();\n})\n\ncontext.handlebars.registerHelper('divide', (a, b) =\u003e a / b);\n\ncontext.handlebars.registerHelper('numberFormat', function (value, options) {\n  // Helper parameters\n  var dl = options.hash['decimalLength'] || 2;\n  var ts = options.hash['thousandsSep'] || ',';\n  var ds = options.hash['decimalSep'] || '.';\n\n  // Parse to float\n  var value = parseFloat(value);\n\n  // The regex\n  var re = '\\\\d(?=(\\\\d{3})+' + (dl \u003e 0 ? '\\\\D' : '$') + ')';\n\n  // Formats the number with the decimals\n  var num = value.toFixed(Math.max(0, ~~dl));\n\n  // Returns the formatted number\n  return (ds ? num.replace('.', ds) : num).replace(new RegExp(re, 'g'), '$\u0026' + ts);\n});\n\n",
+                "renderMode": "data",
+                "styles": "#plant-efficiency-kwh-breakdown,\n#plant-efficiency-kwh-breakdown * {\n  box-sizing: border-box;\n}\n#plant-efficiency-kwh-breakdown {\n  width: 100%;\n  min-width: 760px;\n  font-family: var(--font-sans, Inter, Arial, sans-serif);\n  color: var(--color-text-primary, #1f2933);\n  background: #fff;\n  border: 0.5px solid var(--color-border-tertiary, #d0d5dd);\n  border-radius: 6px;\n  overflow: hidden;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-head {\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 12px;\n  padding: 12px 13px;\n  border-bottom: 1px solid #eef2f6;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-title {\n  font-size: 16px;\n  font-weight: 700;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-note {\n  color: var(--color-text-secondary, #667085);\n  font-size: 13px;\n  white-space: nowrap;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart {\n  padding: 11px 13px 12px;\n  border-bottom: 1px solid #eef2f6;\n  background: #fbfcfe;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-head {\n  display: flex;\n  justify-content: space-between;\n  gap: 12px;\n  margin-bottom: 8px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-title {\n  font-size: 12px;\n  font-weight: 700;\n  letter-spacing: 0.3px;\n  text-transform: uppercase;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-note {\n  color: var(--color-text-secondary, #667085);\n  font-size: 13px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-bar {\n  display: flex;\n  width: 100%;\n  height: 26px;\n  overflow: hidden;\n  background: #e9eef5;\n  border-radius: 3px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-segment {\n  min-width: 2px;\n  height: 100%;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-legend {\n  display: flex;\n  flex-wrap: wrap;\n  gap: 7px 18px;\n  margin-top: 9px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-legend-item {\n  display: inline-flex;\n  align-items: center;\n  gap: 6px;\n  color: var(--color-text-secondary, #667085);\n  font-size: 13px;\n  font-variant-numeric: tabular-nums;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-chart-swatch {\n  width: 9px;\n  height: 9px;\n  flex: 0 0 auto;\n  border-radius: 2px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table {\n  width: 100%;\n  border-collapse: collapse;\n  font-size: 13px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table th,\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table td {\n  padding: 9px 12px;\n  border-bottom: 1px solid #eef2f6;\n  text-align: left;\n  white-space: nowrap;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table th:nth-last-child(-n+2),\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table td:nth-last-child(-n+2) {\n  text-align: right;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table th {\n  color: var(--color-text-secondary, #667085);\n  background: #f8fafc;\n  font-size: 11px;\n  font-weight: 700;\n  letter-spacing: 0.3px;\n  text-transform: uppercase;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-group td {\n  padding: 7px 12px;\n  text-align: left;\n  color: #344054;\n  background: #eef3f8;\n  border-top: 1px solid #d0d5dd;\n  font-size: 11px;\n  font-weight: 700;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-group:first-child td {\n  border-top: 0;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-toggle {\n  display: inline-flex;\n  align-items: center;\n  gap: 7px;\n  padding: 0;\n  color: inherit;\n  background: transparent;\n  border: 0;\n  cursor: pointer;\n  font: inherit;\n  letter-spacing: 0.3px;\n  text-transform: uppercase;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-toggle::before {\n  content: '▾';\n  width: 10px;\n  font-size: 11px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-toggle[aria-expanded='false']::before {\n  content: '▸';\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-toggle:focus-visible {\n  outline: 2px solid #286eb7;\n  outline-offset: 3px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-group .plant-efficiency-breakdown-value {\n  font-size: 13px;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table tr:last-child td {\n  border-bottom: 0;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-equipment,\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-value {\n  font-weight: 700;\n  font-variant-numeric: tabular-nums;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-unit {\n  color: var(--color-text-secondary, #667085);\n  font-size: 12px;\n  font-weight: 400;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-subtotal td {\n  background: #f8fafc;\n  border-top: 1px solid #d0d5dd;\n  font-weight: 700;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-unallocated td {\n  background: #fffbeb;\n  color: #8a5a00;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-total td {\n  background: #fff8e6;\n  border-top: 1px solid #e5c45b;\n  font-weight: 700;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-total .plant-efficiency-breakdown-value {\n  color: #8a5a00;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-foot {\n  padding: 9px 12px;\n  border-top: 1px solid #eef2f6;\n  color: var(--color-text-secondary, #667085);\n  background: #f8fafc;\n  font-size: 13px;\n  line-height: 1.4;\n}\n#plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-empty td {\n  padding: 24px 12px;\n  color: var(--color-text-secondary, #667085);\n  text-align: center;\n}\n@media (max-width: 720px) {\n  #plant-efficiency-kwh-breakdown {\n    min-width: 0;\n  }\n  #plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-head {\n    align-items: flex-start;\n    flex-direction: column;\n  }\n  #plant-efficiency-kwh-breakdown .plant-efficiency-breakdown-table {\n    display: block;\n    overflow-x: auto;\n  }\n}",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
       "panel-5": {
         "kind": "Panel",
         "spec": {
@@ -7009,6 +7118,19 @@
                         "x": 0,
                         "y": 193
                       }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-40"
+                        },
+                        "height": 27,
+                        "width": 24,
+                        "x": 0,
+                        "y": 203
+                      }
                     }
                   ]
                 }
@@ -7242,8 +7364,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "8.270146111111115",
-            "value": "8.270146111111115"
+            "text": "16.883949444444426",
+            "value": "16.883949444444426"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
