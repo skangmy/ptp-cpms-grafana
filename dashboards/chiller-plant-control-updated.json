@@ -101,6 +101,48 @@
         "tooltip": "View source file in repository",
         "type": "link",
         "url": "https://github.com/skangmy/ptp-cpms-grafana/blob/master/dashboards/chiller-plant-control-updated.json"
+      },
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "cpms-main"
+        ],
+        "targetBlank": false,
+        "title": "Main",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
+      },
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "cpms-analytics"
+        ],
+        "targetBlank": false,
+        "title": "Analytics",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
+      },
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "cpms-controls-settings"
+        ],
+        "targetBlank": false,
+        "title": "Controls & Settings",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
       }
     ],
     "liveNow": false,

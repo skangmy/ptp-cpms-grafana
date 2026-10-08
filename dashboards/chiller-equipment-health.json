@@ -222,10 +222,38 @@
         "includeVars": false,
         "keepTime": false,
         "tags": [
-          "cpms"
+          "cpms-main"
         ],
         "targetBlank": false,
-        "title": "Chiller Plant",
+        "title": "Main",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
+      },
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "cpms-analytics"
+        ],
+        "targetBlank": false,
+        "title": "Analytics",
+        "tooltip": "",
+        "type": "dashboards",
+        "url": ""
+      },
+      {
+        "asDropdown": true,
+        "icon": "external link",
+        "includeVars": false,
+        "keepTime": false,
+        "tags": [
+          "cpms-controls-settings"
+        ],
+        "targetBlank": false,
+        "title": "Controls & Settings",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
