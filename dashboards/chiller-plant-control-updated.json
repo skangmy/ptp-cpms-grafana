@@ -80,7 +80,7 @@
                 "kind": "ElementReference",
                 "name": "panel-1"
               },
-              "height": 22,
+              "height": 25,
               "width": 24,
               "x": 0,
               "y": 0
@@ -139,7 +139,7 @@
           "cpms-controls-settings"
         ],
         "targetBlank": false,
-        "title": "Controls & Settings",
+        "title": "Controls \u0026 Settings",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
