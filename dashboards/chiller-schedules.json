@@ -747,7 +747,7 @@
                         "root_selector": "",
                         "source": "url",
                         "type": "json",
-                        "url": "/cpms/schedule/weekly/${payload.id}",
+                        "url": "/cpms-api/schedule/weekly/${payload.id}",
                         "url_options": {
                           "body_content_type": "application/json",
                           "body_type": "raw",
