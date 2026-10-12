@@ -500,6 +500,108 @@
           }
         }
       },
+      "panel-14": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "datasource": {
+                        "name": "cpms-postgres"
+                      },
+                      "group": "grafana-postgresql-datasource",
+                      "kind": "DataQuery",
+                      "spec": {
+                        "dataset": "cpms",
+                        "editorMode": "code",
+                        "format": "table",
+                        "rawQuery": true,
+                        "rawSql": "select\n  scope,\n  key,\n  equipment_kind,\n  equipment_id,\n  value,\n  unit,\n  description,\n  is_active\nfrom\n  control_params\nwhere\n  is_active = true\n  and scope = 'EQUIPMENT'\n  and equipment_kind = 'VALVE'\n  and key = 'ct_valve.close_reseat_enabled'\norder by\n  equipment_id",
+                        "sql": {
+                          "columns": [
+                            {
+                              "parameters": [],
+                              "type": "function"
+                            }
+                          ],
+                          "groupBy": [
+                            {
+                              "property": {
+                                "type": "string"
+                              },
+                              "type": "groupBy"
+                            }
+                          ],
+                          "limit": 50
+                        }
+                      },
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "Configure bounded automatic close-reseat recovery for individual cooling tower valves.",
+          "id": 14,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "marcusolsson-dynamictext-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "afterRender": "(async () =\u003e {\n  const HOST = '/cpms';\n  const KEY = 'ct_valve.close_reseat_enabled';\n  const root = document.getElementById('ctValveCloseRecovery');\n  if (!root) return;\n  const body = root.querySelector('tbody');\n  const message = root.querySelector('.ct-valve-recovery-message');\n  const names = {\n    ct1ValveIn: 'CT-1 Inlet Valve', ct1ValveOut: 'CT-1 Outlet Valve',\n    ct2ValveIn: 'CT-2 Inlet Valve', ct2ValveOut: 'CT-2 Outlet Valve',\n    ct3ValveIn: 'CT-3 Inlet Valve', ct3ValveOut: 'CT-3 Outlet Valve',\n  };\n  const rows = Array.isArray(context.data)\n    ? context.data.filter((row) =\u003e row?.scope === 'EQUIPMENT' \u0026\u0026 row?.equipment_kind === 'VALVE' \u0026\u0026 row?.key === KEY)\n    : [];\n  rows.sort((a, b) =\u003e String(a.equipment_id).localeCompare(String(b.equipment_id), undefined, { numeric: true }));\n  body.replaceChildren();\n\n  const responseBody = async (response) =\u003e {\n    const text = await response.text();\n    if (!text) return undefined;\n    try { return JSON.parse(text); } catch { return text; }\n  };\n  const errorText = (value, response) =\u003e typeof value === 'string'\n    ? value\n    : value?.error || value?.message || ('HTTP ' + response.status);\n  const setMessage = (text, error = false) =\u003e {\n    message.textContent = text;\n    message.classList.toggle('error', error);\n  };\n\n  for (const row of rows) {\n    const tr = document.createElement('tr');\n    const nameCell = document.createElement('td');\n    const name = document.createElement('div');\n    name.className = 'ct-valve-name';\n    name.textContent = names[row.equipment_id] || row.equipment_id;\n    const id = document.createElement('div');\n    id.className = 'ct-valve-id';\n    id.textContent = row.equipment_id;\n    nameCell.append(name, id);\n\n    const valueCell = document.createElement('td');\n    const label = document.createElement('label');\n    label.className = 'ct-valve-toggle';\n    const input = document.createElement('input');\n    input.type = 'checkbox';\n    input.checked = row.value === true;\n    const state = document.createElement('span');\n    state.className = 'ct-valve-state';\n    const renderState = () =\u003e { state.textContent = input.checked ? 'Enabled' : 'Disabled'; };\n    renderState();\n    label.append(input, state);\n    valueCell.append(label);\n\n    const actionCell = document.createElement('td');\n    const save = document.createElement('button');\n    save.className = 'ct-valve-save';\n    save.type = 'button';\n    save.textContent = 'Save';\n    save.disabled = true;\n    actionCell.append(save);\n    tr.append(nameCell, valueCell, actionCell);\n    body.append(tr);\n\n    let original = row.value === true;\n    input.addEventListener('change', () =\u003e { renderState(); save.disabled = input.checked === original; });\n    save.addEventListener('click', async () =\u003e {\n      let reason = '';\n      while (!reason) {\n        const answer = prompt('Remark for this change:', reason);\n        if (answer === null) return;\n        reason = answer.trim();\n        if (!reason) alert('Remark is required.');\n      }\n      input.disabled = true;\n      save.disabled = true;\n      setMessage('Saving ' + row.equipment_id + '...');\n      try {\n        const response = await fetch(HOST + '/params/value', {\n          method: 'POST',\n          headers: { 'Content-Type': 'application/json' },\n          body: JSON.stringify({\n            scope: 'EQUIPMENT', equipmentKind: 'VALVE', equipmentId: row.equipment_id,\n            key: KEY, value: input.checked, reason,\n          }),\n        });\n        const result = await responseBody(response);\n        if (!response.ok) throw new Error(errorText(result, response));\n        original = input.checked;\n        row.value = input.checked;\n        setMessage(row.equipment_id + ' updated successfully.');\n        context.grafana.refresh();\n      } catch (error) {\n        input.checked = original;\n        renderState();\n        setMessage('Save failed: ' + error.message, true);\n      } finally {\n        input.disabled = false;\n        save.disabled = true;\n      }\n    });\n  }\n  setMessage(rows.length ? 'Valve settings loaded.' : 'No CT valve recovery parameters found.', rows.length === 0);\n})();",
+                "content": "\u003csection id=\"ctValveCloseRecovery\" class=\"ct-valve-recovery\" aria-labelledby=\"ctValveCloseRecoveryTitle\"\u003e\n  \u003cdiv class=\"ct-valve-recovery-head\"\u003e\n    \u003cdiv\u003e\n      \u003ch2 id=\"ctValveCloseRecoveryTitle\"\u003eCT Valve Close Recovery\u003c/h2\u003e\n      \u003cp\u003eAllow one bounded open-close reseat when a valve fails to prove closed.\u003c/p\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-valve-recovery-message\" role=\"status\" aria-live=\"polite\"\u003eLoading...\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"ct-valve-recovery-table-wrap\"\u003e\n    \u003ctable class=\"ct-valve-recovery-table\"\u003e\n      \u003cthead\u003e\u003ctr\u003e\u003cth\u003eCooling tower valve\u003c/th\u003e\u003cth\u003eAutomatic reseat\u003c/th\u003e\u003cth\u003e\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\n      \u003ctbody\u003e\u003c/tbody\u003e\n    \u003c/table\u003e\n  \u003c/div\u003e\n  \u003cp class=\"ct-valve-recovery-note\"\u003eKeep disabled unless the valve has an approved automatic reseat procedure.\u003c/p\u003e\n\u003c/section\u003e",
+                "contentPartials": [],
+                "defaultContent": "\u003csection id=\"ctValveCloseRecovery\" class=\"ct-valve-recovery\" aria-labelledby=\"ctValveCloseRecoveryTitle\"\u003e\n  \u003cdiv class=\"ct-valve-recovery-head\"\u003e\n    \u003cdiv\u003e\n      \u003ch2 id=\"ctValveCloseRecoveryTitle\"\u003eCT Valve Close Recovery\u003c/h2\u003e\n      \u003cp\u003eAllow one bounded open-close reseat when a valve fails to prove closed.\u003c/p\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-valve-recovery-message\" role=\"status\" aria-live=\"polite\"\u003eLoading...\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"ct-valve-recovery-table-wrap\"\u003e\n    \u003ctable class=\"ct-valve-recovery-table\"\u003e\n      \u003cthead\u003e\u003ctr\u003e\u003cth\u003eCooling tower valve\u003c/th\u003e\u003cth\u003eAutomatic reseat\u003c/th\u003e\u003cth\u003e\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\n      \u003ctbody\u003e\u003c/tbody\u003e\n    \u003c/table\u003e\n  \u003c/div\u003e\n  \u003cp class=\"ct-valve-recovery-note\"\u003eKeep disabled unless the valve has an approved automatic reseat procedure.\u003c/p\u003e\n\u003c/section\u003e",
+                "editor": {
+                  "format": "auto",
+                  "language": "html"
+                },
+                "editors": [
+                  "styles",
+                  "afterRender"
+                ],
+                "externalStyles": [],
+                "helpers": "",
+                "renderMode": "allRows",
+                "styles": "\n#ctValveCloseRecovery, #ctValveCloseRecovery * { box-sizing: border-box; }\n#ctValveCloseRecovery { width: 100%; border: 1px solid var(--color-border-weak, #d0d5dd); border-radius: 6px; overflow: hidden; background: var(--color-background-primary, #fff); color: var(--color-text-primary, #1f2933); font-family: var(--font-sans, Inter, Arial, sans-serif); }\n#ctValveCloseRecovery .ct-valve-recovery-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--color-border-weak, #eaecf0); }\n#ctValveCloseRecovery h2 { margin: 0; font-size: 16px; font-weight: 700; }\n#ctValveCloseRecovery p, #ctValveCloseRecovery .ct-valve-recovery-message { margin: 3px 0 0; color: var(--color-text-secondary, #667085); font-size: 13px; line-height: 1.4; }\n#ctValveCloseRecovery .ct-valve-recovery-message.error { color: #b42318; }\n#ctValveCloseRecovery .ct-valve-recovery-table-wrap { overflow-x: auto; }\n#ctValveCloseRecovery .ct-valve-recovery-table { width: 100%; min-width: 540px; border-collapse: collapse; }\n#ctValveCloseRecovery th, #ctValveCloseRecovery td { padding: 10px 16px; border-bottom: 1px solid var(--color-border-weak, #eaecf0); text-align: left; }\n#ctValveCloseRecovery th { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; }\n#ctValveCloseRecovery td { font-size: 13px; }\n#ctValveCloseRecovery td:last-child, #ctValveCloseRecovery th:last-child { width: 100px; text-align: right; }\n#ctValveCloseRecovery .ct-valve-name { font-weight: 700; }\n#ctValveCloseRecovery .ct-valve-id { margin-top: 2px; color: var(--color-text-secondary, #667085); font-size: 11px; }\n#ctValveCloseRecovery .ct-valve-toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }\n#ctValveCloseRecovery .ct-valve-toggle input { width: 16px; height: 16px; accent-color: #1570ef; }\n#ctValveCloseRecovery .ct-valve-state { font-size: 13px; font-weight: 700; }\n#ctValveCloseRecovery .ct-valve-save { min-height: 32px; padding: 6px 11px; border: 1px solid #2563eb; border-radius: 4px; background: #2563eb; color: #fff; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }\n#ctValveCloseRecovery .ct-valve-save:disabled, #ctValveCloseRecovery input:disabled { cursor: not-allowed; opacity: 0.45; }\n#ctValveCloseRecovery .ct-valve-save:focus-visible, #ctValveCloseRecovery input:focus-visible { outline: 2px solid #1570ef; outline-offset: 2px; }\n#ctValveCloseRecovery .ct-valve-recovery-note { margin: 0; padding: 10px 16px; }\n@media (max-width: 640px) { #ctValveCloseRecovery .ct-valve-recovery-head { align-items: stretch; flex-direction: column; } }\n",
+                "wrap": false
+              }
+            },
+            "version": "6.3.0"
+          }
+        }
+      },
       "panel-2": {
         "kind": "Panel",
         "spec": {
@@ -1336,94 +1438,6 @@
                 "renderMode": "allRows",
                 "styles": ".ptp-actions { \r\n  display: flex; \r\n  gap: 8px; \r\n  justify-content: center; \r\n  align-items: center; \r\n}\r\n\r\ndiv.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {\r\n  margin-left: 0;\r\n} \r\n\r\n.ptp-wrap { width: 100%; max-width: 880px; }\r\n\r\n.ptp-head { margin-bottom: 24px; }\r\n.ptp-eyebrow {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 12px;\r\n  letter-spacing: 0.12em;\r\n  text-transform: uppercase;\r\n  margin-bottom: 6px;\r\n}\r\n.ptp-title {\r\n  margin: 0;\r\n  font-size: 26px;\r\n  font-weight: 600;\r\n  letter-spacing: -0.01em;\r\n}\r\n\r\n.ptp-card {\r\n  border-radius: 8px;\r\n  overflow: hidden;\r\n  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);\r\n}\r\n\r\n.ptp-table {\r\n  width: 100%;\r\n  border-collapse: collapse;\r\n  table-layout: fixed;\r\n}\r\n\r\n.ptp-table th {\r\n  text-align: left;\r\n  height: 48px;\r\n  padding: 0 24px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 500;\r\n}\r\n\r\n.ptp-table .col-setting { width: auto; }\r\n.ptp-table .col-value { width: 38%; }\r\n.ptp-table .col-action { width: 132px; }\r\n\r\n.ptp-table td {\r\n  padding: 14px 24px;\r\n  vertical-align: middle;\r\n}\r\n.ptp-table tr:last-child td { border-bottom: none; }\r\n\r\n.ptp-label { font-size: 15px; font-weight: 500; }\r\n.ptp-hint { font-size: 12.5px; color: #9a9a92; margin-top: 2px; }\r\n\r\n.ptp-value {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-edit-row { display: flex; align-items: center; gap: 8px; }\r\n\r\n.ptp-input {\r\n  flex: 1;\r\n  min-width: 0;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  padding: 9px 11px;\r\n  border: 1.5px solid #1c1c1a;\r\n  border-radius: 6px;\r\n  outline: none;\r\n}\r\n\r\n.ptp-unit {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n}\r\n\r\n.ptp-actions { display: flex; gap: 8px; }\r\n\r\n.ptp-btn {\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n  font-size: 14px;\r\n  font-weight: 400 !important;\r\n  padding: 7px 16px;\r\n  border: none;\r\n  border-radius: 6px;\r\n  cursor: pointer;\r\n}\r\n\r\n\n.ptp-btn:disabled,\n.ptp-btn[disabled] {\n  opacity: 0.45;\n  cursor: not-allowed;\n  filter: grayscale(1);\n}\n\n.ptp-btn-save:disabled,\n.ptp-btn-save[disabled] {\n  background: #d1d5db !important;\n  color: #6b7280 !important;\n}\n// .ptp-btn:hover { background: #f4f4f2; border-color: #bcbcb4; }\r\n\r\n.ptp-btn-save {\r\n  font-weight: 400;\r\n  padding: 7px 14px;\r\n}\r\n// .ptp-btn-save:hover { background: #000; }\r\n\r\n.ptp-btn-cancel {\r\n  font-size: 18px;\r\n  line-height: 1;\r\n  padding: 7px 14px;\r\n}\r\n\r\n.ptp-note {\r\n  margin-top: 14px;\r\n  font-size: 12.5px;\r\n  font-family: Inter, Helvetica, Arial, sans-serif;\r\n}\n\n.ptp-btn-icon {\n  width: 34px;\n  height: 34px;\n  padding: 0;\n  display: inline-flex;\n  align-items: center;\n  justify-content: center;\n}\n\n.ptp-btn-icon .fa {\n  font-size: 14px;\n  line-height: 1;\n}",
                 "wrap": true
-              }
-            },
-            "version": "6.3.0"
-          }
-        }
-      },
-      "panel-14": {
-        "kind": "Panel",
-        "spec": {
-          "data": {
-            "kind": "QueryGroup",
-            "spec": {
-              "queries": [
-                {
-                  "kind": "PanelQuery",
-                  "spec": {
-                    "hidden": false,
-                    "query": {
-                      "datasource": {
-                        "name": "cpms-postgres"
-                      },
-                      "group": "grafana-postgresql-datasource",
-                      "kind": "DataQuery",
-                      "spec": {
-                        "dataset": "cpms",
-                        "editorMode": "code",
-                        "format": "table",
-                        "rawQuery": true,
-                        "rawSql": "select scope, key, equipment_kind, equipment_id, value, unit, description, is_active from control_params where is_active = true and scope = 'EQUIPMENT' and equipment_kind = 'VALVE' and key = 'ct_valve.close_reseat_enabled' order by equipment_id",
-                        "sql": {
-                          "columns": [
-                            {
-                              "parameters": [],
-                              "type": "function"
-                            }
-                          ],
-                          "groupBy": [
-                            {
-                              "property": {
-                                "type": "string"
-                              },
-                              "type": "groupBy"
-                            }
-                          ],
-                          "limit": 50
-                        }
-                      },
-                      "version": "v0"
-                    },
-                    "refId": "A"
-                  }
-                }
-              ],
-              "queryOptions": {},
-              "transformations": []
-            }
-          },
-          "description": "Configure bounded automatic close-reseat recovery for individual cooling tower valves.",
-          "id": 14,
-          "links": [],
-          "title": "",
-          "transparent": true,
-          "vizConfig": {
-            "group": "marcusolsson-dynamictext-panel",
-            "kind": "VizConfig",
-            "spec": {
-              "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-              },
-              "options": {
-                "afterRender": "(async () =\u003e {\n  const HOST = '/cpms';\n  const KEY = 'ct_valve.close_reseat_enabled';\n  const root = document.getElementById('ctValveCloseRecovery');\n  if (!root) return;\n  const body = root.querySelector('tbody');\n  const message = root.querySelector('.ct-valve-recovery-message');\n  const names = {\n    ct1ValveIn: 'CT-1 Inlet Valve', ct1ValveOut: 'CT-1 Outlet Valve',\n    ct2ValveIn: 'CT-2 Inlet Valve', ct2ValveOut: 'CT-2 Outlet Valve',\n    ct3ValveIn: 'CT-3 Inlet Valve', ct3ValveOut: 'CT-3 Outlet Valve',\n  };\n  const rows = Array.isArray(context.data)\n    ? context.data.filter((row) =\u003e row?.scope === 'EQUIPMENT' \u0026\u0026 row?.equipment_kind === 'VALVE' \u0026\u0026 row?.key === KEY)\n    : [];\n  rows.sort((a, b) =\u003e String(a.equipment_id).localeCompare(String(b.equipment_id), undefined, { numeric: true }));\n  body.replaceChildren();\n\n  const responseBody = async (response) =\u003e {\n    const text = await response.text();\n    if (!text) return undefined;\n    try { return JSON.parse(text); } catch { return text; }\n  };\n  const errorText = (value, response) =\u003e typeof value === 'string'\n    ? value\n    : value?.error || value?.message || ('HTTP ' + response.status);\n  const setMessage = (text, error = false) =\u003e {\n    message.textContent = text;\n    message.classList.toggle('error', error);\n  };\n\n  for (const row of rows) {\n    const tr = document.createElement('tr');\n    const nameCell = document.createElement('td');\n    const name = document.createElement('div');\n    name.className = 'ct-valve-name';\n    name.textContent = names[row.equipment_id] || row.equipment_id;\n    const id = document.createElement('div');\n    id.className = 'ct-valve-id';\n    id.textContent = row.equipment_id;\n    nameCell.append(name, id);\n\n    const valueCell = document.createElement('td');\n    const label = document.createElement('label');\n    label.className = 'ct-valve-toggle';\n    const input = document.createElement('input');\n    input.type = 'checkbox';\n    input.checked = row.value === true;\n    const state = document.createElement('span');\n    state.className = 'ct-valve-state';\n    const renderState = () =\u003e { state.textContent = input.checked ? 'Enabled' : 'Disabled'; };\n    renderState();\n    label.append(input, state);\n    valueCell.append(label);\n\n    const actionCell = document.createElement('td');\n    const save = document.createElement('button');\n    save.className = 'ct-valve-save';\n    save.type = 'button';\n    save.textContent = 'Save';\n    save.disabled = true;\n    actionCell.append(save);\n    tr.append(nameCell, valueCell, actionCell);\n    body.append(tr);\n\n    let original = row.value === true;\n    input.addEventListener('change', () =\u003e { renderState(); save.disabled = input.checked === original; });\n    save.addEventListener('click', async () =\u003e {\n      let reason = '';\n      while (!reason) {\n        const answer = prompt('Remark for this change:', reason);\n        if (answer === null) return;\n        reason = answer.trim();\n        if (!reason) alert('Remark is required.');\n      }\n      input.disabled = true;\n      save.disabled = true;\n      setMessage('Saving ' + row.equipment_id + '...');\n      try {\n        const response = await fetch(HOST + '/params/value', {\n          method: 'POST',\n          headers: { 'Content-Type': 'application/json' },\n          body: JSON.stringify({\n            scope: 'EQUIPMENT', equipmentKind: 'VALVE', equipmentId: row.equipment_id,\n            key: KEY, value: input.checked, reason,\n          }),\n        });\n        const result = await responseBody(response);\n        if (!response.ok) throw new Error(errorText(result, response));\n        original = input.checked;\n        row.value = input.checked;\n        setMessage(row.equipment_id + ' updated successfully.');\n        context.grafana.refresh();\n      } catch (error) {\n        input.checked = original;\n        renderState();\n        setMessage('Save failed: ' + error.message, true);\n      } finally {\n        input.disabled = false;\n        save.disabled = true;\n      }\n    });\n  }\n  setMessage(rows.length ? 'Valve settings loaded.' : 'No CT valve recovery parameters found.', rows.length === 0);\n})();",
-                "content": "\u003csection id=\"ctValveCloseRecovery\" class=\"ct-valve-recovery\" aria-labelledby=\"ctValveCloseRecoveryTitle\"\u003e\n  \u003cdiv class=\"ct-valve-recovery-head\"\u003e\n    \u003cdiv\u003e\n      \u003ch2 id=\"ctValveCloseRecoveryTitle\"\u003eCT Valve Close Recovery\u003c/h2\u003e\n      \u003cp\u003eAllow one bounded open-close reseat when a valve fails to prove closed.\u003c/p\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-valve-recovery-message\" role=\"status\" aria-live=\"polite\"\u003eLoading...\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"ct-valve-recovery-table-wrap\"\u003e\n    \u003ctable class=\"ct-valve-recovery-table\"\u003e\n      \u003cthead\u003e\u003ctr\u003e\u003cth\u003eCooling tower valve\u003c/th\u003e\u003cth\u003eAutomatic reseat\u003c/th\u003e\u003cth\u003e\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\n      \u003ctbody\u003e\u003c/tbody\u003e\n    \u003c/table\u003e\n  \u003c/div\u003e\n  \u003cp class=\"ct-valve-recovery-note\"\u003eKeep disabled unless the valve has an approved automatic reseat procedure.\u003c/p\u003e\n\u003c/section\u003e",
-                "contentPartials": [],
-                "defaultContent": "\u003csection id=\"ctValveCloseRecovery\" class=\"ct-valve-recovery\" aria-labelledby=\"ctValveCloseRecoveryTitle\"\u003e\n  \u003cdiv class=\"ct-valve-recovery-head\"\u003e\n    \u003cdiv\u003e\n      \u003ch2 id=\"ctValveCloseRecoveryTitle\"\u003eCT Valve Close Recovery\u003c/h2\u003e\n      \u003cp\u003eAllow one bounded open-close reseat when a valve fails to prove closed.\u003c/p\u003e\n    \u003c/div\u003e\n    \u003cdiv class=\"ct-valve-recovery-message\" role=\"status\" aria-live=\"polite\"\u003eLoading...\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"ct-valve-recovery-table-wrap\"\u003e\n    \u003ctable class=\"ct-valve-recovery-table\"\u003e\n      \u003cthead\u003e\u003ctr\u003e\u003cth\u003eCooling tower valve\u003c/th\u003e\u003cth\u003eAutomatic reseat\u003c/th\u003e\u003cth\u003e\u003c/th\u003e\u003c/tr\u003e\u003c/thead\u003e\n      \u003ctbody\u003e\u003c/tbody\u003e\n    \u003c/table\u003e\n  \u003c/div\u003e\n  \u003cp class=\"ct-valve-recovery-note\"\u003eKeep disabled unless the valve has an approved automatic reseat procedure.\u003c/p\u003e\n\u003c/section\u003e",
-                "editor": {
-                  "format": "auto",
-                  "language": "html"
-                },
-                "editors": [
-                  "styles",
-                  "afterRender"
-                ],
-                "externalStyles": [],
-                "helpers": "",
-                "renderMode": "allRows",
-                "styles": "\n#ctValveCloseRecovery, #ctValveCloseRecovery * { box-sizing: border-box; }\n#ctValveCloseRecovery { width: 100%; border: 1px solid var(--color-border-weak, #d0d5dd); border-radius: 6px; overflow: hidden; background: var(--color-background-primary, #fff); color: var(--color-text-primary, #1f2933); font-family: var(--font-sans, Inter, Arial, sans-serif); }\n#ctValveCloseRecovery .ct-valve-recovery-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--color-border-weak, #eaecf0); }\n#ctValveCloseRecovery h2 { margin: 0; font-size: 16px; font-weight: 700; }\n#ctValveCloseRecovery p, #ctValveCloseRecovery .ct-valve-recovery-message { margin: 3px 0 0; color: var(--color-text-secondary, #667085); font-size: 13px; line-height: 1.4; }\n#ctValveCloseRecovery .ct-valve-recovery-message.error { color: #b42318; }\n#ctValveCloseRecovery .ct-valve-recovery-table-wrap { overflow-x: auto; }\n#ctValveCloseRecovery .ct-valve-recovery-table { width: 100%; min-width: 540px; border-collapse: collapse; }\n#ctValveCloseRecovery th, #ctValveCloseRecovery td { padding: 10px 16px; border-bottom: 1px solid var(--color-border-weak, #eaecf0); text-align: left; }\n#ctValveCloseRecovery th { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; text-transform: uppercase; }\n#ctValveCloseRecovery td { font-size: 13px; }\n#ctValveCloseRecovery td:last-child, #ctValveCloseRecovery th:last-child { width: 100px; text-align: right; }\n#ctValveCloseRecovery .ct-valve-name { font-weight: 700; }\n#ctValveCloseRecovery .ct-valve-id { margin-top: 2px; color: var(--color-text-secondary, #667085); font-size: 11px; }\n#ctValveCloseRecovery .ct-valve-toggle { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }\n#ctValveCloseRecovery .ct-valve-toggle input { width: 16px; height: 16px; accent-color: #1570ef; }\n#ctValveCloseRecovery .ct-valve-state { font-size: 13px; font-weight: 700; }\n#ctValveCloseRecovery .ct-valve-save { min-height: 32px; padding: 6px 11px; border: 1px solid #2563eb; border-radius: 4px; background: #2563eb; color: #fff; font-family: inherit; font-size: 13px; font-weight: 700; cursor: pointer; }\n#ctValveCloseRecovery .ct-valve-save:disabled, #ctValveCloseRecovery input:disabled { cursor: not-allowed; opacity: 0.45; }\n#ctValveCloseRecovery .ct-valve-save:focus-visible, #ctValveCloseRecovery input:focus-visible { outline: 2px solid #1570ef; outline-offset: 2px; }\n#ctValveCloseRecovery .ct-valve-recovery-note { margin: 0; padding: 10px 16px; }\n@media (max-width: 640px) { #ctValveCloseRecovery .ct-valve-recovery-head { align-items: stretch; flex-direction: column; } }\n",
-                "wrap": false
               }
             },
             "version": "6.3.0"
