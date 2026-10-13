@@ -1890,7 +1890,7 @@
           "cpms-controls-settings"
         ],
         "targetBlank": false,
-        "title": "Controls & Settings",
+        "title": "Controls \u0026 Settings",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
@@ -1899,7 +1899,7 @@
     "liveNow": false,
     "preload": true,
     "tags": [
-      "cpms", "cpms-controls-settings"
+      "cpms"
     ],
     "timeSettings": {
       "autoRefresh": "",
