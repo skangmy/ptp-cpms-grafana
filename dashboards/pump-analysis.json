@@ -2429,6 +2429,218 @@
           }
         }
       },
+      "panel-26": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "",
+                      "kind": "DataQuery",
+                      "spec": {},
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 26,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "volkovlabs-variable-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "thresholdsStyle": {
+                      "mode": "color",
+                      "thresholds": []
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alertCustomMessage": "",
+                "alwaysVisibleFilter": false,
+                "autoScroll": false,
+                "browserTabNamePattern": "",
+                "collapsedByDefault": false,
+                "customValue": false,
+                "displayMode": "button",
+                "emptyValue": false,
+                "favorites": {
+                  "enabled": false,
+                  "storage": "browser"
+                },
+                "filter": false,
+                "groupSelection": false,
+                "header": true,
+                "isMinimizeForTable": false,
+                "isMinimizeViewShowCustomIcon": false,
+                "isPinTabsEnabled": false,
+                "isUseLocalTime": false,
+                "minimizeOutputFormat": "text",
+                "minimizeViewCustomIcon": "",
+                "minimizeViewNativeIcon": "gf-movepane-right",
+                "padding": 10,
+                "persistent": false,
+                "requestLatency": "low",
+                "saveSelectedGroup": false,
+                "saveSelectedGroupKey": "",
+                "selectedValues": {
+                  "showSelected": false
+                },
+                "showGroupTotal": false,
+                "showLabel": true,
+                "showName": false,
+                "showResetButton": false,
+                "showTotal": false,
+                "statusSort": false,
+                "tableViewPosition": "normal",
+                "tabsInOrder": true,
+                "toolbarMode": "tabs",
+                "variable": "chartInterval",
+                "wordBreak": "normal"
+              }
+            },
+            "version": "5.2.0"
+          }
+        }
+      },
+      "panel-27": {
+        "kind": "Panel",
+        "spec": {
+          "data": {
+            "kind": "QueryGroup",
+            "spec": {
+              "queries": [
+                {
+                  "kind": "PanelQuery",
+                  "spec": {
+                    "hidden": false,
+                    "query": {
+                      "group": "",
+                      "kind": "DataQuery",
+                      "spec": {},
+                      "version": "v0"
+                    },
+                    "refId": "A"
+                  }
+                }
+              ],
+              "queryOptions": {},
+              "transformations": []
+            }
+          },
+          "description": "",
+          "id": 27,
+          "links": [],
+          "title": "",
+          "transparent": true,
+          "vizConfig": {
+            "group": "volkovlabs-variable-panel",
+            "kind": "VizConfig",
+            "spec": {
+              "fieldConfig": {
+                "defaults": {
+                  "custom": {
+                    "thresholdsStyle": {
+                      "mode": "color",
+                      "thresholds": []
+                    }
+                  },
+                  "thresholds": {
+                    "mode": "absolute",
+                    "steps": [
+                      {
+                        "color": "green",
+                        "value": 0
+                      },
+                      {
+                        "color": "red",
+                        "value": 80
+                      }
+                    ]
+                  }
+                },
+                "overrides": []
+              },
+              "options": {
+                "alertCustomMessage": "",
+                "alwaysVisibleFilter": false,
+                "autoScroll": false,
+                "browserTabNamePattern": "",
+                "collapsedByDefault": false,
+                "customValue": false,
+                "displayMode": "button",
+                "emptyValue": false,
+                "favorites": {
+                  "enabled": false,
+                  "storage": "browser"
+                },
+                "filter": false,
+                "groupSelection": false,
+                "header": true,
+                "isMinimizeForTable": false,
+                "isMinimizeViewShowCustomIcon": false,
+                "isPinTabsEnabled": false,
+                "isUseLocalTime": false,
+                "minimizeOutputFormat": "text",
+                "minimizeViewCustomIcon": "",
+                "minimizeViewNativeIcon": "gf-movepane-right",
+                "padding": 10,
+                "persistent": false,
+                "requestLatency": "low",
+                "saveSelectedGroup": false,
+                "saveSelectedGroupKey": "",
+                "selectedValues": {
+                  "showSelected": false
+                },
+                "showGroupTotal": false,
+                "showLabel": true,
+                "showName": false,
+                "showResetButton": false,
+                "showTotal": false,
+                "statusSort": false,
+                "tableViewPosition": "normal",
+                "tabsInOrder": true,
+                "toolbarMode": "tabs",
+                "variable": "chartInterval",
+                "wordBreak": "normal"
+              }
+            },
+            "version": "5.2.0"
+          }
+        }
+      },
       "panel-3": {
         "kind": "Panel",
         "spec": {
@@ -3518,6 +3730,19 @@
                         "x": 0,
                         "y": 14
                       }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
+                          "name": "panel-26"
+                        },
+                        "height": 2,
+                        "width": 18,
+                        "x": 0,
+                        "y": 22
+                      }
                     }
                   ]
                 }
@@ -3537,12 +3762,25 @@
                       "spec": {
                         "element": {
                           "kind": "ElementReference",
+                          "name": "panel-27"
+                        },
+                        "height": 2,
+                        "width": 18,
+                        "x": 0,
+                        "y": 0
+                      }
+                    },
+                    {
+                      "kind": "GridLayoutItem",
+                      "spec": {
+                        "element": {
+                          "kind": "ElementReference",
                           "name": "panel-5"
                         },
                         "height": 8,
                         "width": 24,
                         "x": 0,
-                        "y": 0
+                        "y": 2
                       }
                     },
                     {
@@ -3555,7 +3793,7 @@
                         "height": 8,
                         "width": 24,
                         "x": 0,
-                        "y": 8
+                        "y": 10
                       }
                     },
                     {
@@ -3568,7 +3806,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 16
+                        "y": 18
                       }
                     },
                     {
@@ -3581,7 +3819,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 25
+                        "y": 27
                       }
                     },
                     {
@@ -3594,7 +3832,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 34
+                        "y": 36
                       }
                     },
                     {
@@ -3607,7 +3845,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 43
+                        "y": 45
                       }
                     },
                     {
@@ -3620,7 +3858,7 @@
                         "height": 9,
                         "width": 24,
                         "x": 0,
-                        "y": 52
+                        "y": 54
                       }
                     },
                     {
@@ -3633,7 +3871,7 @@
                         "height": 9,
                         "width": 12,
                         "x": 0,
-                        "y": 61
+                        "y": 63
                       }
                     },
                     {
@@ -3646,7 +3884,7 @@
                         "height": 9,
                         "width": 12,
                         "x": 12,
-                        "y": 61
+                        "y": 63
                       }
                     },
                     {
@@ -3659,7 +3897,7 @@
                         "height": 9,
                         "width": 12,
                         "x": 0,
-                        "y": 70
+                        "y": 72
                       }
                     },
                     {
@@ -3672,7 +3910,7 @@
                         "height": 9,
                         "width": 12,
                         "x": 12,
-                        "y": 70
+                        "y": 72
                       }
                     },
                     {
@@ -3685,7 +3923,7 @@
                         "height": 9,
                         "width": 12,
                         "x": 0,
-                        "y": 79
+                        "y": 81
                       }
                     },
                     {
@@ -3698,7 +3936,7 @@
                         "height": 9,
                         "width": 12,
                         "x": 12,
-                        "y": 79
+                        "y": 81
                       }
                     }
                   ]
@@ -3888,7 +4126,7 @@
             "text": "Auto",
             "value": "v.windowPeriod"
           },
-          "hide": "dontHide",
+          "hide": "hideVariable",
           "includeAll": false,
           "label": "Chart Interval",
           "multi": false,
