@@ -496,7 +496,8 @@
                     "mode": "absolute",
                     "steps": [
                       {
-                        "color": "green"
+                        "color": "green",
+                        "value": 0
                       },
                       {
                         "color": "red",
@@ -524,7 +525,8 @@
                           "mode": "absolute",
                           "steps": [
                             {
-                              "color": "red"
+                              "color": "red",
+                              "value": 0
                             },
                             {
                               "color": "transparent",
@@ -1058,7 +1060,7 @@
           "cpms-controls-settings"
         ],
         "targetBlank": false,
-        "title": "Controls & Settings",
+        "title": "Controls \u0026 Settings",
         "tooltip": "",
         "type": "dashboards",
         "url": ""
@@ -1067,7 +1069,7 @@
     "liveNow": false,
     "preload": true,
     "tags": [
-      "cpms", "cpms-main"
+      "cpms"
     ],
     "timeSettings": {
       "autoRefresh": "10s",
