@@ -5657,7 +5657,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"date\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nmonthStart = date.truncate(t: now(), unit: 1mo)\nlastCompletedInterval = date.truncate(t: now(), unit: 30m)\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: monthStart, stop: lastCompletedInterval)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"totalPower\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e aggregateWindow(every: 30m, fn: mean, createEmpty: false, timeSrc: \"_start\")\n  |\u003e group()\n  |\u003e max(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({r with maximumDemandKw: r._value}))\n  |\u003e keep(columns: [\"_time\", \"maximumDemandKw\"])"
+                        "query": "import \"date\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nmonthStart = date.truncate(t: now(), unit: 1mo)\nlastCompletedInterval = date.truncate(t: now(), unit: 30m)\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: monthStart, stop: lastCompletedInterval)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e aggregateWindow(every: 30m, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e group()\n  |\u003e max(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({r with maximumDemandKw: r._value}))\n  |\u003e keep(columns: [\"_time\", \"maximumDemandKw\"])"
                       },
                       "version": "v0"
                     },
@@ -5698,7 +5698,7 @@
               },
               "options": {
                 "afterRender": "",
-                "content": "\u003csection class=\"plant-performance-kpi-wrap\" aria-label=\"Plant performance KPI cards\"\u003e\n  \u003cdiv class=\"plant-performance-kpi-head\"\u003e\n    \u003cdiv class=\"plant-performance-kpi-title\"\u003ePlant Performance\u003c/div\u003e\n    \u003cdiv class=\"plant-performance-kpi-note\"\u003eLIVE · Last 5-min avg\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"plant-performance-kpi-grid\"\u003e\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-snowflake-o plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant RT\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].coolingLoad\n        decimalLength=1}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e RT\u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003e{{numberFormat data.[1].[0].coolingCapacity decimalLength=1}} kW cooling\n        capacity\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].loadUsage decimalLength=0}} RTh\n      \u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-bolt plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant Power\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].totalPower\n        decimalLength=1}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].energyUsage decimalLength=0}} kWh\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eEst. MTD 30-min MD {{numberFormat data.[5].[0].maximumDemandKw decimalLength=1}} kW · {{demandDateTime data.[5].[0]._time}}\n      \u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card plant-performance-kpi-{{plantEfficiencyStatus data.[1].[0].efficiency}}\"\u003e\n      \u003ci class=\"fa fa-line-chart plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant Efficiency\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].efficiency\n        decimalLength=2}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e kW/RT\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].efficiency decimalLength=2}} kW/RT\n      \u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-exchange plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant COP\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].cop\n        decimalLength=2}}\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].cop decimalLength=2}}\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-database plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003eExpansion Tank\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[2].[0].tank1\n        decimalLength=2}} / {{numberFormat data.[2].[0].tank2\n        decimalLength=2}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e m\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003ePoint 1 / Point 2\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-tree plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      {{#with (outdoorWeather data.[4].[0].outdoorTemp data.[4].[0].outdoorHumid data.[3].[0].radiation)}}\n      \u003ci class=\"fa {{iconClass}} plant-performance-weather-icon\" role=\"img\" aria-label=\"{{condition}}\" title=\"{{condition}}\"\u003e\u003c/i\u003e\n      {{/with}}\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003eOutdoor\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[4].[0].outdoorTemp\n        decimalLength=1}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eRH {{numberFormat data.[4].[0].outdoorHumid\n        decimalLength=1}}%, WB {{numberFormat (wetBulb data.[4].[0].outdoorTemp data.[4].[0].outdoorHumid)\n        decimalLength=1}} °C\n        \u003cbr\u003eSolar {{numberFormat data.[3].[0].radiation\n        decimalLength=0}} W/m2\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/section\u003e",
+                "content": "\u003csection class=\"plant-performance-kpi-wrap\" aria-label=\"Plant performance KPI cards\"\u003e\n  \u003cdiv class=\"plant-performance-kpi-head\"\u003e\n    \u003cdiv class=\"plant-performance-kpi-title\"\u003ePlant Performance\u003c/div\u003e\n    \u003cdiv class=\"plant-performance-kpi-note\"\u003eLIVE · Last 5-min avg\u003c/div\u003e\n  \u003c/div\u003e\n  \u003cdiv class=\"plant-performance-kpi-grid\"\u003e\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-snowflake-o plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant RT\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].coolingLoad\n        decimalLength=1}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e RT\u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003e{{numberFormat data.[1].[0].coolingCapacity decimalLength=1}} kW cooling\n        capacity\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].loadUsage decimalLength=0}} RTh\n      \u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-bolt plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant Power\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].totalPower\n        decimalLength=1}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].energyUsage decimalLength=0}} kWh\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003e30-min MD {{numberFormat data.[5].[0].maximumDemandKw\n        decimalLength=1}} kW\n        \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003e\n        {{demandDateTime data.[5].[0]._time}}\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eThis month so far\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card plant-performance-kpi-{{plantEfficiencyStatus data.[1].[0].efficiency}}\"\u003e\n      \u003ci class=\"fa fa-line-chart plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant Efficiency\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].efficiency\n        decimalLength=2}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e kW/RT\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].efficiency decimalLength=2}} kW/RT\n      \u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-exchange plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant COP\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[1].[0].cop\n        decimalLength=2}}\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far {{numberFormat data.[0].[0].cop decimalLength=2}}\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-database plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003eExpansion Tank\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[2].[0].tank1\n        decimalLength=2}} / {{numberFormat data.[2].[0].tank2\n        decimalLength=2}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e m\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003ePoint 1 / Point 2\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-tree plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      {{#with (outdoorWeather data.[4].[0].outdoorTemp data.[4].[0].outdoorHumid data.[3].[0].radiation)}}\n      \u003ci class=\"fa {{iconClass}} plant-performance-weather-icon\" role=\"img\" aria-label=\"{{condition}}\" title=\"{{condition}}\"\u003e\u003c/i\u003e\n      {{/with}}\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003eOutdoor\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e{{numberFormat data.[4].[0].outdoorTemp\n        decimalLength=1}}\u003cspan class=\"plant-performance-kpi-unit\"\u003e °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eRH {{numberFormat data.[4].[0].outdoorHumid\n        decimalLength=1}}%, WB {{numberFormat (wetBulb data.[4].[0].outdoorTemp data.[4].[0].outdoorHumid)\n        decimalLength=1}} °C\n        \u003cbr\u003eSolar {{numberFormat data.[3].[0].radiation\n        decimalLength=0}} W/m2\n      \u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/section\u003e",
                 "contentPartials": [],
                 "defaultContent": "\u003csection class=\"plant-performance-kpi-wrap\" aria-label=\"Plant performance KPI cards\"\u003e\n  \u003cdiv class=\"plant-performance-kpi-head\"\u003e\n    \u003cdiv class=\"plant-performance-kpi-title\"\u003ePlant Performance\u003c/div\u003e\n    \u003cdiv class=\"plant-performance-kpi-freshness\"\u003eLIVE · Today so far\u003c/div\u003e\n  \u003c/div\u003e\n\n  \u003cdiv class=\"plant-performance-kpi-grid\"\u003e\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-snowflake-o plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant RT (today avg)\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e---\u003cspan class=\"plant-performance-kpi-unit\"\u003e RT\u003c/span\u003e\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003e--- kW cooling capacity\n      \u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far --- RTh\n      \u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-bolt plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant Power\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e---\u003cspan class=\"plant-performance-kpi-unit\"\u003e kW\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eToday so far --- kWh\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eEst. MTD 30-min MD --- kW · --\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card plant-performance-kpi-good\"\u003e\n      \u003ci class=\"fa fa-line-chart plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant Efficiency\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e---\u003cspan class=\"plant-performance-kpi-unit\"\u003e kW/RT\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eLast 5-min avg\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card plant-performance-kpi-good\"\u003e\n      \u003ci class=\"fa fa-exchange plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003ePlant COP\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e---\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eLast 5-min avg\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-database plant-performance-kpi-icon\" aria-hidden=\"true\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003eExpansion Tank Level\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e---\u003cspan class=\"plant-performance-kpi-unit\"\u003e %\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eThermal storage level\u003c/div\u003e\n    \u003c/div\u003e\n\n    \u003cdiv class=\"plant-performance-kpi-card\"\u003e\n      \u003ci class=\"fa fa-sun-o plant-performance-weather-icon\" role=\"img\" aria-label=\"Sunny\" title=\"Sunny\"\u003e\u003c/i\u003e\n      \u003cdiv class=\"plant-performance-kpi-label\"\u003eOutdoor\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-value\"\u003e---\u003cspan class=\"plant-performance-kpi-unit\"\u003e °C\u003c/span\u003e\u003c/div\u003e\n      \u003cdiv class=\"plant-performance-kpi-sub\"\u003eRH ---%, WB --- °C\u003cbr\u003e\n      solar --- W/m2\u003c/div\u003e\n    \u003c/div\u003e\n  \u003c/div\u003e\n\u003c/section\u003e",
                 "editor": {
@@ -6511,8 +6511,8 @@
                           "kind": "ElementReference",
                           "name": "panel-5"
                         },
-                        "height": 6,
-                        "width": 18,
+                        "height": 7,
+                        "width": 19,
                         "x": 0,
                         "y": 5
                       }
@@ -6524,9 +6524,9 @@
                           "kind": "ElementReference",
                           "name": "panel-2"
                         },
-                        "height": 6,
-                        "width": 6,
-                        "x": 18,
+                        "height": 7,
+                        "width": 5,
+                        "x": 19,
                         "y": 5
                       }
                     },
@@ -6540,7 +6540,7 @@
                         "height": 27,
                         "width": 24,
                         "x": 0,
-                        "y": 11
+                        "y": 12
                       }
                     },
                     {
@@ -6553,7 +6553,7 @@
                         "height": 8,
                         "width": 16,
                         "x": 0,
-                        "y": 38
+                        "y": 39
                       }
                     },
                     {
@@ -6566,7 +6566,7 @@
                         "height": 8,
                         "width": 8,
                         "x": 16,
-                        "y": 38
+                        "y": 39
                       }
                     },
                     {
@@ -6585,7 +6585,7 @@
                         },
                         "width": 24,
                         "x": 0,
-                        "y": 46
+                        "y": 47
                       }
                     },
                     {
@@ -6604,7 +6604,7 @@
                         },
                         "width": 24,
                         "x": 0,
-                        "y": 60
+                        "y": 61
                       }
                     }
                   ]
@@ -7229,8 +7229,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "12.990864999999987",
-            "value": "12.990864999999987"
+            "text": "13.791126111111096",
+            "value": "13.791126111111096"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
