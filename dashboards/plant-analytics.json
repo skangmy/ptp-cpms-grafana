@@ -5657,7 +5657,7 @@
                       "group": "influxdb",
                       "kind": "DataQuery",
                       "spec": {
-                        "query": "import \"date\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nmonthStart = date.truncate(t: now(), unit: 1mo)\nlastCompletedInterval = date.truncate(t: now(), unit: 30m)\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: monthStart, stop: lastCompletedInterval)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e aggregateWindow(every: 30m, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e group()\n  |\u003e max(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({r with maximumDemandKw: r._value}))\n  |\u003e keep(columns: [\"_time\", \"maximumDemandKw\"])"
+                        "query": "import \"date\"\nimport \"timezone\"\n\noption location = timezone.location(name: \"Asia/Kuala_Lumpur\")\n\nmonthStart = date.truncate(t: now(), unit: 1mo)\nlastCompletedInterval = date.truncate(t: now(), unit: 30m)\n\nfrom(bucket: \"cpms\")\n  |\u003e range(start: monthStart, stop: lastCompletedInterval)\n  |\u003e filter(fn: (r) =\u003e r[\"_measurement\"] == \"power\")\n  |\u003e filter(fn: (r) =\u003e r[\"_field\"] == \"energyUsage\")\n  |\u003e filter(fn: (r) =\u003e r[\"deviceId\"] == \"main\")\n  |\u003e aggregateWindow(every: 30m, fn: sum, createEmpty: false, timeSrc: \"_start\")\n  |\u003e group()\n  |\u003e max(column: \"_value\")\n  |\u003e map(fn: (r) =\u003e ({r with maximumDemandKw: r._value * 2.0}))\n  |\u003e keep(columns: [\"_time\", \"maximumDemandKw\"])"
                       },
                       "version": "v0"
                     },
@@ -7229,8 +7229,8 @@
         "spec": {
           "allowCustomValue": false,
           "current": {
-            "text": "13.791126111111096",
-            "value": "13.791126111111096"
+            "text": "14.315667222222205",
+            "value": "14.315667222222205"
           },
           "definition": "from(bucket: \"cpms\")\n  |\u003e range(start: v.timeRangeStart, stop: v.timeRangeStop)\n  |\u003e filter(fn: (r) =\u003e r._measurement == \"plantStatus\")\n  |\u003e filter(fn: (r) =\u003e r.deviceId == \"plant1\")\n  |\u003e filter(fn: (r) =\u003e r._field == \"state\")\n  |\u003e aggregateWindow(every: 5m, fn: last)\n  |\u003e integral(unit: 1h)\n",
           "hide": "hideVariable",
