@@ -156,6 +156,7 @@
     },
     "preload": false,
     "tags": [
+      "cpms",
       "cpms-controls-settings"
     ],
     "timeSettings": {

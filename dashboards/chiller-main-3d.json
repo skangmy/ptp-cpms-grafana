@@ -144,6 +144,7 @@
     "liveNow": false,
     "preload": true,
     "tags": [
+      "cpms",
       "cpms-main"
     ],
     "timeSettings": {

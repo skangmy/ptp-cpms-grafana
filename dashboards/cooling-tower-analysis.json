@@ -2694,7 +2694,10 @@
     ],
     "liveNow": false,
     "preload": false,
-    "tags": [],
+    "tags": [
+      "cpms",
+      "cpms-analytics"
+    ],
     "timeSettings": {
       "timezone": "browser",
       "from": "now-6h",

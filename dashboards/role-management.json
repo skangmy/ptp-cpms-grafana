@@ -150,6 +150,7 @@
     "liveNow": false,
     "preload": false,
     "tags": [
+      "cpms",
       "cpms-controls-settings"
     ],
     "timeSettings": {
