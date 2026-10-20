@@ -515,7 +515,7 @@
               ]
             }
           },
-          "description": "",
+          "description": "Selected period",
           "id": 11,
           "links": [],
           "title": "Runtime Comparison",
