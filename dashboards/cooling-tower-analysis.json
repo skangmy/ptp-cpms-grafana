@@ -1531,7 +1531,6 @@
                         "dataset": "chiller",
                         "editorMode": "code",
                         "format": "table",
-                        "query": "SELECT\n    tower_id,\n    total_runtime_seconds\n        + CASE\n            WHEN current_started_at IS NOT NULL\n            THEN FLOOR(\n                EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - current_started_at))\n            )::bigint\n            ELSE 0\n          END AS total_runtime_seconds,\n    start_count,\n    current_started_at,\n    last_started_at,\n    last_stopped_at\nFROM cooling_tower_runtime\nWHERE tower_id = '${coolingTower}';\n",
                         "rawQuery": true,
                         "rawSql": "SELECT\n    equipment_id,\n    total_runtime_seconds\n        + CASE\n            WHEN current_started_at IS NOT NULL\n            THEN FLOOR(\n                EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - current_started_at))\n            )::bigint\n            ELSE 0\n          END AS total_runtime_seconds,\n    coalesce(start_count, 0) as start_count,\n    current_started_at,\n    last_started_at,\n    last_stopped_at\nFROM equipment_runtime\nWHERE equipment_id = '${coolingTower}' and equipment_kind = 'COOLING_TOWER';\n",
                         "sql": {
