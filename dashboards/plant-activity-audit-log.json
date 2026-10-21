@@ -89,18 +89,10 @@
                                   "field": "event_time",
                                   "fieldSrc": "field",
                                   "operator": "macros",
-                                  "value": [
-                                    "timeFilter"
-                                  ],
-                                  "valueError": [
-                                    null
-                                  ],
-                                  "valueSrc": [
-                                    "value"
-                                  ],
-                                  "valueType": [
-                                    "datetime"
-                                  ]
+                                  "value": ["timeFilter"],
+                                  "valueError": [null],
+                                  "valueSrc": ["value"],
+                                  "valueType": ["datetime"]
                                 },
                                 "type": "rule"
                               }
@@ -371,7 +363,7 @@
                         "editorMode": "code",
                         "format": "table",
                         "rawQuery": true,
-                        "rawSql": "SELECT l.*, p.description, p.unit\nFROM control_param_audit_log l left join control_params p \non \tl.\"key\" = p.\"key\"\n\tand l.\"scope\" = p.\"scope\"\n\tand l.equipment_kind is not distinct from p.equipment_kind\n\tand l.equipment_id is not distinct from p.equipment_id\nWHERE \n$__timeFilter(l.created_at) \nORDER BY l.created_at DESC ",
+                        "rawSql": "SELECT l.created_at, 'PARAMETER' AS change_type, l.equipment_kind, l.equipment_id, l.key, l.old_value, l.new_value, l.changed_by, l.source, l.reason, p.description, p.unit\nFROM control_param_audit_log l\nLEFT JOIN control_params p\n  ON l.key = p.key\n AND l.scope = p.scope\n AND l.equipment_kind IS NOT DISTINCT FROM p.equipment_kind\n AND l.equipment_id IS NOT DISTINCT FROM p.equipment_id\nWHERE $__timeFilter(l.created_at)\nUNION ALL\nSELECT l.created_at, 'SCHEDULE' AS change_type, l.schedule_kind AS equipment_kind, l.schedule_id::text AS equipment_id, l.action AS key, l.old_value, l.new_value, l.changed_by, l.source, l.reason, initcap(lower(l.schedule_kind)) || ' schedule' AS description, NULL::text AS unit\nFROM schedule_audit_log l\nWHERE $__timeFilter(l.created_at)\nORDER BY created_at DESC",
                         "sql": {
                           "columns": [
                             {
@@ -408,18 +400,10 @@
                                   "field": "created_at",
                                   "fieldSrc": "field",
                                   "operator": "macros",
-                                  "value": [
-                                    "timeFilter"
-                                  ],
-                                  "valueError": [
-                                    null
-                                  ],
-                                  "valueSrc": [
-                                    "value"
-                                  ],
-                                  "valueType": [
-                                    "datetime"
-                                  ]
+                                  "value": ["timeFilter"],
+                                  "valueError": [null],
+                                  "valueSrc": ["value"],
+                                  "valueType": ["datetime"]
                                 },
                                 "type": "rule"
                               }
@@ -470,6 +454,7 @@
                       },
                       "includeByName": {},
                       "indexByName": {
+                        "change_type": 2,
                         "changed_by": 10,
                         "created_at": 1,
                         "description": 5,
@@ -485,6 +470,7 @@
                         "unit": 9
                       },
                       "renameByName": {
+                        "change_type": "Change Type",
                         "changed_by": "Changed By",
                         "created_at": "Change Time",
                         "description": "Parameter",
@@ -746,9 +732,7 @@
         "icon": "external link",
         "includeVars": false,
         "keepTime": false,
-        "tags": [
-          "cpms-main"
-        ],
+        "tags": ["cpms-main"],
         "targetBlank": false,
         "title": "Main",
         "tooltip": "",
@@ -760,9 +744,7 @@
         "icon": "external link",
         "includeVars": false,
         "keepTime": false,
-        "tags": [
-          "cpms-analytics"
-        ],
+        "tags": ["cpms-analytics"],
         "targetBlank": false,
         "title": "Analytics",
         "tooltip": "",
@@ -774,9 +756,7 @@
         "icon": "external link",
         "includeVars": false,
         "keepTime": false,
-        "tags": [
-          "cpms-controls-settings"
-        ],
+        "tags": ["cpms-controls-settings"],
         "targetBlank": false,
         "title": "Controls & Settings",
         "tooltip": "",
@@ -786,9 +766,7 @@
     ],
     "liveNow": false,
     "preload": false,
-    "tags": [
-      "cpms", "cpms-controls-settings"
-    ],
+    "tags": ["cpms", "cpms-controls-settings"],
     "timeSettings": {
       "autoRefresh": "",
       "autoRefreshIntervals": [
